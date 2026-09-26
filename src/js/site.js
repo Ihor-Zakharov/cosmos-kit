@@ -7,7 +7,8 @@
  *   const site = bootSite();                        // главная: живая сцена, гаснет за героем
  *   bootSite({ page: 'inner' });                    // внутренняя страница: сцена спит с первого кадра
  *   bootSite({ accent: 'gold' });                   // ступень излучения: violet | ice | gold | ember (по умолчанию белая)
- *   bootSite({ plateUrl: 'img/my-plate.webp' });    // свой фон сцены (те же пропорции и точки привязки, что у plate.webp)
+ *   bootSite({ plateUrl: 'img/my-plate.webp' });    // свой фон сцены (те же пропорции и точки привязки, что у plate.webp);
+ *                                                   // без него на больших экранах высокой чёткости берётся plate-hd.webp
  *   site.toast('ok', 'Сохранено');                  // тон: '' | 'ok' | 'err'
  */
 import { createCosmos, attachSceneScroll } from './cosmos.js';
@@ -23,7 +24,10 @@ export function bootSite({ page = 'home', accent = null, plateUrl = null } = {})
   const wrap = $('cosmos-wrap'), canvas = $('cosmos');
   let cosmos = null;
   if (wrap && canvas) {
-    cosmos = createCosmos(canvas, { reduced, ...(plateUrl ? { plateUrl } : {}) });
+    // фон: на больших экранах высокой чёткости — plate-hd.webp (3342×1882, Real-ESRGAN ×2), на телефонах — лёгкий plate.webp
+    const hd = !matchMedia('(pointer: coarse)').matches && Math.max(screen.width, innerWidth) * devicePixelRatio >= 2400;
+    const plate = plateUrl || (hd ? new URL('../scene/plate-hd.webp', import.meta.url).href : null);
+    cosmos = createCosmos(canvas, { reduced, ...(plate ? { plateUrl: plate } : {}) });
     if (!cosmos.ok) wrap.classList.add('fallback');
     new ResizeObserver(() => cosmos.resize()).observe(wrap);
     if (accent && accent !== 'white') cosmos.setAccent(getComputedStyle(document.documentElement).getPropertyValue('--el-a').trim());
