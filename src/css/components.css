@@ -22,8 +22,27 @@
    Кнопки
    ============================================================ */
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: var(--r-m); font-weight: 500; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--ink); text-decoration: none;
+/* Движение кнопок — motion.js: attachButtons() (нажатие .97 / подъём 1.02 / магнит у раскалённых / фокус-вдох),
+   buttonState() (idle → busy → done без скачка ширины). Здесь — только то, что делает CSS: свет курсора по
+   поверхности (--mx/--my ставит attachPointerGlow) и переходы цвета. */
+.btn { position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: var(--r-m); font-weight: 500; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--ink); text-decoration: none;
   transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast), box-shadow var(--t-base) var(--ease-out); }
+/* свет курсора на плитных кнопках: мягкое пятно в точке указателя, проявляется при наведении */
+.btn:not(.primary):not(.solid)::after, .chip-btn::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: -1;
+  background: radial-gradient(90px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .12), transparent 70%); transition: opacity var(--t-base) var(--ease-out); }
+@media (hover: hover) { .btn:not(.primary):not(.solid):hover::after, .chip-btn:hover::after { opacity: 1; } }
+/* состояния busy/done (buttonState): подпись остаётся в потоке, поверх — спиннер или галочка, рисующая себя */
+.btn-label { display: inline-flex; align-items: center; gap: 8px; }
+.btn-fx { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; pointer-events: none; }
+.btn-fx > * { grid-area: 1 / 1; }
+.btn-spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; opacity: 0; animation: spin-ring .8s linear infinite; transition: opacity var(--t-fast); }
+.btn-check { width: 18px; height: 18px; stroke-width: 2.4; opacity: 0; }
+.btn-check path { stroke-dasharray: 24; stroke-dashoffset: 24; }
+.is-busy .btn-spin { opacity: .9; }
+.is-done .btn-check { opacity: 1; }
+.is-done .btn-check path { animation: draw-check .45s var(--ease-out) .05s forwards; }
+@keyframes draw-check { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .is-done .btn-check path { animation: none; stroke-dashoffset: 0; } .btn-spin { animation-duration: 1.6s; } }
 .btn svg { width: 16px; height: 16px; }
 .btn:not(.glass) { background: var(--s1); border: 1px solid var(--line-2); }
 .btn:not(.glass):not(.primary):not(.solid):hover { background: var(--s3); border-color: var(--line-3); }
@@ -36,10 +55,12 @@
 .btn.primary:hover:not(:disabled) { background: var(--white-hot); box-shadow: 0 0 0 1px #fff, 0 0 34px rgba(255, 255, 255, .5), 0 0 100px rgba(255, 255, 255, .2); }
 /* разрушительное действие — «красная плита»: тёмный текст на err (контраст держит текст, не белый) */
 .btn.solid.danger { color: #14040a; background: var(--err); border-color: transparent; box-shadow: 0 0 22px rgba(255, 95, 115, .28); }
+/* Правило: красная плита — только для необратимого разрушительного действия и только внутри подтверждения
+   (диалог), никогда в общем ряду кнопок. Обычное «удалить»/«очистить» — .btn с понятным текстом. */
 .btn.busy svg, .chip-btn.busy svg { animation: spin-ring 1s linear infinite; }
 @keyframes spin-ring { to { transform: rotate(270deg); } }
 
-.chip-btn { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: var(--r-m); text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--ink);
+.chip-btn { position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: var(--r-m); text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--ink);
   transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast); }
 .chip-btn:not(.glass) { background: var(--s1); border: 1px solid var(--line-2); }
 .chip-btn svg { width: 16px; height: 16px; }
@@ -91,11 +112,28 @@
 .switch:hover { color: var(--ink); }
 .switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .switch-track { position: relative; flex: none; width: 34px; height: 20px; border-radius: 7px; background: var(--s3); box-shadow: inset 0 0 0 1px var(--line-2); transition: background-color var(--t-base) var(--ease-out), box-shadow var(--t-base) var(--ease-out); }
-.switch-thumb { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 5px; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .4); transition: transform var(--t-base) var(--ease-out), width var(--t-fast) var(--ease-out); }
-.switch:active .switch-thumb { width: 17px; }
+/* ползунок — «капля» (motion.js: attachSwitches): растягивается по ходу и пружиной доезжает; transform ставит JS,
+   правило translateX ниже — запасное без JS */
+.switch-thumb { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 5px; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .4); transition: transform var(--t-base) var(--ease-out); will-change: transform; }
 .switch input:checked + .switch-track { background: color-mix(in oklab, var(--el-a) 85%, transparent); box-shadow: none; }
 .switch input:checked + .switch-track .switch-thumb { transform: translateX(14px); }
-.switch:active input:checked + .switch-track .switch-thumb { transform: translateX(11px); }
+@media (prefers-reduced-motion: reduce) { .switch-thumb, .switch-track { transition: none; } }
+
+/* чекбокс и радио (motion.js: attachChecks — хлопок коробки, точка радио с перелётом) */
+.check, .radio { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; color: var(--ink-2); user-select: none; width: fit-content; transition: color var(--t-fast) var(--ease-out); }
+.check:hover, .radio:hover { color: var(--ink); }
+.check input, .radio input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.check-box { position: relative; flex: none; width: 20px; height: 20px; border-radius: var(--r-xs); background: var(--s2); box-shadow: inset 0 0 0 1px var(--line-3); display: grid; place-items: center; transition: background-color var(--t-base) var(--ease-out), box-shadow var(--t-base) var(--ease-out); will-change: transform; }
+.check-box svg { width: 14px; height: 14px; stroke: #000; stroke-width: 2.6; }
+.check-box svg path { stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset .35s var(--ease-out); }
+.check input:checked + .check-box { background: var(--el-a); box-shadow: none; }
+.check input:checked + .check-box svg path { stroke-dashoffset: 0; }
+.check input:focus-visible + .check-box, .radio input:focus-visible + .radio-dot { outline: 2px solid var(--el-a); outline-offset: 3px; box-shadow: var(--focus-ring); }
+.check input:checked ~ span, .radio input:checked ~ span { color: var(--ink); }
+.radio-dot { position: relative; flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--s2); box-shadow: inset 0 0 0 1px var(--line-3); display: grid; place-items: center; transition: box-shadow var(--t-base) var(--ease-out); }
+.radio-dot i { display: block; width: 10px; height: 10px; border-radius: 50%; background: var(--el-a); box-shadow: var(--el-glow); transform: scale(0); will-change: transform; }
+.radio input:checked + .radio-dot { box-shadow: inset 0 0 0 1px var(--el-a); }
+.radio input:checked + .radio-dot i { transform: scale(1); }
 .switch input:focus-visible + .switch-track { outline: 2px solid var(--el-a); outline-offset: 2px; box-shadow: var(--focus-ring); }
 .switch-text { display: inline-flex; align-items: center; gap: 7px; }
 .switch-text svg { width: 16px; height: 16px; }
@@ -164,9 +202,13 @@
    Карточки (плиты со свечением по границе при выделении/наведении на цель drop)
    ============================================================ */
 
-.card { position: relative; display: block; padding: 18px; border: 1px solid var(--line-1); text-align: left; color: inherit; cursor: pointer; border-radius: var(--r-l); background: var(--s1);
-  transition: border-color .3s, background-color .3s, box-shadow .35s; }
+.card { position: relative; isolation: isolate; display: block; padding: 18px; border: 1px solid var(--line-1); text-align: left; color: inherit; cursor: pointer; border-radius: var(--r-l); background: var(--s1);
+  transition: border-color .3s, background-color .3s, box-shadow .35s; will-change: transform; }
 .card:hover { border-color: var(--line-2); background: var(--surface-2); }
+/* свет по поверхности карточки в точке курсора (--mx/--my от attachPointerGlow) + наклон к курсору (attachCards) */
+.card:not(.static)::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: -1;
+  background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .09), transparent 70%); transition: opacity var(--t-base) var(--ease-out); }
+@media (hover: hover) { .card:not(.static):hover::after { opacity: 1; } }
 .card.selected { border-color: var(--el-a); box-shadow: inset 0 0 0 1px var(--el-a); background: color-mix(in oklab, var(--el-a) 10%, var(--surface)); }
 .card.drop-target { border-color: var(--el-a); box-shadow: 0 0 0 1px var(--el-a), var(--el-glow); }
 .card-glyph { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-1); border-radius: var(--r-m); }
@@ -202,6 +244,23 @@
 .tnode .tn { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tnode .tc { flex: none; font: 500 11px/1 var(--font-mono); color: var(--ink-3); }
 .tkids { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; padding-left: 14px; }
+/* подсветка текущей строки переезжает к новой строке (motion.js: moveInk с .tree-ink, ось y) — как в «выдре» */
+.tree-nav { position: relative; }
+.tree-ink { position: absolute; left: 0; right: 0; top: 0; height: var(--h, 0px); transform: translateY(var(--y, 0)); border-radius: 9px; background: var(--surface-2); pointer-events: none; will-change: transform; }
+.tree-nav:has(.tree-ink) .tnode[aria-current="true"] { background: transparent; }
+.tree-nav:has(.tree-ink) .tnode { position: relative; z-index: 1; }
+
+/* раскрытие (motion.js: attachDisclosures): тело на grid-template-rows, шеврон и содержимое — на пружинах */
+.disclosure { border-top: 1px solid var(--line-1); }
+.disclosure:last-child { border-bottom: 1px solid var(--line-1); }
+.disclosure-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 16px 4px; text-align: left; font: 600 15.5px/1.3 var(--font-text); color: var(--ink); cursor: pointer; transition: color var(--t-fast); }
+.disclosure-head:hover { color: var(--ink); }
+.disclosure-chev { flex: none; width: 16px; height: 16px; color: var(--ink-3); will-change: transform; }
+.disclosure-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--t-base) var(--ease-out); }
+.disclosure.is-open .disclosure-body { grid-template-rows: 1fr; }
+.disclosure-inner { min-height: 0; overflow: hidden; }
+.disclosure-inner > * { margin: 0 0 16px; color: var(--ink-2); line-height: 1.55; font-size: 14.5px; padding: 0 4px; }
+@media (prefers-reduced-motion: reduce) { .disclosure-body { transition: none; } }
 
 /* ============================================================
    Крошки (breadcrumbs)
@@ -260,6 +319,13 @@
 .meter.breathing { animation: meter-breath 2.4s ease-in-out infinite; }
 @keyframes meter-breath { 50% { opacity: .55; } }
 
+/* «барабан» чисел (motion.js: odometer) — каждая цифра колонка 0–9 на translateY */
+.odometer { display: inline-flex; overflow: hidden; height: 1em; line-height: 1; font-family: var(--font-display); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.02em; vertical-align: bottom; }
+.odo-digit { position: relative; height: 1em; width: .62em; overflow: hidden; }
+.odo-col { position: absolute; left: 0; top: 0; display: grid; will-change: transform; }
+.odo-col i { display: block; height: 1em; font-style: normal; text-align: center; }
+.count { font-variant-numeric: tabular-nums; }
+
 /* точка «жив/активен» с дыханием */
 .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--el-a); animation: breathe 2.4s ease-in-out infinite; }
 @keyframes breathe { 50% { opacity: .45; } }
@@ -292,6 +358,7 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 /* хват для смахивания на телефоне (см. motion.js: attachSwipeToClose) */
 .grab { display: none; }
 
+/* появление/уход плит диалогов — motion.js: openDialog/closeDialog (пружины на transform/opacity), подложка — CSS */
 .modal { margin: auto; width: min(520px, calc(100vw - 32px)); }
 .modal-box { display: grid; padding: 24px; border-radius: var(--r-xl); background: var(--s-raised); border: 1px solid var(--line-2); box-shadow: var(--shadow); }
 .modal-box > .drawer-head { padding: 0 0 16px; }
@@ -413,8 +480,8 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
    «Остров» (.island): плавающая пилюля по центру с бренд-знаком, сегментными ссылками (.tab-ink) и
    действием. Для сайтов-приложений и одностраничников с 3–5 якорями; на телефоне остров не помещается —
    вместо него та же «линия» с кнопкой меню.
-   Активный пункт в обеих — цвет --ink и волосяная полоска излучения снизу (1px, слабое свечение):
-   это единственное излучение в навигации. Кнопка в навигации — обычная плита, не .primary:
+   Активный пункт: в «линии» — цвет --ink и волосяная полоска излучения снизу (1px, слабое свечение), в «острове» —
+   плашка .tab-ink. Один индикатор на элемент: где есть плашка, полоски нет. Кнопка в навигации — обычная плита, не .primary:
    раскалённое действие на первом экране — у героя.
    ============================================================ */
 
@@ -430,6 +497,10 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 .nav a:hover { color: var(--ink); background: var(--surface); }
 .nav a[aria-current="page"] { color: var(--ink); }
 .nav a[aria-current="page"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 3px; height: 1px; background: var(--el-a); box-shadow: 0 0 8px color-mix(in oklab, var(--el-a) 45%, transparent); }
+/* с JS полоска общая и едет между пунктами пружиной (moveInk c .nav-ink) — статичная тогда прячется */
+.nav { position: relative; }
+.nav-ink { position: absolute; left: 12px; bottom: 3px; height: 1px; width: calc(var(--w, 0px) - 24px); transform: translateX(var(--x, 0)); background: var(--el-a); box-shadow: 0 0 8px color-mix(in oklab, var(--el-a) 45%, transparent); pointer-events: none; }
+.nav:has(.nav-ink) a::after { display: none; }
 .topbar-actions { display: flex; align-items: center; gap: 8px; }
 .topbar .menu-btn { display: none; }
 
@@ -440,7 +511,7 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 .island .tabs { border: 0; background: transparent; padding: 0; }
 .island .tab { padding: 7px 12px; border-radius: 999px; }
 .island .tab-ink { top: 0; bottom: 0; border-radius: 999px; }
-.island .tab[aria-selected="true"]::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 3px; height: 1px; background: var(--el-a); box-shadow: 0 0 8px color-mix(in oklab, var(--el-a) 45%, transparent); }
+/* один индикатор активного пункта: у острова это плашка .tab-ink, полоска излучения — только у «линии» без плашки */
 .island .btn { border-radius: 999px; height: 34px; }
 
 @media (max-width: 680px) {
@@ -478,30 +549,38 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 .stat b { font: 600 24px/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
 .stat span { font: 500 11px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
 
+/* Правило композиции: всё по центру, кроме героя. Голова секции — центрированная колонка 640px с центрированным
+   текстом; исключения (длинный текст .prose, таблицы, формы, дерево/крошки — всё, что читается слева направо)
+   остаются левыми ВНУТРИ своей колонки, но сама колонка стоит по центру (.centered). Голова слева — .section-head.left,
+   только по острой необходимости (например, рядом с сайдбаром). */
 .section { padding: 96px var(--datum); }
 .section + .section { padding-top: 0; }
-.section-head { display: grid; gap: 12px; max-width: 640px; margin: 0 0 40px; }
+.section-head { display: grid; justify-items: center; text-align: center; gap: 12px; max-width: 640px; margin: 0 auto 40px; }
+.section-head.left { justify-items: start; text-align: left; margin-left: 0; }
+.section-head .kicker::before { display: none; }
+.section-head.left .kicker::before { display: block; }
+.centered { max-width: 760px; margin-left: auto; margin-right: auto; }
+.row-center { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; }
 .section-head h2 { margin: 0; font: 700 clamp(28px, 3.2vw, 40px)/1.1 var(--font-display); letter-spacing: -.03em; color: var(--ink); text-wrap: balance; }
 .section-head h2 code, .display code { font-size: .78em; font-weight: 500; padding: .04em .3em; letter-spacing: 0; vertical-align: .04em; }
 .section-head p { margin: 0; color: var(--ink-2); line-height: 1.55; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.prose { max-width: 640px; color: var(--ink-2); line-height: 1.6; }
+.prose { max-width: 640px; margin: 0 auto; color: var(--ink-2); line-height: 1.6; }
 .prose p { margin: 0 0 16px; }
 .prose strong { color: var(--ink); font-weight: 600; }
 .prose h3 { margin: 32px 0 10px; font: 600 20px/1.25 var(--font-display); letter-spacing: -.02em; color: var(--ink); }
 
-.site-footer { padding: 56px var(--datum) 32px; border-top: 1px solid var(--line-1); display: grid; gap: 40px; }
-.footer-grid { display: grid; grid-template-columns: 1.6fr repeat(3, minmax(0, 1fr)); gap: 32px; }
-.footer-about { display: grid; gap: 14px; align-content: start; max-width: 320px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
-.footer-col { display: grid; gap: 2px; align-content: start; }
+.site-footer { padding: 56px var(--datum) 32px; border-top: 1px solid var(--line-1); display: grid; gap: 40px; justify-items: center; text-align: center; }
+.footer-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px 64px; }
+.footer-about { display: grid; gap: 14px; justify-items: center; align-content: start; max-width: 360px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.footer-col { display: grid; gap: 2px; align-content: start; min-width: 120px; }
 .footer-col h5 { margin: 0 0 8px; font: 500 11px/1 var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-3); }
 .footer-col a { display: block; padding: 5px 0; color: var(--ink-2); font-size: 14px; text-decoration: none; transition: color var(--t-fast); }
 .footer-col a:hover { color: var(--ink); }
-.footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding-top: 20px; border-top: 1px solid var(--line-1); font: 500 11.5px/1.6 var(--font-mono); letter-spacing: .06em; color: var(--ink-3); }
+.footer-bottom { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 32px; width: 100%; padding-top: 20px; border-top: 1px solid var(--line-1); font: 500 11.5px/1.6 var(--font-mono); letter-spacing: .06em; color: var(--ink-3); }
 
 @media (max-width: 980px) {
   .grid-3 { grid-template-columns: 1fr; }
-  .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 680px) {
   html, body { overflow-x: hidden; }
@@ -516,6 +595,6 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
   .lead { font-size: 16px; }
   .section { padding: 64px var(--datum); }
   .section-head { margin-bottom: 28px; }
-  .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+  .footer-grid { gap: 24px 40px; }
   .site-footer { padding-top: 40px; }
 }

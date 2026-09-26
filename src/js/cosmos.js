@@ -12,7 +12,9 @@
 // (--bh-par, --bh-sea-persp, --bh-waves, --bh-mist, --bh-near, --bh-dust) и звёзд (--bh-specks, --bh-pair) в 0 дают
 // плоский вид без параллакса и без частиц — самый дешёвый режим.
 //
-// API: createCosmos(canvas, { reduced, seed, resScale, plateUrl }) — он же init(canvas, opts) —→
+// API: createCosmos(canvas, { reduced, seed, resScale, plateUrl, ringBrightness }) — он же init(canvas, opts) —→
+//   ringBrightness — яркость первого ореола (раскалённый пояс у кромки тени + фотонное кольцо); по умолчанию 0.88,
+//   1.0 = пиксель в пиксель как в v0.1.0. Внешнее гало, диск, отражение и звёзды не трогает. Переопределяется CSS-токеном --bh-ring.
 //   { ok, setAccent(hex, amt), setPointer(x, y), setScroll(v), setEnergy(v), pulse('go' | 'done'), pause(), resume(), resize(),
 //     readTokens(), destroy() } (+ setInvert для светлой темы — заготовка, см. DESIGN-TODO.md).
 //
@@ -67,6 +69,7 @@ uniform vec2  uFarAnchor;  // куда на холсте попадает точ
 uniform float uHasFar;     // 0..1 — план проявляется за 0,5 с после загрузки (без скачка)
 uniform float uExpo;       // появление сцены 0..1 (всё, кроме фотонного кольца)
 uniform float uExpoRing;   // появление фотонного кольца (раньше остального)
+uniform float uRing;       // яркость первого ореола: раскалённый пояс у кромки тени + фотонное кольцо, экранные значения (1.0 = как в v0.1.0)
 
 #define PI 3.14159265
 #define TAU 6.2831853
@@ -390,6 +393,10 @@ void main(){
   col = 1.0 - exp(-col * 1.25);
   col = pow(col, vec3(0.94));
   col *= uExpo;                                                    // появление: сначала кольцо, потом всё остальное
+  // первый ореол (раскалённый пояс у кромки тени, до ~1,1 ширины пояса, дальше плавно до 2 ширин) — в экранных
+  // значениях: HDR-множитель на насыщенном белом не виден, а здесь 0.88 честно даёт −12 % яркости обода.
+  // Внешнее гало (дальше 2 поясов), диск, плоскость и звёзды не задеты; uRing = 1.0 — ничего не меняет
+  col *= mix(1.0, uRing, smoothstep(0.0, 0.03, e) * (1.0 - smoothstep(band * 1.1, band * 2.0, e)));
 
   // ---------- ядро: сфера в контровом свете, не #000 (экранные значения) ----------
   float d = clamp(1.0 - b, 0.0, 1.0);
@@ -417,7 +424,7 @@ void main(){
   float ringR = exp(-pow((length(p - dCA * 0.6) - 1.0) / pw, 2.0));
   float ringG = exp(-pow((b - 1.0) / pw, 2.0));
   float ringB = exp(-pow((length(p + dCA * 0.6) - 1.0) / pw, 2.0));
-  vec3 ringC = vec3(ringR, ringG, ringB) * (1.05 + 0.20 * be) * (1.0 + 0.12 * uSwell) * uExpoRing;
+  vec3 ringC = vec3(ringR, ringG, ringB) * (1.05 + 0.20 * be) * (1.0 + 0.12 * uSwell) * uExpoRing * uRing;
   col = 1.0 - (1.0 - col) * (1.0 - clamp(ringC, 0.0, 1.0));
 
   // ---------- ближний план: расфокусированные частицы и клочья тумана — поверх всего, сильнее всех в параллаксе ----------
@@ -549,8 +556,9 @@ export function createCosmos(canvas, opts = {}) {
   for (const n of ['uRes', 'uH', 'uTime', 'uPar', 'uParAmt', 'uScroll', 'uC', 'uR', 'uHalo', 'uBand', 'uCA', 'uBeam', 'uBeamAmt', 'uLensE',
     'uTint', 'uTintAmt', 'uSwell', 'uEnergy', 'uFog', 'uRays', 'uPlane', 'uPlaneY', 'uFar', 'uStars', 'uFlare',
     'uInner', 'uFib', 'uPersp', 'uWaves', 'uMist', 'uNear', 'uDust', 'uSpecks', 'uPairA', 'uPairS', 'uInvert', 'uSeed', 'uFarTex', 'uFarMap', 'uFarAnchor', 'uHasFar',
-    'uExpo', 'uExpoRing']) U[n] = gl.getUniformLocation(prog, n);
+    'uExpo', 'uExpoRing', 'uRing']) U[n] = gl.getUniformLocation(prog, n);
   const seed = opts.seed ?? 0.37;
+  const ringDefault = opts.ringBrightness ?? 0.88;   // 1.0 = как в v0.1.0
   api.ok = true;
 
   // текстура дальнего плана: грузится асинхронно (index.html её предзагружает), до загрузки сцена рисуется без неё,
@@ -596,6 +604,7 @@ export function createCosmos(canvas, opts = {}) {
       specks: num(cs, '--bh-specks', DEF.specks), specksN: num(cs, '--bh-specks-n', DEF.specksN),
       specksHue: num(cs, '--bh-specks-hue', DEF.specksHue), specksPar: num(cs, '--bh-specks-par', DEF.specksPar),
       pair: num(cs, '--bh-pair', DEF.pair), pairPar: num(cs, '--bh-pair-par', DEF.pairPar),
+      ring: num(cs, '--bh-ring', ringDefault),
     };
     const key = JSON.stringify(n);
     if (key === tokKey) return false;
@@ -672,6 +681,7 @@ export function createCosmos(canvas, opts = {}) {
     gl.uniform1f(U.uHasFar, api._far);
     gl.uniform1f(U.uExpo, api._expo);
     gl.uniform1f(U.uExpoRing, api._expoRing);
+    gl.uniform1f(U.uRing, tok.ring ?? ringDefault);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
   const ease = (cur, target, dt, tau) => cur + (target - cur) * Math.min(1, dt / tau);

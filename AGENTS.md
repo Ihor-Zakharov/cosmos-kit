@@ -29,12 +29,15 @@
 - `src/js/cosmos.js` — фон «чёрная дыра» (WebGL-шейдер), самодостаточный модуль:
   `createCosmos(canvas, opts)` / алиас `init(canvas, opts)`; `attachSceneScroll(api, {hero, wrap})` —
   поведение при прокрутке.
-- `src/js/motion.js` — пружинная физика (`Spring`, `Motion`, `enter`/`exit`, `pressable`, `flip`)
-  + хелперы `attachPointerGlow`, `moveInk`, `attachSwipeToClose`.
+- `src/js/motion.js` — пружинная физика (`Spring`, `Motion`, `enter`/`exit`, `flip`) + механика интерфейса:
+  `attachButtons`, `buttonState`, `attachSwitches`, `attachChecks`, `attachDisclosures`, `attachCards`,
+  `openDialog`/`closeDialog`, `pushToast`, `countTo`/`odometer`, `moveInk` («капля»), `attachPointerGlow`, `attachSwipeToClose`.
+- `src/css/kosmos.css` + `src/js/kosmos.js` — необязательные: три компонента по мотивам KOCMOC (глифы, пульс, HUD).
 - `src/fonts/` — Geologica, Onest, Unbounded, JetBrains Mono (Google Fonts, OFL) + `fonts.css`.
 - `src/icons/sprite.svg` — общие UI-глифы (без брендов платформ).
 - `src/scene/plate.webp` — текстура дальнего плана для сцены чёрной дыры.
-- `demo/index.html` — витрина всего кита живьём.
+- `demo/` — витрина: `index.html` (сайт + каталог), `motion.html` («Движение» — живые образцы с параметрами пружин),
+  `kosmos.html`; общие `demo.css`/`demo.js`.
 - `.agents/skills/cosmos-site/SKILL.md` — воркфлоу «сделать новый сайт в этом стиле».
 - `DESIGN-TODO.md` — журнал дизайнерских решений: что решено (и где искать), что отложено
   (светлая тема), что открыто.

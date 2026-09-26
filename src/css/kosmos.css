@@ -1,0 +1,76 @@
+/* cosmos-kit — kosmos.css: три компонента по мотивам уровня KOCMOC (Geometry Dash, ремейк Neiro «RTX: ON»).
+   Необязательный файл — подключать после components.css там, где они нужны. Из уровня взято только то, что
+   ложится в дисциплину кита (монохром, цвет только в излучении, спокойный тон); неоновые зигзаги, шары со шлейфом,
+   вспышки и глитч рассмотрены и отклонены — см. DESIGN-TODO.md §10.
+     · линейные глифы, у которых свет принадлежит линии   → .glyph + символы k-* в sprite.svg, .spikes (ряд шипов-разделитель)
+     · пульс «в такт»                                       → .pulse-host/.pulse-ring + kosmos.js: pulse()
+     · HUD-панель финального экрана                          → .hud: рамка с уголками, тихая развёртка, кикер и заголовок,
+                                                              терминальный список с отточиями, кольцо-индикатор с барабаном
+   Цвет приходит только через data-accent — на <html> (весь сайт) или на самом блоке (только HUD в «углях», например).
+   Движение — src/js/kosmos.js, всё на пружинах motion.js, только transform и opacity. */
+
+/* ---------- свет, принадлежащий линии ---------- */
+.k-light { --k-glow: color-mix(in oklab, var(--el-a) 70%, transparent); filter: drop-shadow(0 0 3px var(--k-glow)) drop-shadow(0 0 10px color-mix(in oklab, var(--el-a) 28%, transparent)); }
+
+/* ---------- глифы: тонкая белая линия + свет линии ---------- */
+.glyph { display: inline-grid; place-items: center; color: var(--ink); --k-glow: color-mix(in oklab, var(--el-a) 70%, transparent); }
+.glyph svg { width: 48px; height: 48px; stroke-width: 1.6; filter: drop-shadow(0 0 3px var(--k-glow)) drop-shadow(0 0 9px color-mix(in oklab, var(--el-a) 25%, transparent)); }
+.glyph.small svg { width: 28px; height: 28px; stroke-width: 1.8; }
+.glyph.large svg { width: 72px; height: 72px; stroke-width: 1.3; }
+.glyph.dim { color: var(--ink-3); }
+.glyph.dim svg { filter: none; }
+.glyph.spin svg { animation: glyph-spin 14s linear infinite; }
+.glyph.spin.fast svg { animation-duration: 6s; }
+@keyframes glyph-spin { to { transform: rotate(360deg); } }
+/* ряд шипов: повторяющийся треугольник как разделитель/декор (маска — только линия) */
+.spikes { height: 14px; background: color-mix(in oklab, var(--ink) 55%, transparent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 14'%3E%3Cpath d='M1 13 12 1.5 23 13' fill='none' stroke='%23000' stroke-width='1.4' stroke-linejoin='round'/%3E%3C/svg%3E") 0 0 / 24px 14px repeat-x;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 14'%3E%3Cpath d='M1 13 12 1.5 23 13' fill='none' stroke='%23000' stroke-width='1.4' stroke-linejoin='round'/%3E%3C/svg%3E") 0 0 / 24px 14px repeat-x; }
+
+/* ---------- пульс «в такт» ---------- */
+.pulse-host { position: relative; display: inline-grid; place-items: center; }
+.pulse-ring { position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid var(--el-a); box-shadow: 0 0 10px color-mix(in oklab, var(--el-a) 60%, transparent); pointer-events: none; opacity: 0; will-change: transform, opacity; }
+.beat-dot { width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: var(--white-glow); will-change: transform; }
+
+/* ---------- HUD ---------- */
+.hud { position: relative; isolation: isolate; padding: 28px 32px 24px; border-radius: 4px; color: var(--ink); background: linear-gradient(180deg, color-mix(in oklab, var(--el-a) 6%, var(--s1)), var(--s1) 60%); overflow: hidden; }
+/* рамка с уголками: тонкая линия излучения и четыре скобки */
+.hud::before { content: ""; position: absolute; inset: 10px; border: 1px solid color-mix(in oklab, var(--el-a) 35%, transparent); pointer-events: none; }
+.hud-corner { position: absolute; width: 14px; height: 14px; border: 2px solid var(--el-a); pointer-events: none; box-shadow: 0 0 6px color-mix(in oklab, var(--el-a) 55%, transparent); }
+.hud-corner.tl { left: 6px; top: 6px; border-right: 0; border-bottom: 0; }
+.hud-corner.tr { right: 6px; top: 6px; border-left: 0; border-bottom: 0; }
+.hud-corner.bl { left: 6px; bottom: 6px; border-right: 0; border-top: 0; }
+.hud-corner.br { right: 6px; bottom: 6px; border-left: 0; border-top: 0; }
+/* развёртка: горизонтальные строки + бегущая полоса */
+.hud-scan { position: absolute; inset: 0; pointer-events: none; z-index: -1; opacity: .5;
+  background: repeating-linear-gradient(180deg, transparent 0 3px, color-mix(in oklab, var(--el-a) 5%, transparent) 3px 4px); }
+.hud-kicker { margin: 0 0 6px; font: 500 10.5px/1 var(--font-mono); letter-spacing: .3em; text-transform: uppercase; color: color-mix(in oklab, var(--el-a) 75%, var(--ink-3)); }
+/* заголовок: широкий дисплейный (Unbounded), свет в тексте — только мягкая тень цвета излучения; без глитча */
+.hud-title { position: relative; margin: 0 0 18px; font: 700 clamp(30px, 4.6vw, 52px)/1 var(--font-brand); letter-spacing: .06em; text-transform: uppercase; color: var(--ink); text-shadow: 0 0 18px color-mix(in oklab, var(--el-a) 40%, transparent); }
+.hud-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 40px; align-items: center; }
+/* терминальный список: ключ … значение, строки печатаются по очереди (kosmos.js: hudType) */
+.hud-list { margin: 0; display: grid; gap: 6px; font: 500 12px/1.5 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.hud-list div { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.hud-list dt { color: var(--ink-3); white-space: nowrap; }
+.hud-list div::before { content: ""; order: 2; flex: 1; min-width: 12px; border-bottom: 1px dotted var(--line-3); translate: 0 -3px; }
+.hud-list dd { order: 3; margin: 0; color: var(--ink); white-space: nowrap; }
+.hud-list dd.lit { color: var(--el-a); text-shadow: 0 0 8px color-mix(in oklab, var(--el-a) 60%, transparent); }
+.hud-list .typing { opacity: 0; }
+/* кольцо-индикатор: дуга по --p, свет линии; число — барабан */
+.hud-ring { position: relative; width: 132px; height: 132px; display: grid; align-content: center; justify-items: center; gap: 5px; padding-bottom: 3px; }
+.hud-ring > svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.hud-ring circle { fill: none; stroke-width: 2; }
+.hud-ring .track { stroke: var(--line-2); }
+.hud-ring .arc { stroke: var(--el-a); stroke-linecap: round; stroke-dasharray: 100 100; stroke-dashoffset: calc(100 - var(--p, 0) * 100); filter: drop-shadow(0 0 4px color-mix(in oklab, var(--el-a) 70%, transparent)); }
+.hud-ring .ticks { stroke: var(--line-3); stroke-dasharray: .35 3.65; stroke-width: 4; }
+.hud-ring b { position: relative; font: 600 30px/1 var(--font-display); letter-spacing: -.02em; }
+.hud-ring b small { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; margin-left: 2px; color: var(--ink-3); }
+/* подпись под числом, число+подпись — единой группой по оптическому центру кольца, с полем до пунктира */
+.hud-ring .hud-label { position: relative; font: 500 9.5px/1 var(--font-mono); letter-spacing: .24em; text-transform: uppercase; color: var(--ink-3); }
+
+@media (max-width: 680px) {
+  .hud { padding: 22px 18px 18px; }
+  .hud-grid { grid-template-columns: 1fr; justify-items: center; }
+  .hud-list { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .glyph.spin svg { animation: none; } }

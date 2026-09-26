@@ -9,29 +9,7 @@
 <link rel="stylesheet" href="../src/fonts/fonts.css">
 <link rel="stylesheet" href="../src/css/tokens.css">
 <link rel="stylesheet" href="../src/css/components.css">
-<style>
-  /* стили самой витрины (не часть кита): каталог компонентов, сцена для острова, свотчи акцентов */
-  .catalog { display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; }
-  .catalog .field { max-width: 760px; }
-  .demo-section { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
-  .demo-section h3 { margin: 0; font: 600 12px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
-  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-  .demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-  .demo-note { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-3); max-width: 640px; }
-  .demo-stage { position: relative; display: grid; place-items: center; min-height: 120px; padding: 24px 16px; border-radius: var(--r-l); border: 1px dashed var(--line-2); overflow: hidden; }
-  .demo-stage .island { max-width: 100%; }
-  .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
-  .swatch { display: grid; gap: 10px; justify-items: start; padding: 14px 16px 12px; min-width: 132px; border-radius: var(--r-l); border: 1px solid var(--line-1); background: var(--s1); text-align: left; color: var(--ink-2); font-size: 13.5px; font-weight: 500;
-    transition: border-color var(--t-fast), background-color var(--t-fast), color var(--t-fast); }
-  .swatch:hover { border-color: var(--line-2); background: var(--s2); color: var(--ink); }
-  .swatch[aria-pressed="true"] { border-color: var(--line-3); color: var(--ink); }
-  .swatch i { display: block; width: 100%; height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--a), var(--b)); box-shadow: 0 0 10px color-mix(in oklab, var(--a) 45%, transparent); }
-  .swatch small { font: 500 10.5px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
-  .drawer-links { display: grid; gap: 2px; }
-  .drawer-links a { display: block; padding: 11px 12px; border-radius: var(--r-m); color: var(--ink-2); font-size: 16px; font-weight: 500; text-decoration: none; }
-  .drawer-links a:hover, .drawer-links a[aria-current="page"] { color: var(--ink); background: var(--surface-2); }
-  @media (max-width: 680px) { .catalog { gap: 40px; } .swatch { min-width: calc(50% - 4px); } .demo-stage .island .btn, .demo-stage .island .brand span { display: none; } .demo-stage .island { padding-left: 10px; } }
-</style>
+<link rel="stylesheet" href="demo.css">
 </head>
 <body>
   <!-- фон-сцена: одна на сайт, fixed, под всем содержимым; поведение при прокрутке — attachSceneScroll (cosmos.js) -->
@@ -42,19 +20,7 @@
   </div>
 
   <!-- навигация «линия»: прозрачная над героем, плита после прокрутки -->
-  <header class="topbar" id="topbar">
-    <a class="brand" href="#top"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>cosmos</a>
-    <nav class="nav" aria-label="Разделы">
-      <a href="#language" aria-current="page">Язык</a>
-      <a href="#accents">Акценты</a>
-      <a href="#components">Компоненты</a>
-      <a href="#scene">Сцена</a>
-    </nav>
-    <div class="topbar-actions">
-      <a class="btn small" href="#connect">Подключить</a>
-      <button class="icon-btn menu-btn" id="open-menu" type="button" aria-label="Меню"><svg><use href="../src/icons/sprite.svg#i-menu"/></svg></button>
-    </div>
-  </header>
+  <header class="topbar" id="topbar"></header>
 
   <div class="site" id="top">
     <!-- герой: колонка текста слева, дыра справа. Единственное раскалённое действие экрана — .btn.primary -->
@@ -69,10 +35,10 @@
           <a class="btn" href="#connect">Как подключить</a>
         </div>
         <div class="hero-stats">
-          <div class="stat"><b>4</b><span>шрифта · OFL</span></div>
-          <div class="stat"><b>47</b><span>глифов в спрайте</span></div>
-          <div class="stat"><b>5</b><span>ступеней излучения</span></div>
-          <div class="stat"><b>0</b><span>зависимостей</span></div>
+          <div class="stat"><b class="count" data-to="4">0</b><span>шрифта · OFL</span></div>
+          <div class="stat"><b class="count" data-to="47">0</b><span>глифов в спрайте</span></div>
+          <div class="stat"><b class="count" data-to="5">0</b><span>ступеней излучения</span></div>
+          <div class="stat"><b class="count" data-to="0">0</b><span>зависимостей</span></div>
         </div>
       </div>
     </section>
@@ -155,12 +121,19 @@
             <button class="btn primary">Основное действие</button>
             <button class="btn">Обычная</button>
             <button class="glass btn">Плита</button>
-            <button class="btn solid danger">Опасно</button>
             <button class="btn" disabled>Недоступна</button>
             <button class="chip-btn"><svg><use href="../src/icons/sprite.svg#i-download"/></svg>Скачать копию</button>
             <button class="icon-btn glass" aria-label="Настройки"><svg><use href="../src/icons/sprite.svg#i-sliders"/></svg></button>
             <button class="text-btn"><svg><use href="../src/icons/sprite.svg#i-keyboard"/></svg>клавиши</button>
           </div>
+        </div>
+
+        <div class="demo-section">
+          <h3>Разрушительное действие</h3>
+          <div class="demo-row">
+            <button class="btn" data-open="#danger-modal">Удалить проект…</button>
+          </div>
+          <p class="demo-note">Красная плита — только внутри подтверждения необратимого действия, никогда в общем ряду. Само действие в интерфейсе — обычная кнопка с честным текстом; опасность передаёт текст и подтверждение.</p>
         </div>
 
         <div class="demo-section">
@@ -253,8 +226,8 @@
         <div class="demo-section">
           <h3>Диалоги, тосты</h3>
           <div class="demo-row">
-            <button class="btn" id="open-modal">Модальное окно</button>
-            <button class="btn" id="open-drawer">Шторка</button>
+            <button class="btn" data-open="#demo-modal">Модальное окно</button>
+            <button class="btn" data-open="#demo-drawer">Шторка</button>
             <button class="btn" id="fire-toast-ok">Тост: успех</button>
             <button class="btn" id="fire-toast-err">Тост: ошибка</button>
           </div>
@@ -340,6 +313,17 @@
     </div>
   </dialog>
 
+  <dialog class="modal" id="danger-modal">
+    <div class="modal-box" tabindex="-1">
+      <header class="drawer-head">
+        <div><p class="drawer-kicker"><svg><use href="../src/icons/sprite.svg#i-warn"/></svg>Необратимо</p><h3>Удалить проект «Выдра»?</h3></div>
+        <button class="icon-btn" data-close type="button" aria-label="Закрыть"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button>
+      </header>
+      <p class="modal-text">Будут удалены 48 файлов и история загрузок. Восстановить не получится.</p>
+      <div class="btn-row modal-actions"><button class="btn" data-close type="button">Оставить</button><button class="btn solid danger" data-close type="button">Удалить навсегда</button></div>
+    </div>
+  </dialog>
+
   <dialog class="drawer" id="demo-drawer">
     <div class="drawer-box" tabindex="-1">
       <div class="grab" aria-hidden="true"></div>
@@ -362,9 +346,7 @@
         <button class="icon-btn" data-close type="button" aria-label="Закрыть"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button>
       </header>
       <div class="drawer-scroll">
-        <nav class="drawer-links">
-          <a href="#language" data-close>Язык</a><a href="#accents" data-close>Акценты</a><a href="#components" data-close>Компоненты</a><a href="#scene" data-close>Сцена</a><a href="#connect" data-close>Подключить</a>
-        </nav>
+        <nav class="drawer-links"></nav>
       </div>
     </div>
   </dialog>
@@ -372,60 +354,18 @@
   <div class="toasts" id="toasts" aria-live="polite"></div>
 
   <script type="module">
-    import { createCosmos, attachSceneScroll } from '../src/js/cosmos.js';
-    import { pressable, attachPointerGlow, moveInk, enter, attachSwipeToClose } from '../src/js/motion.js';
-
-    const reducedQuery = matchMedia('(prefers-reduced-motion: reduce)');
-    const wrap = document.getElementById('cosmos-wrap');
-    const canvas = document.getElementById('cosmos');
-    const cosmosApi = createCosmos(canvas, { reduced: reducedQuery.matches });
-    window.cosmosApi = cosmosApi; // для консоли — см. секцию «Сцена»
-    if (!cosmosApi.ok) wrap.classList.add('fallback');
-    new ResizeObserver(() => cosmosApi.resize()).observe(wrap);
-    window.addEventListener('pointermove', (e) => {
-      if (e.pointerType && e.pointerType !== 'mouse') return;
-      cosmosApi.setPointer((e.clientX / innerWidth - 0.5) * 2, (e.clientY / innerHeight - 0.5) * -2);
-    }, { passive: true });
-    // сцена при прокрутке: живая → за горизонтом (см. components.css «Фон-сцена»)
+    import { boot, shell, wireSegmented } from './demo.js';
+    shell('index');
+    import('../src/js/motion.js').then(({ countTo }) => document.querySelectorAll('.hero-stats .count').forEach((el, i) => setTimeout(() => countTo(el, +el.dataset.to, { response: 1.4 }), 600 + i * 120)));
     const hero = document.getElementById('hero');
-    const sceneScroll = attachSceneScroll(cosmosApi, { hero, wrap });
+    const { api: cosmosApi, wrap, toast } = boot({ hero });
+    const reducedQuery = matchMedia('(prefers-reduced-motion: reduce)');
 
-    // навигация «линия»: плита после первых 40px прокрутки; активный пункт — по секции в верхней трети окна
-    const topbar = document.getElementById('topbar');
-    const links = [...document.querySelectorAll('.topbar .nav a')];
-    const targets = links.map((a) => document.querySelector(a.getAttribute('href')));
-    let navRaf = 0;
-    const syncNav = () => {
-      navRaf = 0;
-      topbar.classList.toggle('solid', scrollY > 40);
-      const line = innerHeight * 0.34;
-      let cur = 0;
-      targets.forEach((t, i) => { if (t && t.getBoundingClientRect().top <= line) cur = i; });
-      links.forEach((a, i) => { if (i === cur) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-    };
-    addEventListener('scroll', () => { if (!navRaf) navRaf = requestAnimationFrame(syncNav); }, { passive: true });
-    syncNav();
-
-    attachPointerGlow(document, '.glass, .field-body');
-    pressable(document, '.btn, .chip-btn, .icon-btn, .tab, .pills button, .card:not(.static), .crumb, .text-btn, .pager-btn, .swatch', { scale: 0.97 });
-    pressable(document, '.go-btn, .field-body', { scale: 0.99 });
-
-    // сегментированные переключатели: кликом переключаем aria-checked/aria-selected и двигаем плашку
-    function wireSegmented(root, attr, onChange) {
-      const items = [...root.querySelectorAll(`[${attr}]`)];
-      const setActive = (el) => {
-        items.forEach((it) => it.setAttribute(attr, it === el ? 'true' : 'false'));
-        moveInk(root, el);
-      };
-      items.forEach((it) => it.addEventListener('click', () => { setActive(it); onChange?.(it); }));
-      requestAnimationFrame(() => setActive(items.find((it) => it.getAttribute(attr) === 'true') || items[0]));
-      new ResizeObserver(() => setActive(items.find((it) => it.getAttribute(attr) === 'true'))).observe(root);
-    }
     wireSegmented(document.getElementById('demo-tabs'), 'aria-selected');
     wireSegmented(document.getElementById('demo-pills'), 'aria-checked');
     wireSegmented(document.getElementById('demo-island').querySelector('.tabs'), 'aria-selected');
 
-    // ось акцентов (tokens.css: :root[data-accent]) — сцена перекрашивается в тот же --el-a
+    // ось акцентов (tokens.css: [data-accent]) — сцена перекрашивается в тот же --el-a
     const swatches = [...document.querySelectorAll('.swatch')];
     swatches.forEach((btn) => btn.addEventListener('click', () => {
       const v = btn.dataset.accent;
@@ -435,55 +375,31 @@
       cosmosApi.setAccent(getComputedStyle(document.documentElement).getPropertyValue('--el-a').trim(), 1);
     }));
 
-    // композиции дыры: токены на обёртке; герой «ось» — текст под дырой по центру
+    // композиции дыры: токены на обёртке; герой «ось» — текст над дырой по центру
+    const sceneScroll = () => dispatchEvent(new Event('scroll'));
     wireSegmented(document.getElementById('comp-pills'), 'aria-checked', (it) => {
       wrap.dataset.comp = it.dataset.comp;
       hero.classList.toggle('axis', it.dataset.comp === 'center');
       hero.classList.toggle('short', it.dataset.comp === 'far');
-      cosmosApi.resize();
-      sceneScroll();
+      cosmosApi.resize(); sceneScroll();
       document.getElementById('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' });
     });
-
-    // состояние «спит»
     document.getElementById('toggle-asleep').addEventListener('click', (e) => {
       const asleep = wrap.classList.toggle('asleep');
       if (asleep) cosmosApi.pause(); else cosmosApi.resume();
+      e.currentTarget.querySelector('.btn-label')?.remove();
       e.currentTarget.textContent = asleep ? 'Сцена: разбудить' : 'Сцена: усыпить';
       if (asleep) document.getElementById('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' });
     });
-
     document.getElementById('toggle-motion').addEventListener('click', (e) => {
       document.documentElement.classList.toggle('motion-off');
       e.target.textContent = document.documentElement.classList.contains('motion-off') ? 'Reduced motion: включён' : 'Reduced motion: авто';
     });
-
-    // диалоги
-    document.querySelectorAll('dialog').forEach((dlg) => {
-      dlg.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => dlg.close()));
-      dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
-      attachSwipeToClose(dlg);
-    });
-    document.getElementById('open-modal').addEventListener('click', () => document.getElementById('demo-modal').showModal());
-    document.getElementById('open-drawer').addEventListener('click', () => document.getElementById('demo-drawer').showModal());
-    document.getElementById('open-menu').addEventListener('click', () => document.getElementById('menu-drawer').showModal());
-
-    // тосты
-    function toast(kind, text) {
-      const el = document.createElement('div');
-      el.className = `toast ${kind}`;
-      el.innerHTML = `<span class="ti"><svg><use href="../src/icons/sprite.svg#${kind === 'ok' ? 'i-check' : 'i-alert'}"/></svg></span><span class="tt">${text}</span>`;
-      document.getElementById('toasts').append(el);
-      enter(el, { dy: 20, response: 0.5 });
-      setTimeout(() => el.remove(), 3200);
-    }
     document.getElementById('fire-toast-ok').addEventListener('click', () => toast('ok', 'Готово'));
     document.getElementById('fire-toast-err').addEventListener('click', () => toast('err', 'Не получилось'));
-
     document.getElementById('pulse-go').addEventListener('click', () => cosmosApi.pulse('go'));
     document.getElementById('energy-up').addEventListener('click', () => cosmosApi.setEnergy(1));
     document.getElementById('energy-down').addEventListener('click', () => cosmosApi.setEnergy(0));
-
     document.getElementById('demo-field').addEventListener('submit', (e) => e.preventDefault());
   </script>
 </body>

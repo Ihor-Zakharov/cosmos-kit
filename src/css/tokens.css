@@ -78,6 +78,7 @@
   color-scheme: dark;
   transition: --el-a var(--t-scene) var(--ease-out), --el-b var(--t-scene) var(--ease-out);
 }
+[data-accent] { transition: --el-a var(--t-scene) var(--ease-out), --el-b var(--t-scene) var(--ease-out); }
 
 /* ---------- акцентная ось: ТЕМПЕРАТУРА ИЗЛУЧЕНИЯ ----------
    Единственный цвет мира — свет, который излучает дыра, а у света есть одна ось: температура.
@@ -89,12 +90,13 @@
    На одном экране — не больше двух ступеней, и одна из них белая. Зелёного и розового на оси нет
    нарочно: зелёный занят --ok, розово-красный — --err; у них семантика, а не температура.
    --el-a — сам свет, --el-b — его хвост в градиенте (чуть холоднее или тусклее, никогда другой оттенок).
-   Ступень применяется на <html data-accent="…">; при смене сцена перекрашивается через cosmosApi.setAccent(--el-a). */
-:root[data-accent="violet"] { --el-a: #b49cff; --el-b: #7d6cf5; }   /* ультрафиолет — самый горячий край */
-:root[data-accent="ice"]    { --el-a: #a9ccff; --el-b: #e4eeff; }   /* голубовато-белый, «лёд» */
-:root[data-accent="white"]  { --el-a: #ffffff; --el-b: #d6d6d6; }   /* = по умолчанию, явная форма */
-:root[data-accent="gold"]   { --el-a: #ffc76a; --el-b: #ff9a3c; }   /* тёплый: жёлтый карлик → оранжевый */
-:root[data-accent="ember"]  { --el-a: #ff9448; --el-b: #ff5a3c; }   /* угли — самый холодный край, не путать с --err */
+   Ступень применяется на <html data-accent="…"> — весь сайт; или на любом элементе — только его поддерево (например,
+   HUD в «углях» на белой странице). При смене на <html> сцена перекрашивается через cosmosApi.setAccent(--el-a). */
+[data-accent="violet"] { --el-a: #b49cff; --el-b: #7d6cf5; }   /* ультрафиолет — самый горячий край */
+[data-accent="ice"]    { --el-a: #a9ccff; --el-b: #e4eeff; }   /* голубовато-белый, «лёд» */
+[data-accent="white"]  { --el-a: #ffffff; --el-b: #d6d6d6; }   /* = по умолчанию, явная форма */
+[data-accent="gold"]   { --el-a: #ffc76a; --el-b: #ff9a3c; }   /* тёплый: жёлтый карлик → оранжевый */
+[data-accent="ember"]  { --el-a: #ff9448; --el-b: #ff5a3c; }   /* угли — самый холодный край, не путать с --err */
 
 /* ---------- светлая тема — ЗАГОТОВКА, ОТЛОЖЕНА ----------
    В «выдре» отключена намеренно; правила перенесены как есть, НЕ проверены и не являются готовым
@@ -145,7 +147,7 @@ a { color: inherit; }
 code { font-family: var(--font-mono); font-size: .9em; padding: .1em .4em; border-radius: var(--r-xs); background: var(--s2); }
 kbd { display: inline-block; min-width: 22px; padding: 2px 6px; border-radius: var(--r-xs); border: 1px solid var(--line-2); background: var(--s2); font: 500 11.5px/1.4 var(--font-mono); color: var(--ink-2); text-align: center; }
 [hidden] { display: none !important; }
-:focus-visible { outline: 2px solid var(--el-a); outline-offset: 2px; border-radius: var(--r-s); box-shadow: var(--focus-ring); }
+:focus-visible { outline: 2px solid var(--el-a); outline-offset: 3px; border-radius: var(--r-s); box-shadow: var(--focus-ring); transition: outline-offset var(--t-fast) var(--ease-out), box-shadow var(--t-base) var(--ease-out); }
 ::selection { background: color-mix(in oklab, var(--el-a) 40%, transparent); }
 .num, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
