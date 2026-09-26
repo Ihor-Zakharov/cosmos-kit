@@ -51,7 +51,7 @@ export function boot({ hero = null } = {}) {
 
   // механика компонентов — по одному вызову на страницу
   attachButtons(document);
-  attachPointerGlow(document, '.glass, .field-body, .btn, .chip-btn, .card');
+  attachPointerGlow(document);   // только .field-body и [data-glow] — свет курсора это акцент, не фон для каждой кнопки
   attachSwitches(document);
   attachChecks(document);
   attachDisclosures(document);

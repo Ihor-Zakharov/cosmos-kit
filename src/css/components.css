@@ -27,10 +27,11 @@
    поверхности (--mx/--my ставит attachPointerGlow) и переходы цвета. */
 .btn { position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: var(--r-m); font-weight: 500; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--ink); text-decoration: none;
   transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast), box-shadow var(--t-base) var(--ease-out); }
-/* свет курсора на плитных кнопках: мягкое пятно в точке указателя, проявляется при наведении */
-.btn:not(.primary):not(.solid)::after, .chip-btn::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: -1;
+/* свет курсора — только по явному [data-glow] (правило: 1–3 элемента на экран — главное поле, главная карточка;
+   не для рядовых кнопок в ряду, списков и навигации). Мягкое пятно в точке указателя, проявляется при наведении */
+.btn[data-glow]::after, .chip-btn[data-glow]::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: -1;
   background: radial-gradient(90px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .12), transparent 70%); transition: opacity var(--t-base) var(--ease-out); }
-@media (hover: hover) { .btn:not(.primary):not(.solid):hover::after, .chip-btn:hover::after { opacity: 1; } }
+@media (hover: hover) { .btn[data-glow]:hover::after, .chip-btn[data-glow]:hover::after { opacity: 1; } }
 /* состояния busy/done (buttonState): подпись остаётся в потоке, поверх — спиннер или галочка, рисующая себя */
 .btn-label { display: inline-flex; align-items: center; gap: 8px; }
 .btn-fx { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; pointer-events: none; }
@@ -205,12 +206,14 @@
 .card { position: relative; isolation: isolate; display: block; padding: 18px; border: 1px solid var(--line-1); text-align: left; color: inherit; cursor: pointer; border-radius: var(--r-l); background: var(--s1);
   transition: border-color .3s, background-color .3s, box-shadow .35s; will-change: transform; }
 .card:hover { border-color: var(--line-2); background: var(--surface-2); }
-/* свет по поверхности карточки в точке курсора (--mx/--my от attachPointerGlow) + наклон к курсору (attachCards) */
-.card:not(.static)::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: -1;
+/* свет по поверхности карточки в точке курсора — только у .card[data-glow] (главная карточка экрана); наклон (attachCards) — у всех */
+.card[data-glow]::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: -1;
   background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .09), transparent 70%); transition: opacity var(--t-base) var(--ease-out); }
-@media (hover: hover) { .card:not(.static):hover::after { opacity: 1; } }
-.card.selected { border-color: var(--el-a); box-shadow: inset 0 0 0 1px var(--el-a); background: color-mix(in oklab, var(--el-a) 10%, var(--surface)); }
-.card.drop-target { border-color: var(--el-a); box-shadow: 0 0 0 1px var(--el-a), var(--el-glow); }
+@media (hover: hover) { .card[data-glow]:hover::after { opacity: 1; } }
+/* выбранное и цель перетаскивания — отметка (--el-mark: gold в белом мире, иначе ступень излучения);
+   поверхность остаётся монохромной (--s2), цвет только в кайме и её свечении */
+.card.selected { border-color: var(--el-mark); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--el-mark) 55%, transparent), var(--el-mark-glow); background: var(--s2); }
+.card.drop-target { border-color: var(--el-mark); box-shadow: 0 0 0 1px var(--el-mark), var(--el-mark-glow); background: var(--s2); }
 .card-glyph { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-1); border-radius: var(--r-m); }
 .card-glyph svg { width: 22px; height: 22px; }
 .card-title { font: 600 16.5px/1.2 var(--font-display); letter-spacing: -.02em; color: var(--ink); margin: 0; }
@@ -235,7 +238,7 @@
 .tnode:hover { background: var(--surface); color: var(--ink); }
 .tnode[aria-current="true"] { color: var(--ink); background: var(--surface-2); }
 .tnode[aria-disabled="true"] { opacity: .45; cursor: default; }
-.tnode.drop-target { box-shadow: 0 0 0 2px var(--el-a), var(--el-glow-soft); color: var(--ink); }
+.tnode.drop-target { box-shadow: 0 0 0 2px var(--el-mark), var(--el-mark-glow); color: var(--ink); }
 .tnode .tw { width: 16px; height: 16px; display: grid; place-items: center; color: var(--ink-3); flex: none; }
 .tnode .tw svg { width: 12px; height: 12px; transition: transform .3s var(--ease-out); }
 .tnode.open .tw svg { transform: rotate(90deg); }
@@ -271,7 +274,7 @@
 .crumb svg { width: 15px; height: 15px; }
 .crumb:hover { background: var(--surface-2); color: var(--ink); }
 .crumb[aria-current="page"] { color: var(--ink); font-weight: 600; }
-.crumb.drop-target { box-shadow: 0 0 0 2px var(--el-a), var(--el-glow-soft); color: var(--ink); }
+.crumb.drop-target { box-shadow: 0 0 0 2px var(--el-mark), var(--el-mark-glow); color: var(--ink); }
 .crumb-sep { color: var(--ink-3); }
 .crumb-sep svg { width: 14px; height: 14px; }
 
@@ -555,6 +558,7 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
    только по острой необходимости (например, рядом с сайдбаром). */
 .section { padding: 96px var(--datum); }
 .section + .section { padding-top: 0; }
+.section > * { margin-inline: auto; }   /* блоки с max-width каркас центрирует сам — по правилу «всё по центру» */
 .section-head { display: grid; justify-items: center; text-align: center; gap: 12px; max-width: 640px; margin: 0 auto 40px; }
 .section-head.left { justify-items: start; text-align: left; margin-left: 0; }
 .section-head .kicker::before { display: none; }

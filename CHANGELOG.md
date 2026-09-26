@@ -19,7 +19,16 @@
   `attachDisclosures()` (новый `.disclosure`), `attachCards()` (наклон к курсору и подъём), `openDialog()`/`closeDialog()`
   (плита въезжает и уходит; закрытие после ухода, Esc так же), `pushToast()`/`dismissToast()`, `countTo()` и `odometer()`
   (новый `.odometer`); `enter()`/`exit()` принимают `dx`; `Motion` умеет `rx`/`ry` (rotateX/Y с perspective).
-- `components.css`: свет курсора на плитных кнопках и карточках (`::after` по `--mx/--my`); у `.switch` убрано
+- `components.css`: свет курсора по поверхности — только у `.btn[data-glow]`/`.chip-btn[data-glow]`/`.card[data-glow]`
+  (правило «1–3 элемента на экран»). **Ломает**: селектор по умолчанию `attachPointerGlow()` сменился с
+  `.glass, .field-body` на `.field-body, [data-glow]` — `.glass`-плиты больше не получают `--mx/--my` (CSS их и не
+  использовал); кто передавал свой селектор — не задет.
+- `components.css`: `.section > * { margin-inline: auto }` — блоки с `max-width` внутри секции центрирует каркас
+  (раньше вставали слева, что нарушало правило «всё по центру»).
+- `tokens.css`: `--el-mark`/`--el-mark-glow` — цвет отметки (выбранное, цель перетаскивания): gold в белом мире,
+  иначе ступень излучения. **Ломает** визуально: `.card.selected`/`.card.drop-target`/`.tnode.drop-target`/
+  `.crumb.drop-target` — тёплая кайма и свечение на монохромной плите `--s2` вместо белой каймы с подкрашенным фоном.
+- `components.css`: у `.switch` убрано
   правило `:active { width: 17px }` — ширину ползунка теперь ведёт пружина (transform), не layout.
 - `tokens.css`: `:focus-visible` — offset 3px и переход кольца.
 - **Правила движения в SKILL.md пересмотрены** (раздел «Движение»): основа прежняя (четыре длительности, пружины

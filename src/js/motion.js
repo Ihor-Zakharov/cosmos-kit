@@ -239,10 +239,10 @@ export function flip(container, mutate, removed = [], { stagger = 32, response =
 // Хелперы уровня страницы (в «выдре» жили внутри app.js, здесь обобщены)
 // ---------------------------------------------------------------------------
 
-/** Свет курсора по кайме/поверхности .field-body (components.css): следит за указателем и
-    выставляет --mx/--my на ближайшем предке, matching selector (по умолчанию — .glass, .field-body).
-    Один слушатель на весь документ, throttled через rAF. */
-export function attachPointerGlow(root = document, selector = '.glass, .field-body') {
+/** Свет курсора по кайме/поверхности: следит за указателем и выставляет --mx/--my на ближайшем предке, matching
+    selector. По умолчанию — только .field-body и явный [data-glow]: свет курсора — акцент, 1–3 элемента на экран (главное
+    поле, главная карточка), не рядовые кнопки, списки и навигация (SKILL.md «Движение»). Один слушатель, throttled через rAF. */
+export function attachPointerGlow(root = document, selector = '.field-body, [data-glow]') {
   let ev = null, ticking = 0;
   root.addEventListener('pointermove', (e) => {
     ev = e;
