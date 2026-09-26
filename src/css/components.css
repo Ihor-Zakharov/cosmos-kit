@@ -250,7 +250,9 @@
 /* подсветка текущей строки переезжает к новой строке (motion.js: moveInk с .tree-ink, ось y) — как в «выдре» */
 .tree-nav { position: relative; }
 .tree-ink { position: absolute; left: 0; right: 0; top: 0; height: var(--h, 0px); transform: translateY(var(--y, 0)); border-radius: 9px; background: var(--surface-2); pointer-events: none; will-change: transform; }
-.tree-nav:has(.tree-ink) .tnode[aria-current="true"] { background: transparent; }
+/* плашка одна на всё дерево: у текущей строки и свой фон, и :hover прозрачны — иначе во время переезда плашки
+   строка под курсором рисует вторую (как решено в «выдре») */
+.tree-nav:has(.tree-ink) .tnode[aria-current="true"], .tree-nav:has(.tree-ink) .tnode[aria-current="true"]:hover { background: transparent; transition-duration: 0s, .2s, .25s; }
 .tree-nav:has(.tree-ink) .tnode { position: relative; z-index: 1; }
 
 /* раскрытие (motion.js: attachDisclosures): тело на grid-template-rows, шеврон и содержимое — на пружинах */
@@ -504,6 +506,7 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 .nav { position: relative; }
 .nav-ink { position: absolute; left: 12px; bottom: 3px; height: 1px; width: calc(var(--w, 0px) - 24px); transform: translateX(var(--x, 0)); background: var(--el-a); box-shadow: 0 0 8px color-mix(in oklab, var(--el-a) 45%, transparent); pointer-events: none; }
 .nav:has(.nav-ink) a::after { display: none; }
+.nav:has(.nav-ink) a[aria-current="page"]:hover { background: transparent; }   /* один индикатор: у текущего пункта hover тихий */
 .topbar-actions { display: flex; align-items: center; gap: 8px; }
 .topbar .menu-btn { display: none; }
 
