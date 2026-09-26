@@ -9,13 +9,14 @@
  *   bootSite({ accent: 'gold' });                   // ступень излучения: violet | ice | gold | ember (по умолчанию белая)
  *   bootSite({ plateUrl: 'img/my-plate.webp' });    // свой фон сцены (те же пропорции и точки привязки, что у plate.webp);
  *                                                   // без него на больших экранах высокой чёткости берётся plate-hd.webp
+ *   bootSite({ stars: 'procedural' });              // экспериментально: звёзды кодом, резкие на 4K (дороже на 2×)
  *   site.toast('ok', 'Сохранено');                  // тон: '' | 'ok' | 'err'
  */
 import { createCosmos, attachSceneScroll } from './cosmos.js';
 import { attachButtons, attachPointerGlow, attachSwitches, attachChecks, attachDisclosures, attachCards, attachSwipeToClose,
   moveInk, openDialog, closeDialog, pushToast } from './motion.js';
 
-export function bootSite({ page = 'home', accent = null, plateUrl = null } = {}) {
+export function bootSite({ page = 'home', accent = null, plateUrl = null, stars = 'plate' } = {}) {
   const $ = (id) => document.getElementById(id);
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (accent && accent !== 'white') document.documentElement.setAttribute('data-accent', accent);
@@ -26,8 +27,9 @@ export function bootSite({ page = 'home', accent = null, plateUrl = null } = {})
   if (wrap && canvas) {
     // фон: на больших экранах высокой чёткости — plate-hd.webp (3342×1882, Real-ESRGAN ×2), на телефонах — лёгкий plate.webp
     const hd = !matchMedia('(pointer: coarse)').matches && Math.max(screen.width, innerWidth) * devicePixelRatio >= 2400;
-    const plate = plateUrl || (hd ? new URL('../scene/plate-hd.webp', import.meta.url).href : null);
-    cosmos = createCosmos(canvas, { reduced, ...(plate ? { plateUrl: plate } : {}) });
+    // в режиме stars: 'procedural' звёзды рисуются кодом, план берётся беззвёздный — HD-план со звёздами не подставляем
+    const plate = plateUrl || (hd && stars !== 'procedural' ? new URL('../scene/plate-hd.webp', import.meta.url).href : null);
+    cosmos = createCosmos(canvas, { reduced, stars, ...(plate ? { plateUrl: plate } : {}) });
     if (!cosmos.ok) wrap.classList.add('fallback');
     new ResizeObserver(() => cosmos.resize()).observe(wrap);
     if (accent && accent !== 'white') cosmos.setAccent(getComputedStyle(document.documentElement).getPropertyValue('--el-a').trim());

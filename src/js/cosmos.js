@@ -25,6 +25,10 @@
 // Разметка-минимум (см. demo/index.html):
 //   <div class="cosmos-wrap" id="cosmos-wrap"><canvas class="cosmos" id="cosmos"></canvas><div class="cosmos-fallback"></div></div>
 //   createCosmos(document.getElementById('cosmos'), { reduced: matchMedia('(prefers-reduced-motion: reduce)').matches });
+//
+// Звёзды плана: opts.stars = 'plate' (по умолчанию — звёзды в картинке, как раньше) | 'procedural' — план без звёзд
+// (scene/plate-nostars.webp) и звёзды из каталога scene/stars.bin, резкие в разрешении устройства (см. createStarLayer).
+// Свой opts.plateUrl в режиме 'procedural' должен быть беззвёздным (для HD — scene/plate-nostars-hd.webp). api.stars — что включилось.
 
 const VERT = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }`;
 
@@ -505,6 +509,200 @@ export function baseLayout(vw, vh) {
   return { cx: 0.70 * vw, cy: 68 + heroH / 2, R: k * heroH };
 }
 
+// ---------- звёзды плана кодом: createCosmos(canvas, { stars: 'procedural' }) ----------
+// Звёзды вынуты из плана (scene/plate-nostars.webp; HD — plate-nostars-hd.webp) в каталог scene/stars.bin: 6405 записей
+// по 4 × uint16 — x·32, y·32 (px плана 1671×941), A·4096 (пик над фоном, единицы текстуры), σ·4096 (px плана); у ярких
+// звёзд ореол — вторая, широкая запись в той же точке. Сцена рисуется как прежде (в текстуру, ≤ 1,1 Мпикс), затем
+// растягивается на холст в полном разрешении устройства, и поверх в экранном смешивании (screen) рисуются звёзды —
+// по четырёхугольнику на запись, без перебора в пикселе. Каждая звезда проходит ту же линзу, что план (прямое решение
+// β = θ·(1 − E²/(θ² + 0,02)) по Ньютону), вытягивается по якобиану линзы, получает тот же параллакс неба, спад у краёв
+// плана, притенение у горизонта и виньетку; профиль — гаусс, свёрнутый с пикселем (поток сохраняется при любом
+// подпиксельном сдвиге — не мерцает), не уже 0,5 px устройства. Тон-маппинг сцены 1 − exp(−1,25·L) превращает сумму
+// света в screen-смешивание, поэтому слой вне сцены даёт тот же результат, что звёзды внутри неё.
+const STARS_VERT = `
+precision highp float;
+attribute vec4 aStar;      // x, y (px плана), A, σ (px плана)
+attribute vec2 aCorner;    // −1..1
+uniform vec2  uPlate;      // размер плана, px
+uniform vec4  uFarMap;     // как в сцене: xy — точка привязки (u, v), zw — размер плана, px сцены
+uniform vec2  uFarAnchor;  // px сцены (GL)
+uniform vec2  uC;          // центр дыры с учётом прокрутки, px сцены (GL)
+uniform float uR, uH, uLensE, uPlaneY, uGain;
+uniform vec2  uSh;         // параллакс неба, px сцены
+uniform vec2  uRes;        // размер сцены, px
+uniform float uK;          // px холста на px сцены
+varying vec2  vD;          // смещение от центра в осях (радиально, тангенциально), px холста
+varying vec2  vS2;         // дисперсии по осям, px холста²
+varying float vA;          // пик в линейном свете сцены
+void main(){
+  vec2 uv = aStar.xy / uPlate;
+  vec2 Pl = uFarAnchor + vec2(uv.x - uFarMap.x, -(uv.y - uFarMap.y)) * uFarMap.zw;
+  vec2 bt = (Pl - uC - uSh) / uR;                  // источник β, доли R
+  float bb = max(length(bt), 1e-4);
+  vec2 dir = bt / bb;
+  float E2 = uLensE * uLensE;
+  float t = 0.5 * (bb + sqrt(bb * bb + 4.0 * E2));  // первичное изображение (вторичное — внутри тени)
+  for (int i = 0; i < 4; i++) {
+    float q = t * t + 0.02;
+    float f = t - E2 * t / q - bb;
+    float fd = 1.0 - E2 * (0.02 - t * t) / (q * q);
+    t -= f / fd;
+  }
+  float q = t * t + 0.02;
+  float g = 1.0 - E2 / q;                          // тангенциальное растяжение⁻¹
+  float gr = 1.0 - E2 * (0.02 - t * t) / (q * q);  // радиальное
+  vec2 th = dir * t;                               // изображение, доли R
+  float kp = uFarMap.z / uPlate.x * uK;            // px холста на px плана
+  float s = aStar.w * kp;
+  float sr = s / max(abs(gr), 0.05), st = s / max(abs(g), 0.05);
+  float v = 1.0 / 12.0;                            // свёртка с пикселем
+  vS2 = vec2(max(sr * sr, 0.25) + v, max(st * st, 0.25) + v);
+  float amp = aStar.z * sr * st / sqrt(vS2.x * vS2.y);   // поток сохраняется
+  // те же множители, что у плана в сцене: края текстуры, притенение под горизонтом, виньетка
+  float inb = smoothstep(0.0, 0.03, uv.x) * smoothstep(1.0, 0.97, uv.x) * smoothstep(0.0, 0.03, uv.y) * smoothstep(1.0, 0.985, uv.y);
+  float ylF = th.y + uPlaneY;
+  vec2 P = uC + th * uR;                           // px сцены
+  vec2 vc = (P / uRes - 0.5) * vec2(uRes.x / uRes.y, 1.0);
+  vA = amp * uGain * inb * mix(0.48, 1.0, smoothstep(-0.35, 0.05, ylF)) * (1.0 - 0.22 * dot(vc, vc));
+  vec2 ext = 3.3 * sqrt(vS2) + 1.0;
+  vD = aCorner * ext;
+  vec2 pos = P * uK + (dir * vD.x + vec2(-dir.y, dir.x) * vD.y);
+  gl_Position = vec4(pos / (uRes * uK) * 2.0 - 1.0, 0.0, 1.0);
+  if (vA < 1e-4) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+}`;
+const STARS_FRAG = `
+precision highp float;
+uniform vec2  uC;
+uniform float uR, uK, uFade;
+varying vec2  vD;
+varying vec2  vS2;
+varying float vA;
+void main(){
+  float L = vA * exp(-0.5 * (vD.x * vD.x / vS2.x + vD.y * vD.y / vS2.y));
+  float b = length(gl_FragCoord.xy / uK - uC) / uR;             // тень дыры закрывает звёзды, как ядро в сцене
+  float aa = 1.3 / uR;
+  float m = 1.0 - smoothstep(1.0 - aa, 1.0 + aa * 0.25, b);
+  float T = pow(1.0 - exp(-1.25 * L), 0.94) * uFade * (1.0 - m);
+  gl_FragColor = vec4(vec3(T), 1.0);
+}`;
+const BLIT_FRAG = `precision highp float; uniform sampler2D uScene; uniform vec2 uOut;
+void main(){ gl_FragColor = texture2D(uScene, gl_FragCoord.xy / uOut); }`;
+const STARS_CAT = new URL('../scene/stars.bin', import.meta.url).href;
+const PLATE_STARLESS = new URL('../scene/plate-nostars.webp', import.meta.url).href;
+const STARS_CAP = 8.9e6;   // холст в режиме 'procedural': полное разрешение устройства, не больше 4K
+
+function createStarLayer(gl, canvas, scene) {
+  const mk = (vs, fs) => {
+    const p = gl.createProgram();
+    for (const [type, src] of [[gl.VERTEX_SHADER, vs], [gl.FRAGMENT_SHADER, fs]]) {
+      const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+      gl.attachShader(p, s);
+    }
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+    return p;
+  };
+  const blit = mk(VERT, BLIT_FRAG), sp = mk(STARS_VERT, STARS_FRAG);
+  const U = {};
+  for (const n of ['uPlate', 'uFarMap', 'uFarAnchor', 'uC', 'uR', 'uH', 'uLensE', 'uPlaneY', 'uGain', 'uSh', 'uRes', 'uK', 'uFade']) U[n] = gl.getUniformLocation(sp, n);
+  const uScene = gl.getUniformLocation(blit, 'uScene'), uOut = gl.getUniformLocation(blit, 'uOut');
+  const aStar = gl.getAttribLocation(sp, 'aStar'), aCorner = gl.getAttribLocation(sp, 'aCorner'), aBlit = gl.getAttribLocation(blit, 'p');
+  const fbo = gl.createFramebuffer(), ftex = gl.createTexture();
+  let fw = 0, fh = 0, cw = 0, ch = 0, count = 0;
+  const vbuf = gl.createBuffer();
+  fetch(STARS_CAT).then((r) => r.arrayBuffer()).then((ab) => {
+    const q = new Uint16Array(ab), n = q.length / 4;
+    const v = new Float32Array(n * 6 * 6);
+    const cs = [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1];
+    for (let i = 0, o = 0; i < n; i++) {
+      const x = q[i * 4] / 32, y = q[i * 4 + 1] / 32, A = q[i * 4 + 2] / 4096, s = q[i * 4 + 3] / 4096;
+      for (let k = 0; k < 6; k++) { v[o++] = x; v[o++] = y; v[o++] = A; v[o++] = s; v[o++] = cs[k * 2]; v[o++] = cs[k * 2 + 1]; }
+    }
+    if (gl.isContextLost()) return;
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbuf);
+    gl.bufferData(gl.ARRAY_BUFFER, v, gl.STATIC_DRAW);
+    count = n * 6;
+    scene.redraw();
+  }).catch(() => {});
+  return {
+    get count() { return count / 6; },
+    // размер: сцена — w×h (как раньше), холст — полное разрешение устройства; true — буфер холста очищен
+    size(w, h, rect) {
+      let W = Math.max(2, Math.round(rect.width * (devicePixelRatio || 1))), H = Math.max(2, Math.round(rect.height * (devicePixelRatio || 1)));
+      if (W * H > STARS_CAP) { const k = Math.sqrt(STARS_CAP / (W * H)); W = Math.round(W * k); H = Math.round(H * k); }
+      if (w !== fw || h !== fh) {
+        fw = w; fh = h;
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, ftex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        for (const [k, val] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, val);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, ftex, 0);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.activeTexture(gl.TEXTURE0);
+      }
+      if (W === cw && H === ch) return false;
+      cw = W; ch = H; canvas.width = W; canvas.height = H;
+      return true;
+    },
+    // перед кадром сцены: рисовать в текстуру
+    begin() {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+      gl.viewport(0, 0, fw, fh);
+      gl.useProgram(scene.prog);
+      gl.bindBuffer(gl.ARRAY_BUFFER, scene.buf);
+      gl.vertexAttribPointer(scene.loc, 2, gl.FLOAT, false, 0, 0);
+    },
+    // после кадра сцены: растянуть её на холст и положить звёзды; f — величины кадра из draw()
+    end(f) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, cw, ch);
+      gl.useProgram(blit);
+      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, ftex); gl.activeTexture(gl.TEXTURE0);
+      gl.uniform1i(uScene, 1);
+      gl.uniform2f(uOut, cw, ch);
+      gl.enableVertexAttribArray(aBlit);
+      gl.vertexAttribPointer(aBlit, 2, gl.FLOAT, false, 0, 0);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      if (aBlit !== scene.loc) gl.disableVertexAttribArray(aBlit);
+      const gain = f.far * f.hasFar;
+      if (count && gain > 0) {
+        gl.useProgram(sp);
+        const k = cw / fw, H = fh;
+        gl.uniform2f(U.uPlate, PLATE.w, PLATE.h);
+        gl.uniform4f(U.uFarMap, PLATE.u0, PLATE.v0, PLATE.w * f.s * f.sx, PLATE.h * f.s * f.sy);
+        gl.uniform2f(U.uFarAnchor, f.ax * f.sx, fh - f.ay * f.sy);
+        gl.uniform2f(U.uC, f.comp.cx * f.sx, fh - f.comp.cy * f.sy + f.scroll * H * 0.16);
+        gl.uniform1f(U.uR, f.comp.R * f.sy);
+        gl.uniform1f(U.uH, H);
+        gl.uniform1f(U.uLensE, f.lens);
+        gl.uniform1f(U.uPlaneY, f.planeY);
+        gl.uniform1f(U.uGain, gain);
+        gl.uniform2f(U.uSh, f.par[0] * f.parAmt * 0.15 * H, f.par[1] * f.parAmt * 0.15 * H);
+        gl.uniform2f(U.uRes, fw, fh);
+        gl.uniform1f(U.uK, k);
+        const x = Math.min(1, Math.max(0, (f.scroll - 0.12) / 0.58));                  // сцена гаснет за героем — как в шейдере
+        gl.uniform1f(U.uFade, f.expo * (1 - 0.92 * x * x * (3 - 2 * x)) * (1 - f.invert));
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbuf);
+        gl.enableVertexAttribArray(aStar); gl.enableVertexAttribArray(aCorner);
+        gl.vertexAttribPointer(aStar, 4, gl.FLOAT, false, 24, 0);
+        gl.vertexAttribPointer(aCorner, 2, gl.FLOAT, false, 24, 16);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.ONE_MINUS_DST_COLOR, gl.ONE);           // screen: 1 − (1 − фон)(1 − звезда)
+        gl.drawArrays(gl.TRIANGLES, 0, count);
+        gl.disable(gl.BLEND);
+        if (aStar !== scene.loc) gl.disableVertexAttribArray(aStar);
+        if (aCorner !== scene.loc) gl.disableVertexAttribArray(aCorner);
+        gl.enableVertexAttribArray(scene.loc);
+      }
+      gl.bindBuffer(gl.ARRAY_BUFFER, scene.buf);
+      gl.vertexAttribPointer(scene.loc, 2, gl.FLOAT, false, 0, 0);
+      gl.useProgram(scene.prog);
+    },
+  };
+}
+
 export function createCosmos(canvas, opts = {}) {
   const reduced = !!opts.reduced;
   let gl = null;
@@ -585,6 +783,12 @@ export function createCosmos(canvas, opts = {}) {
   const seed = opts.seed ?? 0.37;
   const ringDefault = opts.ringBrightness ?? 0.88;   // 1.0 = как в v0.1.0
   api.ok = true;
+  // звёзды: 'plate' (по умолчанию) — в картинке плана; 'procedural' — план без звёзд и звёзды из каталога в разрешении устройства
+  let hi = null;
+  if (opts.stars === 'procedural') {
+    try { hi = createStarLayer(gl, canvas, { prog, buf, loc, redraw: () => api._redraw() }); } catch { hi = null; }
+  }
+  api.stars = hi ? 'procedural' : 'plate';
 
   // текстура дальнего плана: грузится асинхронно (index.html её предзагружает), до загрузки сцена рисуется без неё,
   // план проявляется за 0,5 с — без скачка
@@ -607,7 +811,7 @@ export function createCosmos(canvas, opts = {}) {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       hasFar = 1; api._redraw();
     };
-    img.src = opts.plateUrl || PLATE.url;
+    img.src = opts.plateUrl || (hi ? PLATE_STARLESS : PLATE.url);
   }
 
   // токены композиции и вида из CSS (.cosmos-wrap)
@@ -647,6 +851,7 @@ export function createCosmos(canvas, opts = {}) {
     let nw = Math.max(2, Math.round(r.width * dpr * RES_SCALE)), nh = Math.max(2, Math.round(r.height * dpr * RES_SCALE));
     const cap = 1.1e6;
     if (nw * nh > cap) { const k = Math.sqrt(cap / (nw * nh)); nw = Math.round(nw * k); nh = Math.round(nh * k); }
+    if (hi) { w = nw; hgt = nh; return hi.size(nw, nh, r); }       // 'procedural': сцена — в текстуру w×h, холст — в px устройства
     if (nw === w && nh === hgt) return false;
     w = nw; hgt = nh; canvas.width = w; canvas.height = hgt; gl.viewport(0, 0, w, hgt);
     return true;
@@ -656,6 +861,7 @@ export function createCosmos(canvas, opts = {}) {
   api.resize = () => { const cleared = measure(); api.readTokens(); if (cleared) draw(); api._redraw(); };
 
   const draw = () => {
+    if (hi) hi.begin();
     const sx = w / cssW, sy = hgt / cssH;
     // композиция в CSS px холста (холст = окно, 100svh)
     const comp = tok.anchor === 'baseline' ? baseLayout(cssW, cssH) : { cx: tok.x * cssW, cy: tok.y * cssH, R: tok.r * cssH };
@@ -710,6 +916,7 @@ export function createCosmos(canvas, opts = {}) {
     gl.uniform1f(U.uChaos, api.chaos);
     gl.uniform1f(U.uGod, api.god);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if (hi) hi.end({ comp, s, sx, sy, ax, ay, scroll: api._scroll, lens: tok.lens, planeY: tok.planeY, far: tok.far, hasFar: api._far, par: reduced ? [0, 0] : api._ptS, parAmt: 0.01 * tok.par, expo: api._expo, invert: api.invert });
   };
   const ease = (cur, target, dt, tau) => cur + (target - cur) * Math.min(1, dt / tau);
   const smooth = (x) => x * x * (3 - 2 * x);
