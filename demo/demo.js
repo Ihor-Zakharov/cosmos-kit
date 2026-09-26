@@ -38,7 +38,9 @@ export function boot({ hero = null } = {}) {
     if (!targets.some(Boolean)) return;
     const line = innerHeight * 0.34;
     let cur = links.findIndex((a) => a.hasAttribute('aria-current'));
-    targets.forEach((t, i) => { if (t && t.getBoundingClientRect().top <= line) cur = i; });
+    // активна секция, чей верх ближе всего над линией; порядок пунктов меню не важен
+    let best = -Infinity;
+    targets.forEach((t, i) => { const top = t?.getBoundingClientRect().top; if (top != null && top <= line && top > best) { best = top; cur = i; } });
     if (cur < 0) cur = 0;
     if (!links[cur].hasAttribute('aria-current')) setCurrent(cur, false);
   };
@@ -97,7 +99,7 @@ export function wireTree(tree) {
 
 /** шапка + меню витрины: одна страница, все разделы — якоря */
 export function shell() {
-  const nav = [['#language', 'Язык'], ['#accents', 'Акценты'], ['#components', 'Компоненты'], ['#motion', 'Движение'], ['#kosmos', 'KOCMOC'], ['#scene', 'Сцена']];
+  const nav = [['#language', 'Язык'], ['#accents', 'Акценты'], ['#components', 'Компоненты'], ['#scene', 'Сцена'], ['#motion', 'Движение'], ['#kosmos', 'KOCMOC']];
   const links = nav.map(([h, t], i) => `<a href="${h}"${i === 0 ? ' aria-current="page"' : ''}>${t}</a>`).join('');
   document.getElementById('topbar').innerHTML = `
     <a class="brand" href="#top"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>cosmos</a>
