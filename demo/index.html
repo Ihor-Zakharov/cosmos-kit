@@ -242,38 +242,7 @@
         <p>Текстура плана одна и привязана к дыре — куда дыра, туда и подсвеченная плоскость. Композиция задаётся
         токенами <code>--bh-*</code> на обёртке; переключите и прокрутите к началу, чтобы увидеть героя.</p>
       </div>
-      <div class="demo-row">
-        <div class="pills glass" role="radiogroup" id="comp-pills" aria-label="Композиция">
-          <button type="button" role="radio" data-comp="right" aria-checked="true">Витрина — справа</button>
-          <button type="button" role="radio" data-comp="center" aria-checked="false">Ось — по центру</button>
-          <button type="button" role="radio" data-comp="far" aria-checked="false">Далеко</button>
-          <span class="pill-ink" aria-hidden="true"></span>
-        </div>
-      </div>
-      <div class="demo-row" style="margin-top:12px">
-        <div class="pills glass" role="radiogroup" id="halo-pills" aria-label="Ореол">
-          <button type="button" role="radio" data-halo="calm" aria-checked="true">Ореол: спокойный</button>
-          <button type="button" role="radio" data-halo="chaotic" aria-checked="false">Ореол: хаотичный</button>
-          <span class="pill-ink" aria-hidden="true"></span>
-        </div>
-        <label class="switch"><input type="checkbox" id="rays-switch"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Лучи RTX</span></label>
-      </div>
-      <div class="demo-row" style="margin-top:12px">
-        <button class="btn" id="toggle-asleep" type="button">Сцена: усыпить</button>
-        <button class="btn" id="spin-btn" type="button"><span class="btn-label">Крутить</span></button>
-        <button class="btn" id="pulse-go" type="button">pulse('go')</button>
-        <button class="btn" id="energy-up" type="button">energy → 1</button>
-        <button class="btn" id="energy-down" type="button">energy → 0</button>
-      </div>
-      <div class="demo-row" style="margin-top:12px" id="smoke-row" aria-label="Дым">
-        <span class="demo-note">Дым:</span>
-        <button class="btn small" data-smoke="neutral" aria-pressed="true" type="button">нейтральный</button>
-        <button class="btn small" data-smoke="cold" type="button">холодный</button>
-        <button class="btn small" data-smoke="moon" type="button">лунный</button>
-        <button class="btn small" data-smoke="warm" type="button">тёплый</button>
-        <button class="btn small" data-smoke="violet" type="button">дымчато-фиолетовый</button>
-        <button class="btn small" data-smoke="ember" type="button">угольный</button>
-      </div>
+      <p class="demo-note">Все настройки сцены — в панели «Фон» на первом экране, где сцена живая.</p>
       <p class="demo-note" style="margin-top:16px">Варианты: ореол <code>halo: 'calm' | 'chaotic'</code> (хаос — неровная яркость, дрожь кромки, шире радужная кайма; средняя яркость обода та же) и <code>rays: true</code> (лучи RTX — рассеяние кольца в дымке перераспределяется в тонкие радиальные лучи, общий свет тот же). Сочетаются как угодно.</p>
       <p class="demo-note" style="margin-top:16px"><strong>Крутить</strong> — как загрузка в «выдре»: <code>pulse('go')</code> на старте, <code>setEnergy(1)</code> на время процесса (вихрь и нити быстрее, время сцены ×1,3, ореол дышит шире), <code>pulse('done')</code> и <code>setEnergy(0)</code> на финише. <strong>Дым</strong> — <code>setSmoke(name)</code>: лёгкие оттенки тумана и каймы на оси излучения, amt 0.2–0.45 (полная подкраска «выдры» — 1).</p>
       <p class="demo-note" style="margin-top:16px">Состояния: <strong>живая</strong> — герой на экране; <strong>за горизонтом</strong> — герой ушёл вверх, кадр
@@ -622,19 +591,51 @@
     </div>
   </dialog>
 
-  <!-- панель сцены: кручение и дым — видно над героем, где сцена живая -->
-  <div class="scene-dock" id="scene-dock">
-    <button class="btn small" id="dock-spin" type="button">Крутить</button>
-    <div class="pills glass small" id="dock-smoke" role="radiogroup" aria-label="Дым">
-      <button type="button" role="radio" data-smoke="neutral" aria-checked="true">Дым: нет</button>
-      <button type="button" role="radio" data-smoke="cold" aria-checked="false">холодный</button>
-      <button type="button" role="radio" data-smoke="moon" aria-checked="false">лунный</button>
-      <button type="button" role="radio" data-smoke="warm" aria-checked="false">тёплый</button>
-      <button type="button" role="radio" data-smoke="violet" aria-checked="false">фиолетовый</button>
-      <button type="button" role="radio" data-smoke="ember" aria-checked="false">угли</button>
-      <span class="pill-ink" aria-hidden="true"></span>
+  <!-- панель «Фон»: все настройки сцены на первом экране, где сцена живая -->
+  <details class="scene-dock" id="scene-dock" open>
+    <summary class="btn small">Фон</summary>
+    <div class="scene-dock-body">
+      <div class="demo-row">
+        <div class="pills glass" role="radiogroup" id="plate-pills" aria-label="Текстура">
+          <button type="button" role="radio" data-plate="hd" aria-checked="true">ESRGAN испр.</button>
+          <button type="button" role="radio" data-plate="old" aria-checked="false">Старый</button>
+          <span class="pill-ink" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="demo-row">
+        <div class="pills glass" role="radiogroup" id="comp-pills" aria-label="Композиция">
+          <button type="button" role="radio" data-comp="right" aria-checked="true">Витрина — справа</button>
+          <button type="button" role="radio" data-comp="center" aria-checked="false">Ось — по центру</button>
+          <button type="button" role="radio" data-comp="far" aria-checked="false">Далеко</button>
+          <span class="pill-ink" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="demo-row">
+        <div class="pills glass" role="radiogroup" id="halo-pills" aria-label="Ореол">
+          <button type="button" role="radio" data-halo="calm" aria-checked="true">Ореол: спокойный</button>
+          <button type="button" role="radio" data-halo="chaotic" aria-checked="false">Ореол: хаотичный</button>
+          <span class="pill-ink" aria-hidden="true"></span>
+        </div>
+        <label class="switch"><input type="checkbox" id="rays-switch"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Лучи RTX</span></label>
+      </div>
+      <div class="demo-row">
+        <button class="btn" id="toggle-asleep" type="button">Сцена: усыпить</button>
+        <button class="btn" id="spin-btn" type="button"><span class="btn-label">Крутить</span></button>
+        <button class="btn" id="pulse-go" type="button">pulse('go')</button>
+        <button class="btn" id="energy-up" type="button">energy → 1</button>
+        <button class="btn" id="energy-down" type="button">energy → 0</button>
+      </div>
+      <div class="demo-row" id="smoke-row" aria-label="Дым">
+        <span class="demo-note">Дым:</span>
+        <button class="btn small" data-smoke="neutral" aria-pressed="true" type="button">нейтральный</button>
+        <button class="btn small" data-smoke="cold" type="button">холодный</button>
+        <button class="btn small" data-smoke="moon" type="button">лунный</button>
+        <button class="btn small" data-smoke="warm" type="button">тёплый</button>
+        <button class="btn small" data-smoke="violet" type="button">дымчато-фиолетовый</button>
+        <button class="btn small" data-smoke="ember" type="button">угольный</button>
+      </div>
     </div>
-  </div>
+  </details>
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
 
@@ -694,15 +695,13 @@
       e.currentTarget.classList.toggle('busy', spinning);
       document.getElementById('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' });
     });
-    // панель сцены внизу: те же кручение и дым, что в секции «Сцена», но видны над живой сценой
-    document.getElementById('dock-spin').addEventListener('click', (e) => {
-      document.getElementById('spin-btn').click();
-      e.currentTarget.textContent = spinning ? 'Остановить' : 'Крутить';
+    // текстура фона: по умолчанию ESRGAN испр. (plate-hd), «Старый» — исходный plate.webp
+    const plateQ = new URLSearchParams(location.search).get('plate') === 'old' ? 'old' : 'hd';
+    document.querySelectorAll('#plate-pills [data-plate]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.plate === plateQ)));
+    wireSegmented(document.getElementById('plate-pills'), 'aria-checked', (it) => {
+      const u = new URL(location.href); if (it.dataset.plate === 'old') u.searchParams.set('plate', 'old'); else u.searchParams.delete('plate'); location.replace(u);
     });
-    wireSegmented(document.getElementById('dock-smoke'), 'aria-checked', (it) => {
-      cosmosApi.setSmoke(it.dataset.smoke);
-      document.querySelectorAll('#smoke-row [data-smoke]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.smoke === it.dataset.smoke)));
-    });
+    if (innerWidth < 700) document.getElementById('scene-dock').removeAttribute('open');
     // оттенки дыма
     document.querySelectorAll('#smoke-row [data-smoke]').forEach((b) => b.addEventListener('click', () => {
       document.querySelectorAll('#smoke-row [data-smoke]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));

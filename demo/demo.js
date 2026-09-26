@@ -7,7 +7,9 @@ import { attachButtons, attachPointerGlow, attachSwitches, attachChecks, attachD
 export function boot({ hero = null } = {}) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const wrap = document.getElementById('cosmos-wrap');
-  const api = createCosmos(document.getElementById('cosmos'), { reduced });
+  // фон по умолчанию — ESRGAN испр. (plate-hd.webp); ?plate=old — исходный plate.webp
+  const plateUrl = new URLSearchParams(location.search).get('plate') === 'old' ? undefined : new URL('../src/scene/plate-hd.webp', import.meta.url).href;
+  const api = createCosmos(document.getElementById('cosmos'), { reduced, ...(plateUrl ? { plateUrl } : {}) });
   window.cosmosApi = api;
   if (!api.ok) wrap.classList.add('fallback');
   new ResizeObserver(() => api.resize()).observe(wrap);

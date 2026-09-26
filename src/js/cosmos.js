@@ -978,11 +978,12 @@ export function createCosmos(canvas, opts = {}) {
     Применение: api.setSmoke('cold') или setAccent(SMOKE.cold.hex, SMOKE.cold.amt); null — нейтральный. */
 export const SMOKE = {
   neutral: null,
-  cold:   { hex: '#a9ccff', amt: 0.35, name: 'холодный' },        // лёд: голубоватая дымка
-  moon:   { hex: '#d9dcf2', amt: 0.45, name: 'лунный' },          // почти белый с лавандовой тенью
-  warm:   { hex: '#ffc76a', amt: 0.28, name: 'тёплый' },          // золото: как свет свечи в тумане
-  violet: { hex: '#b49cff', amt: 0.30, name: 'дымчато-фиолетовый' },
-  ember:  { hex: '#ff9448', amt: 0.22, name: 'угольный' },        // самый осторожный: оранжевый быстро становится грязным
+  // сила как у подкраски выдры под платформу (setAccent(цвет, 1) при вставке ссылки) — дым заметен, но цвет остаётся в свете, не в поверхностях
+  cold:   { hex: '#8fb8ff', amt: 1.0,  name: 'холодный' },        // лёд: голубая дымка
+  moon:   { hex: '#c9ccf2', amt: 1.0,  name: 'лунный' },          // почти белый с лавандовой тенью
+  warm:   { hex: '#ffb347', amt: 0.9,  name: 'тёплый' },          // золото: как свет свечи в тумане
+  violet: { hex: '#9d7dff', amt: 0.95, name: 'дымчато-фиолетовый' },
+  ember:  { hex: '#ff7a3c', amt: 0.85, name: 'угольный' },        // оранжевый: чуть слабее, иначе становится грязным
 };
 
 /** Алиас с именем, требуемым API-контрактом кита: init(canvas, opts) === createCosmos(canvas, opts). */
