@@ -3,7 +3,7 @@
 // ~/projects/video-downloader/vydra/static/spring.js — оно уже было независимо от логики «выдры».
 // Добавлены обобщённые хелперы, которые в «выдре» жили внутри app.js (не переносился целиком,
 // т.к. завязан на конкретный интерфейс): attachPointerGlow, moveInk, attachSwipeToClose.
-// Проход «кнопки» (см. CHANGELOG): attachButtons — нажатие/наведение/магнит/фокус одним вызовом,
+// Проход «кнопки» (см. CHANGELOG): attachButtons — нажатие/наведение/фокус одним вызовом,
 // buttonState — состояния idle/busy/done без скачка ширины; moveInk теперь едет пружиной.
 // pressable оставлен для совместимости — новым сайтам нужен attachButtons.
 
@@ -438,7 +438,7 @@ export function odometer(el, value, { digits, response = 0.55, damping = 0.78 } 
 }
 
 // ---------------------------------------------------------------------------
-// Кнопки: нажатие, наведение, магнит, фокус, состояния — один вызов attachButtons() на страницу
+// Кнопки: нажатие, наведение, фокус, состояния — один вызов attachButtons() на страницу
 // ---------------------------------------------------------------------------
 
 const btnState = new WeakMap();   // el → { pressed, hovered, press, lift }
@@ -457,20 +457,15 @@ function applyScale(el, opts = {}) {
  * Единая механика кнопок кита. Селекторы — по умолчанию на классы components.css, переопределяйте при нужде.
  *   press    — что нажимается (масштаб .97; small — .90 для иконок и мелкого; soft — .985 для крупных плит); вниз response .09
  *   lift     — что чуть приподнимается при наведении (scale 1.02; small — 1.06)
- *   magnetic — что тянется к курсору (только мышь, до 6px, сила .18): только явный opt-in [data-magnetic].
- *              Главное действие (.btn.primary, .go-btn) за курсором НЕ двигается — решение пользователя: раскалённая
- *              кнопка стоит на месте, к ней идут, а не она к курсору. Магнит — для второстепенных крупных плит,
- *              если он там вообще нужен.
+ *   Кнопки и плиты за курсором не двигаются (магнита нет — решение пользователя): к кнопке идут, а не она к курсору.
  * Клавиатура: Space/Enter нажимают так же, как палец; фокус с клавиатуры — короткий «вдох» (1.06 → 1).
- * Сенсор: без подъёма и магнита (нет hover); нажатие — то же. prefers-reduced-motion: всё снимается.
+ * Сенсор: без подъёма (нет hover); нажатие — то же. prefers-reduced-motion: всё снимается.
  */
 export function attachButtons(root = document, {
   press = '.btn, .chip-btn, .icon-btn, .tab, .pills button, .card:not(.static), .crumb, .text-btn, .pager-btn, .nav a, .ghost-btn, .switch, .swatch',
   small = '.icon-btn, .pager-btn, .crumb, .tnode',
   soft = '.go-btn, .field-body, .card',
   lift = '.btn, .chip-btn, .go-btn, .icon-btn, .swatch',
-  magnetic = '[data-magnetic]',
-  magnetStrength = 0.18, magnetMax = 6,
 } = {}) {
   const stateOf = (el) => {
     let st = btnState.get(el);
@@ -515,9 +510,8 @@ export function attachButtons(root = document, {
     motionOf(el).from({ s: 1.06 }); applyScale(el, { response: 0.45, damping: 0.6 });
   });
 
-  // наведение (только мышь): подъём и магнит
+  // наведение (только мышь): подъём
   if (FINE.matches) {
-    let magnetEl = null;
     root.addEventListener('pointerover', (e) => {
       if (REDUCED || e.pointerType !== 'mouse') return;
       const el = e.target.closest(press);
@@ -525,28 +519,12 @@ export function attachButtons(root = document, {
       const st = stateOf(el);
       if (st.hovered) return;
       st.hovered = true; applyScale(el);
-      if (el.matches(magnetic)) magnetEl = el;
       const out = (ev) => {
         if (el.contains(ev.relatedTarget)) return;
         st.hovered = false; applyScale(el);
-        if (magnetEl === el) { magnetEl = null; motionOf(el).to({ x: 0, y: 0 }, { response: 0.5, damping: 0.62 }); }
         el.removeEventListener('pointerout', out);
       };
       el.addEventListener('pointerout', out);
-    }, { passive: true });
-    let mvRaf = 0, mvEv = null;
-    root.addEventListener('pointermove', (e) => {
-      if (!magnetEl) return;
-      mvEv = e;
-      if (mvRaf) return;
-      mvRaf = requestAnimationFrame(() => {
-        mvRaf = 0;
-        const el = magnetEl; if (!el) return;
-        const r = el.getBoundingClientRect();
-        const dx = (mvEv.clientX - (r.left + r.width / 2)) * magnetStrength, dy = (mvEv.clientY - (r.top + r.height / 2)) * magnetStrength;
-        const cl = (v) => Math.max(-magnetMax, Math.min(magnetMax, v));
-        motionOf(el).to({ x: cl(dx), y: cl(dy) }, { response: 0.4, damping: 0.8 });
-      });
     }, { passive: true });
   }
 }

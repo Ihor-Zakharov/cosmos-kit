@@ -36,7 +36,7 @@ cosmos-kit/
 │   ├── fonts/                — Geologica, Onest, Unbounded, JetBrains Mono + fonts.css
 │   ├── icons/sprite.svg       — общие UI-иконки (без брендов платформ)
 │   └── scene/plate.webp       — текстура дальнего плана сцены
-├── demo/                     — витрина: index.html (сайт + каталог), motion.html («Движение»), kosmos.html (KOCMOC)
+├── demo/index.html           — витрина, одна страница: сайт + каталог + «Движение» + KOCMOC + сцена
 ├── .agents/skills/cosmos-site/SKILL.md — воркфлоу «сделать сайт в этом стиле» + правила композиции и тона
 └── DESIGN-TODO.md            — журнал дизайнерских решений: что решено, что отложено, что открыто
 ```

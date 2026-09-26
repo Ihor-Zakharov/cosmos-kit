@@ -12,7 +12,11 @@
 // (--bh-par, --bh-sea-persp, --bh-waves, --bh-mist, --bh-near, --bh-dust) и звёзд (--bh-specks, --bh-pair) в 0 дают
 // плоский вид без параллакса и без частиц — самый дешёвый режим.
 //
-// API: createCosmos(canvas, { reduced, seed, resScale, plateUrl, ringBrightness }) — он же init(canvas, opts) —→
+// API: createCosmos(canvas, { reduced, seed, resScale, plateUrl, ringBrightness, halo, rays }) — он же init(canvas, opts) —→
+//   halo: 'calm' (по умолчанию) | 'chaotic' — ореол как в старом виде: неровная яркость по окружности, дрожь кромки,
+//     шире радужная кайма, живее нити; средняя яркость обода та же, что у calm при том же ringBrightness (хаос не прибавляет света).
+//   rays: false (по умолчанию) | true — лучи RTX: рассеяние кольца в дымке перераспределяется в тонкие радиальные лучи,
+//     средняя яркость кадра не меняется. Живая смена — api.setHalo('chaotic'), api.setRays(true).
 //   ringBrightness — яркость первого ореола (раскалённый пояс у кромки тени + фотонное кольцо); по умолчанию 0.88,
 //   1.0 = пиксель в пиксель как в v0.1.0. Внешнее гало, диск, отражение и звёзды не трогает. Переопределяется CSS-токеном --bh-ring.
 //   { ok, setAccent(hex, amt), setPointer(x, y), setScroll(v), setEnergy(v), pulse('go' | 'done'), pause(), resume(), resize(),
@@ -70,6 +74,8 @@ uniform float uHasFar;     // 0..1 — план проявляется за 0,5 
 uniform float uExpo;       // появление сцены 0..1 (всё, кроме фотонного кольца)
 uniform float uExpoRing;   // появление фотонного кольца (раньше остального)
 uniform float uRing;       // яркость первого ореола: раскалённый пояс у кромки тени + фотонное кольцо, экранные значения (1.0 = как в v0.1.0)
+uniform float uChaos;      // ореол «хаотичный» 0..1: неровная яркость по окружности, дрожь радиуса, шире радужная кайма, живее нити (средняя яркость та же)
+uniform float uGod;        // лучи RTX 0..1: рассеяние кольца в дымке перераспределяется в тонкие радиальные лучи (среднее не меняется)
 
 #define PI 3.14159265
 #define TAU 6.2831853
@@ -202,6 +208,11 @@ void main(){
   vec2 qss = p * lensS * kRH;
 
   float be = 1.0 + uBeamAmt * cos(ang - uBeam);                    // яркая сторона
+  // «хаос»: неровная яркость по окружности (среднее ≈ 1) и дрожь радиуса кромки (±1 % R), оба живут во времени
+  float chN = fbm(vec2(ang * 1.6 + t * 0.05, 7.0 + uSeed * 4.0), 3);
+  float chJ = fbm(vec2(ang * 2.4 - t * 0.09, 19.0), 3);
+  float beC = be * mix(1.0, 0.72 + 0.56 * chN, uChaos);
+  float jit = (chJ - 0.5) * 0.024 * uChaos;
   float breath = 1.0 + 0.03 * sin(t * TAU / 7.0) + 0.05 * uEnergy + 0.10 * uSwell;
   float yPl = -uPlaneY;                                            // линия плоскости, доли R (в координатах p)
   float xpool = exp(-p.x * p.x / (2.0 * 1.7 * 1.7));
@@ -330,8 +341,8 @@ void main(){
   // ---------- ореол: раскалённо-белый пояс, нити, многоступенчатый спад ----------
   // пояс неровный по углу: внешний край «дышит» прядями, а не ровный бублик
   float nb = fbm(dir * 1.8 + vec2(t * 0.006, uSeed * 3.0), 3);
-  float band = uBand * (0.72 + 0.62 * nb);
-  float w = (0.045 + 0.05 * uEnergy) / pow(max(b, 1.0), 1.5);      // у кольца: 2,6°/с, при загрузке 5,5°/с
+  float band = uBand * (0.72 + 0.62 * nb) * mix(1.0, 0.78 + 0.44 * chJ, uChaos);   // хаос: пояс дышит сильнее
+  float w = (0.045 + 0.05 * uEnergy) / pow(max(b, 1.0), 1.5) * mix(1.0, 1.7, uChaos);   // у кольца: 2,6°/с, при загрузке 5,5°/с; хаос — живее
   float th = atan(p.y, -p.x) + t * w + 1.5 * log(max(b, 1.0));      // спираль: пряди закручиваются наружу
   float rr = b * 12.0 + uSeed * 5.0;
   float fA = fbm(vec2(th * 3.2, rr), 4);
@@ -339,28 +350,36 @@ void main(){
   float seam = smoothstep(PI - 0.35, PI, abs(th));
   float fil = mix(fA, fB, seam * 0.5);
   fil = pow(clamp(fil * 1.2, 0.0, 1.0), 1.4) * 1.6;
-  float tex = mix(1.0, 0.50 + 0.8 * fil, uFib * exp(-e / 0.40));   // нити — только в поясе и ближнем спаде
+  float fibK = mix(uFib, min(uFib * 1.3, 1.0), uChaos);
+  float tex = mix(1.0, 0.50 + 0.8 * fil, fibK * exp(-e / 0.40));   // нити — только в поясе и ближнем спаде
   float wisp = fil * exp(-max(e - band, 0.0) / 0.22) * smoothstep(band * 0.6, band * 1.1, e) * 0.35 * uFib;   // пряди за поясом
   // тёмная дымка вихря поверх свечения (силуэты на фоне ореола)
   float smoke = dens1 * smoothstep(band * 0.6, band * 1.6, e) * (1.0 - smoothstep(1.2, 2.6, e));
   float absorb = (1.0 - 0.42 * smoke) * (1.0 - mistA);
   // латеральная хроматическая аберрация: красный канал смещён вправо, синий — влево
-  vec2 dCA = vec2(0.013 * uCA, 0.0);
-  float eR = max(length(p - dCA) - 1.0, 0.0);
-  float eB = max(length(p + dCA) - 1.0, 0.0);
-  vec3 hal = vec3(haloCore(eR, band), haloCore(e, band), haloCore(eB, band));
-  vec3 sca = vec3(haloScatter(eR, band), haloScatter(e, band), haloScatter(eB, band));
-  vec3 rng = vec3(ringsProfile(eR, uBand), ringsProfile(e, uBand), ringsProfile(eB, uBand));
+  float caK = uCA * mix(1.0, 1.7, uChaos);                          // хаос: кайма шире и заметнее
+  vec2 dCA = vec2(0.013 * caK, 0.0);
+  float eR = max(length(p - dCA) - 1.0 - jit, 0.0);
+  float eB = max(length(p + dCA) - 1.0 - jit, 0.0);
+  float eJ = max(b - 1.0 - jit, 0.0);
+  vec3 hal = vec3(haloCore(eR, band), haloCore(eJ, band), haloCore(eB, band));
+  vec3 sca = vec3(haloScatter(eR, band), haloScatter(eJ, band), haloScatter(eB, band));
+  vec3 rng = vec3(ringsProfile(eR, uBand), ringsProfile(eJ, uBand), ringsProfile(eB, uBand));
+  // лучи RTX: рассеяние кольца в дымке перераспределяется по углу в тонкие радиальные лучи — множитель со средним 1,
+  // поэтому общий свет не растёт; лучи тянутся дальше плато (уже за поясом) и медленно поворачиваются
+  float godN = fbm(vec2(ang * 5.0 + t * 0.012 + uSeed * 9.0, 3.0 + e * 0.35), 3);
+  float godK = mix(1.0, 0.28 + 2.55 * smoothstep(0.34, 0.72, godN) * (0.6 + 0.4 * chN), uGod * smoothstep(band * 0.8, band * 2.5, e));
+  sca *= godK;
   vec3 scaCol = mix(ice, uTint * 1.2, uTintAmt * 0.38);
-  vec3 halo = ((hal * tex + rng + wisp) + sca * mix(1.0, tex, 0.4) * scaCol) * be * breath * uHalo * absorb;
+  vec3 halo = ((hal * tex + rng + wisp) + sca * mix(1.0, tex, 0.4) * scaCol) * beC * breath * uHalo * absorb;
 
   // радужная кайма на внешнем краю пояса — только на дуге, обращённой к форме (сверху-слева)
   float xw = (e - band * 1.05) / (0.030 + band * 0.12);
   float bandCA = exp(-xw * xw * 1.3);
   vec3 spec = mix(vec3(1.0), hue2rgb(clamp(0.02 + (0.5 - 0.5 * xw) * 0.72, 0.0, 0.78)), 0.85);
   spec = mix(spec, uTint * 1.3, uTintAmt * 0.45);
-  float caMask = smoothstep(-0.2, 0.9, cos(ang - 2.25));
-  vec3 kayma = spec * bandCA * caMask * uCA * 0.8 * be * (1.0 + 0.35 * uSwell);
+  float caMask = mix(smoothstep(-0.2, 0.9, cos(ang - 2.25)), smoothstep(-0.9, 0.7, cos(ang - 2.25 + 0.7 * sin(t * 0.17))), uChaos);
+  vec3 kayma = spec * bandCA * caMask * caK * 0.8 * beC * (1.0 + 0.35 * uSwell);
 
   // частицы на орбитах
   float om = (0.035 + 0.04 * uEnergy) / pow(max(b, 1.0), 1.5);
@@ -421,9 +440,9 @@ void main(){
 
   // фотонное кольцо — тонкая раскалённая линия поверх стыка (с той же аберрацией)
   float pw = max(1.0 / uR, 0.007);
-  float ringR = exp(-pow((length(p - dCA * 0.6) - 1.0) / pw, 2.0));
-  float ringG = exp(-pow((b - 1.0) / pw, 2.0));
-  float ringB = exp(-pow((length(p + dCA * 0.6) - 1.0) / pw, 2.0));
+  float ringR = exp(-pow((length(p - dCA * 0.6) - 1.0 - jit) / pw, 2.0));
+  float ringG = exp(-pow((b - 1.0 - jit) / pw, 2.0));
+  float ringB = exp(-pow((length(p + dCA * 0.6) - 1.0 - jit) / pw, 2.0));
   vec3 ringC = vec3(ringR, ringG, ringB) * (1.05 + 0.20 * be) * (1.0 + 0.12 * uSwell) * uExpoRing * uRing;
   col = 1.0 - (1.0 - col) * (1.0 - clamp(ringC, 0.0, 1.0));
 
@@ -503,6 +522,12 @@ export function createCosmos(canvas, opts = {}) {
       api.wake();
     },
     setInvert(v) { api.invert = v ? 1 : 0; api.wake(); },
+    /** Ореол: 'calm' | 'chaotic' — плавно за ~0,9 с. */
+    setHalo(mode) { api.chaosT = mode === 'chaotic' ? 1 : 0; api.wake(); },
+    /** Лучи RTX вкл/выкл — плавно за ~0,9 с. */
+    setRays(on) { api.godT = on ? 1 : 0; api.wake(); },
+    chaos: opts.halo === 'chaotic' ? 1 : 0, chaosT: opts.halo === 'chaotic' ? 1 : 0,
+    god: opts.rays ? 1 : 0, godT: opts.rays ? 1 : 0,
     /** Указатель −1..1 → только параллакс планов (линзы у курсора нет); при reduced не двигает ничего. */
     setPointer(x, y) { if (reduced) return; api._pt = [x, y]; api.wake(); },
     setScroll(v) { if (v === api._scroll) return; api._scroll = v; api.wake(); },
@@ -556,7 +581,7 @@ export function createCosmos(canvas, opts = {}) {
   for (const n of ['uRes', 'uH', 'uTime', 'uPar', 'uParAmt', 'uScroll', 'uC', 'uR', 'uHalo', 'uBand', 'uCA', 'uBeam', 'uBeamAmt', 'uLensE',
     'uTint', 'uTintAmt', 'uSwell', 'uEnergy', 'uFog', 'uRays', 'uPlane', 'uPlaneY', 'uFar', 'uStars', 'uFlare',
     'uInner', 'uFib', 'uPersp', 'uWaves', 'uMist', 'uNear', 'uDust', 'uSpecks', 'uPairA', 'uPairS', 'uInvert', 'uSeed', 'uFarTex', 'uFarMap', 'uFarAnchor', 'uHasFar',
-    'uExpo', 'uExpoRing', 'uRing']) U[n] = gl.getUniformLocation(prog, n);
+    'uExpo', 'uExpoRing', 'uRing', 'uChaos', 'uGod']) U[n] = gl.getUniformLocation(prog, n);
   const seed = opts.seed ?? 0.37;
   const ringDefault = opts.ringBrightness ?? 0.88;   // 1.0 = как в v0.1.0
   api.ok = true;
@@ -682,6 +707,8 @@ export function createCosmos(canvas, opts = {}) {
     gl.uniform1f(U.uExpo, api._expo);
     gl.uniform1f(U.uExpoRing, api._expoRing);
     gl.uniform1f(U.uRing, tok.ring ?? ringDefault);
+    gl.uniform1f(U.uChaos, api.chaos);
+    gl.uniform1f(U.uGod, api.god);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
   const ease = (cur, target, dt, tau) => cur + (target - cur) * Math.min(1, dt / tau);
@@ -711,13 +738,16 @@ export function createCosmos(canvas, opts = {}) {
     for (let i = 0; i < 3; i++) api.tint[i] = reduced ? api.tintT[i] : ease(api.tint[i], api.tintT[i], dt, 0.5);
     api.tintAmt = reduced ? api.tintAmtT : ease(api.tintAmt, api.tintAmtT, dt, 0.5);
     api.energy = reduced ? api.energyT : ease(api.energy, api.energyT, dt, 1.2);
+    api.chaos = reduced ? api.chaosT : ease(api.chaos, api.chaosT, dt, 0.4);
+    api.god = reduced ? api.godT : ease(api.god, api.godT, dt, 0.4);
     // вдох кольца: пока идёт атака — к пику τ 0,2 с, потом выдох τ 0,7 с (виден ≈ 1,5 с, пик ореола +9 %)
     if (api._attack > 0) { api._attack -= dt; api.swell = ease(api.swell, api._peak, dt, 0.2); }
     else api.swell = api.swell < 0.002 ? 0 : ease(api.swell, 0, dt, 0.7);
     // 60 fps — пока идёт появление, вдох, параллакс не осел, оттенок или энергия меняются; в покое — 30 fps
     const busy = api._expo < 1 || api._far < hasFar || api.swell > 0 || api._attack > 0
       || !near(api._ptS[0], api._pt[0], 0.001) || !near(api._ptS[1], api._pt[1], 0.001)
-      || !near(api.tintAmt, api.tintAmtT, 0.002) || !near(api.energy, api.energyT, 0.002);
+      || !near(api.tintAmt, api.tintAmtT, 0.002) || !near(api.energy, api.energyT, 0.002)
+      || !near(api.chaos, api.chaosT, 0.002) || !near(api.god, api.godT, 0.002);
     api._odd = !api._odd;
     if (busy || api._odd || reduced || api._paused) draw();
     if (reduced) { api._last = 0; return; }                          // перерисовка — только по событию
