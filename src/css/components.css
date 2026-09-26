@@ -1,0 +1,368 @@
+/* cosmos-kit — компоненты: чистый CSS-класс-API, без логики конкретного сайта.
+   Обобщено из проекта «выдра» (core.css, hero.css, shell.css, library.css, dialogs.css —
+   ~/projects/video-downloader/vydra/static/css/). Требует tokens.css.
+   Курсорный свет по кайме/поверхности (--mx/--my) и hover/press-пружины — см. motion.js. */
+
+/* ============================================================
+   Плита («стекла» нет — тёмная плита с рамкой-волосом)
+   ============================================================ */
+
+.glass {
+  position: relative; isolation: isolate;
+  background: var(--plate);
+  border: 1px solid var(--line-2);
+  transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+@media (hover: hover) {
+  .glass:hover { background-color: var(--s3); border-color: var(--line-3); color: var(--ink); }
+}
+:root[data-theme="light"] .glass { background: var(--glass-bg); border-color: var(--glass-rim); box-shadow: inset 0 1px 0 var(--glass-spec), 0 1px 2px rgba(20, 20, 30, .08); }
+
+/* ============================================================
+   Кнопки
+   ============================================================ */
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: var(--r-m); font-weight: 500; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--ink);
+  transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast), box-shadow var(--t-base) var(--ease-out); }
+.btn svg { width: 16px; height: 16px; }
+.btn:not(.glass) { background: var(--s1); border: 1px solid var(--line-2); }
+.btn:not(.glass):not(.primary):not(.solid):hover { background: var(--s3); border-color: var(--line-3); }
+.btn:active:not(:disabled) { background-color: var(--s4); }
+.btn:disabled { opacity: .32; cursor: not-allowed; }
+.btn.small { height: 36px; padding: 0 12px; font-size: 13.5px; }
+/* «раскалённая» плита — единственное сильное свечение экрана, приберегите на одно главное действие */
+.btn.primary { color: #000; border-color: transparent; background: var(--white-hot); box-shadow: var(--white-glow); }
+:root[data-theme="light"] .btn.primary { color: #fff; }
+.btn.primary:hover:not(:disabled) { background: var(--white-hot); box-shadow: 0 0 0 1px #fff, 0 0 34px rgba(255, 255, 255, .5), 0 0 100px rgba(255, 255, 255, .2); }
+/* разрушительное действие — «красная плита»: тёмный текст на err (контраст держит текст, не белый) */
+.btn.solid.danger { color: #14040a; background: var(--err); border-color: transparent; box-shadow: 0 0 22px rgba(255, 95, 115, .28); }
+.btn.busy svg, .chip-btn.busy svg { animation: spin-ring 1s linear infinite; }
+@keyframes spin-ring { to { transform: rotate(270deg); } }
+
+.chip-btn { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: var(--r-m); text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--ink);
+  transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast); }
+.chip-btn:not(.glass) { background: var(--s1); border: 1px solid var(--line-2); }
+.chip-btn svg { width: 16px; height: 16px; }
+.chip-btn.danger { color: var(--err); }
+.chip-btn.solid { color: #14040a; background: var(--err); border-color: transparent; box-shadow: 0 0 22px rgba(255, 95, 115, .28); }
+
+.icon-btn { width: 40px; height: 40px; border-radius: var(--r-m); display: grid; place-items: center; color: var(--ink-2);
+  transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast); }
+.icon-btn:hover { color: var(--ink); }
+.icon-btn.small { width: 32px; height: 32px; border-radius: var(--r-s); }
+.icon-btn.small svg { width: 16px; height: 16px; }
+.icon-btn:not(.glass) { background: transparent; border: 1px solid transparent; }
+.icon-btn:not(.glass):hover { background: var(--s3); }
+
+.text-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: var(--r-m); color: var(--ink-2); font-size: 14px;
+  transition: background-color var(--t-fast), color var(--t-fast); }
+.text-btn:hover { background: var(--surface-2); color: var(--ink); }
+.text-btn svg { width: 16px; height: 16px; }
+
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ============================================================
+   Вкладки / сегментированный переключатель (пилюли)
+   Общая «чернильная» плашка (.tab-ink / .pill-ink) скользит на transform — двигайте её из JS,
+   выставляя --x/--w по bounding box активного элемента (см. motion.js: springTo).
+   ============================================================ */
+
+.tabs { position: relative; display: inline-flex; margin: 0; border-radius: var(--r-m); padding: 3px; background: var(--plate); border: 1px solid var(--line-2); }
+.tab { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); font-weight: 500; transition: color var(--t-fast) var(--ease-out); border-radius: var(--r-s); padding: 7px 14px; font-size: 13.5px; cursor: pointer; }
+.tab svg { width: 16px; height: 16px; }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { color: var(--ink); font-weight: 600; }
+
+.pills { position: relative; display: inline-flex; min-width: 0; gap: 2px; max-width: 100%; overflow-x: auto; scrollbar-width: none; border-radius: var(--r-m); padding: 3px; background: var(--plate); border: 1px solid var(--line-2); }
+.pills::-webkit-scrollbar { display: none; }
+.pills button { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 7px; color: var(--ink-2); font-weight: 500; white-space: nowrap; cursor: pointer; transition: color var(--t-fast) var(--ease-out), opacity var(--t-fast) var(--ease-out); border-radius: var(--r-s); padding: 7px 12px; font-size: 13.5px; }
+.pills button svg { width: 15px; height: 15px; }
+.pills button:hover, .pills button[aria-checked="true"] { color: var(--ink); }
+.pills button[aria-checked="true"] { font-weight: 600; }
+.pills button:disabled { opacity: .32; cursor: not-allowed; text-decoration: line-through; text-decoration-thickness: 1px; }
+.pills.small button { padding: 6px 11px; font-size: 13.5px; }
+
+/* плашка активного пункта — общая для .tabs и .pills */
+.pill-ink, .tab-ink { position: absolute; left: 0; width: var(--w, 0); transform: translateX(var(--x, 0)); will-change: transform; top: 3px; bottom: 3px; border-radius: 7px; background: rgba(255, 255, 255, .11); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14); }
+:root[data-theme="light"] .tab-ink, :root[data-theme="light"] .pill-ink { background: #fff; box-shadow: inset 0 0 0 1px var(--line-1), 0 2px 8px rgba(20, 20, 30, .12); }
+
+/* переключатель (switch): дорожка 34×20 r7, ползунок 14×14 r5 */
+.switch { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; color: var(--ink-2); user-select: none; width: fit-content; transition: color var(--t-fast) var(--ease-out); }
+.switch:hover { color: var(--ink); }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch-track { position: relative; flex: none; width: 34px; height: 20px; border-radius: 7px; background: var(--s3); box-shadow: inset 0 0 0 1px var(--line-2); transition: background-color var(--t-base) var(--ease-out), box-shadow var(--t-base) var(--ease-out); }
+.switch-thumb { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 5px; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .4); transition: transform var(--t-base) var(--ease-out), width var(--t-fast) var(--ease-out); }
+.switch:active .switch-thumb { width: 17px; }
+.switch input:checked + .switch-track { background: color-mix(in oklab, var(--el-a) 85%, transparent); box-shadow: none; }
+.switch input:checked + .switch-track .switch-thumb { transform: translateX(14px); }
+.switch:active input:checked + .switch-track .switch-thumb { transform: translateX(11px); }
+.switch input:focus-visible + .switch-track { outline: 2px solid var(--el-a); outline-offset: 2px; box-shadow: var(--focus-ring); }
+.switch-text { display: inline-flex; align-items: center; gap: 7px; }
+.switch-text svg { width: 16px; height: 16px; }
+.switch input:checked ~ .switch-text { color: var(--ink); }
+
+/* ============================================================
+   Поле ввода «портал»: кайма-горизонт + свет курсора по кайме и поверхности.
+   --mx/--my ставит motion.js (см. attachPointerGlow) на hover/focus. --angle крутит
+   конический градиент каймы (уже объявлен в tokens.css как @property).
+   ============================================================ */
+
+.field { position: relative; isolation: isolate; border-radius: var(--r-l); }
+.field-ring { position: absolute; padding: 1px; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: field-spin 24s linear infinite; transition: opacity .5s var(--ease-out), filter .5s var(--ease-out); inset: -1px; border-radius: calc(var(--r-l) + 1px); opacity: .5; background: conic-gradient(from var(--angle), transparent 0 58%, color-mix(in oklab, var(--el-a) 90%, transparent) 78%, transparent 96%); }
+.field.lit .field-ring, .field:focus-within .field-ring { opacity: 1; filter: drop-shadow(0 0 6px color-mix(in oklab, var(--el-a) 60%, transparent)); animation-duration: 12s; }
+.field.busy .field-ring { animation-duration: 6s; }
+@keyframes field-spin { to { --angle: 360deg; } }
+.field-body { position: relative; isolation: isolate; display: flex; align-items: center; border-radius: var(--r-l); padding: 8px; gap: 6px; border: 1px solid var(--line-2); background: var(--lit-from-hole), linear-gradient(180deg, rgba(255, 255, 255, .025), transparent 40%), var(--s1); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 30px 80px -24px rgba(0, 0, 0, .95); transition: border-color var(--t-fast) var(--ease-out); }
+.field:hover .field-body { border-color: var(--line-3); }
+/* свет курсора: кайма и поверхность капсулы подсвечиваются в точке указателя */
+.field-body::before, .field-body::after { content: ""; position: absolute; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .45s var(--ease-out); }
+.field-body::before { inset: -1px; padding: 1.5px; background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), #fff 0%, color-mix(in oklab, var(--el-a, #fff) 45%, rgba(255, 255, 255, .7)) 25%, transparent 75%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+.field-body::after { inset: 0; z-index: -1; background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .10), rgba(255, 255, 255, .03) 40%, transparent 75%); }
+.field:hover .field-body::before, .field:hover .field-body::after { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .field-body::before, .field-body::after { transition: none; } }
+.field-glyph { display: grid; place-items: center; transition: background var(--t-base) var(--ease-out), color var(--t-base) var(--ease-out), box-shadow var(--t-base) var(--ease-out); width: 44px; height: 44px; border-radius: var(--r-m); background: var(--s2); color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line-1); }
+.field-glyph svg { width: 20px; height: 20px; }
+/* акцентный глиф — единственная плита формы, залитая цветом излучения */
+.field-glyph.accent { color: #fff; background: linear-gradient(135deg, var(--el-a), var(--el-b)); box-shadow: var(--el-glow-soft); }
+.field-body input, .field-body textarea { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 17px; padding: 10.5px 4px 9.5px; resize: none; }
+.field-body input::placeholder, .field-body textarea::placeholder { color: var(--ink-3); }
+.field-body input:focus-visible, .field-body textarea:focus-visible { outline: none; box-shadow: none; }
+
+/* кнопка-плита действия внутри поля (например «Скачать») — раскалённая, приберегите на одно действие */
+.go-btn { flex: none; width: auto; height: 48px; padding: 0 20px 0 16px; border-radius: var(--r-m); display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; color: #000; background: #fff; font: 600 15px/1 var(--font-text); letter-spacing: .005em; box-shadow: 0 0 0 1px rgba(255, 255, 255, .9), 0 0 26px rgba(255, 255, 255, .34), 0 0 80px rgba(255, 255, 255, .14); transition: box-shadow var(--t-base) var(--ease-out), filter var(--t-fast) var(--ease-out); cursor: pointer; }
+:root[data-theme="light"] .go-btn { color: #fff; }
+.go-btn svg { width: 18px; height: 18px; stroke-width: 2.4; }
+.go-btn:hover { box-shadow: 0 0 0 1px #fff, 0 0 34px rgba(255, 255, 255, .5), 0 0 100px rgba(255, 255, 255, .2); }
+.go-btn.fire svg { animation: go-dive .7s var(--ease-out); }
+.go-btn:disabled { filter: opacity(.72); cursor: default; }
+@keyframes go-dive { 0% { transform: none; } 40% { transform: translateY(18px); opacity: 0; } 41% { transform: translateY(-18px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+
+.ghost-btn { display: inline-flex; align-items: center; gap: 7px; font-weight: 500; transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out); height: 44px; padding: 0 12px; border-radius: var(--r-m); color: var(--ink-2); font-size: 13.5px; cursor: pointer; }
+.ghost-btn:hover { background: var(--s3); color: var(--ink); }
+.ghost-btn svg { width: 17px; height: 17px; }
+
+/* ============================================================
+   Зона перетаскивания (dropzone)
+   ============================================================ */
+
+.dropzone { position: relative; display: grid; align-content: center; justify-items: center; gap: 6px; min-height: 168px; padding: 20px 24px; text-align: center; cursor: pointer; border-radius: var(--r-l); background: var(--lit-from-hole), var(--plate);
+  --dash-14: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' rx='14' fill='none' stroke='%23000' stroke-width='3' stroke-dasharray='6 6'/%3E%3C/svg%3E"); }
+.dropzone::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: var(--line-3); -webkit-mask: var(--dash-14) 0 0 / 100% 100% no-repeat; mask: var(--dash-14) 0 0 / 100% 100% no-repeat; transition: background-color var(--t-fast) var(--ease-out); }
+.dropzone:hover::before { background: color-mix(in oklab, var(--ink) 40%, transparent); }
+.dropzone:has(input:focus-visible) { outline: 2px solid var(--el-a); outline-offset: 2px; box-shadow: var(--focus-ring); }
+.dropzone input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.dz-orb { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); background: var(--s2); box-shadow: inset 0 0 0 1px var(--line-1); margin-bottom: 6px; transition: color var(--t-fast) var(--ease-out); }
+.dropzone:hover .dz-orb { color: var(--ink); }
+.dz-orb svg { width: 22px; height: 22px; }
+.dz-title { font: 600 15px/1.3 var(--font-text); color: var(--ink); }
+.dz-sub { color: var(--ink-2); font-size: 13px; line-height: 1.45; }
+
+/* ============================================================
+   Карточки (плиты со свечением по границе при выделении/наведении на цель drop)
+   ============================================================ */
+
+.card { position: relative; display: block; padding: 18px; border: 1px solid var(--line-1); text-align: left; color: inherit; cursor: pointer; border-radius: var(--r-l); background: var(--s1);
+  transition: border-color .3s, background-color .3s, box-shadow .35s; }
+.card:hover { border-color: var(--line-2); background: var(--surface-2); }
+.card.selected { border-color: var(--el-a); box-shadow: inset 0 0 0 1px var(--el-a); background: color-mix(in oklab, var(--el-a) 10%, var(--surface)); }
+.card.drop-target { border-color: var(--el-a); box-shadow: 0 0 0 1px var(--el-a), var(--el-glow); }
+.card-glyph { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-1); border-radius: var(--r-m); }
+.card-glyph svg { width: 22px; height: 22px; }
+.card-title { font: 600 16.5px/1.2 var(--font-display); letter-spacing: -.02em; color: var(--ink); margin: 0; }
+.card-sub { font: 500 12px/1.4 var(--font-mono); color: var(--ink-3); letter-spacing: .02em; margin: 4px 0 0; }
+
+/* карточка-«блок» с заголовком-иконкой (например настройки, диагностика) */
+.card-block { display: grid; gap: 12px; padding: 16px; border-radius: var(--r-l); background: var(--s1); border: 1px solid var(--line-1); }
+.card-block h4 { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 0; padding-left: 26px; font: 600 15px/20px var(--font-text); color: var(--ink); }
+.card-block h4 > svg { position: absolute; left: 0; top: 1px; width: 18px; height: 18px; color: var(--ink-2); }
+
+/* ============================================================
+   Дерево / сайдбар
+   ============================================================ */
+
+.tree-nav { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; align-content: start; }
+.tnode { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 9px; color: var(--ink-2); font-size: 13.5px; cursor: pointer; user-select: none; transition: background-color .2s, color .2s, box-shadow .25s; }
+.tnode:hover { background: var(--surface); color: var(--ink); }
+.tnode[aria-current="true"] { color: var(--ink); background: var(--surface-2); }
+.tnode[aria-disabled="true"] { opacity: .45; cursor: default; }
+.tnode.drop-target { box-shadow: 0 0 0 2px var(--el-a), var(--el-glow-soft); color: var(--ink); }
+.tnode .tw { width: 16px; height: 16px; display: grid; place-items: center; color: var(--ink-3); flex: none; }
+.tnode .tw svg { width: 12px; height: 12px; transition: transform .3s var(--ease-out); }
+.tnode.open .tw svg { transform: rotate(90deg); }
+.tnode .tw.leaf { visibility: hidden; }
+.tnode > svg.ti { width: 15px; height: 15px; color: var(--ink-3); }
+.tnode .tn { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tnode .tc { flex: none; font: 500 11px/1 var(--font-mono); color: var(--ink-3); }
+.tkids { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; padding-left: 14px; }
+
+/* ============================================================
+   Крошки (breadcrumbs)
+   ============================================================ */
+
+.crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 2px; min-width: 0; font-size: 14.5px; }
+.crumb { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: 9px; color: var(--ink-2); font-weight: 500; cursor: pointer; transition: background-color .25s, color .25s, box-shadow .25s; }
+.crumb svg { width: 15px; height: 15px; }
+.crumb:hover { background: var(--surface-2); color: var(--ink); }
+.crumb[aria-current="page"] { color: var(--ink); font-weight: 600; }
+.crumb.drop-target { box-shadow: 0 0 0 2px var(--el-a), var(--el-glow-soft); color: var(--ink); }
+.crumb-sep { color: var(--ink-3); }
+.crumb-sep svg { width: 14px; height: 14px; }
+
+/* ============================================================
+   Теги и чипы
+   ============================================================ */
+
+.tag { display: inline-flex; align-items: center; gap: 6px; height: 20px; padding: 0 8px; border: 0; border-radius: var(--r-xs); background: var(--s3); color: var(--ink-3);
+  font: 500 10.5px/1 var(--font-mono); letter-spacing: .04em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tag.accent { color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-3); }
+
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border: 1px solid var(--line-2); color: var(--ink-2); font-size: 12.5px; max-width: 100%; border-radius: var(--r-s); }
+.chip svg { width: 13px; height: 13px; }
+.chip.mono { font-family: var(--font-mono); font-size: 12px; }
+.chip.accent { color: var(--ink); border-color: color-mix(in oklab, var(--el-a) 50%, transparent); }
+
+/* ============================================================
+   Листалка страниц (pager)
+   ============================================================ */
+
+.pager { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; margin-top: 24px; }
+.pager-pos { font: 500 11.5px/1 var(--font-mono); letter-spacing: .06em; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pager-pages { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border-radius: var(--r-m); background: var(--s1); border: 1px solid var(--line-2); }
+.pager-btn { display: inline-grid; place-items: center; min-width: 34px; height: 32px; padding: 0 8px; border-radius: var(--r-s); color: var(--ink-2); cursor: pointer;
+  font: 500 12.5px/1 var(--font-mono); font-variant-numeric: tabular-nums; transition: background-color var(--t-fast), color var(--t-fast); }
+.pager-btn:hover:not(:disabled) { background: var(--s3); color: var(--ink); }
+.pager-btn[aria-current="page"] { color: var(--ink); font-weight: 600; background: rgba(255, 255, 255, .11); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14); }
+.pager-btn:disabled { opacity: .32; cursor: default; }
+.pager-btn svg { width: 14px; height: 14px; }
+.pager-gap { min-width: 18px; text-align: center; font: 500 12.5px/1 var(--font-mono); color: var(--ink-3); }
+
+/* ============================================================
+   Индикатор прогресса (meter) — сегментированная дорожка, заливка по clip-path
+   ============================================================ */
+
+.meter { position: relative; height: 6px; margin-top: 4px; border-radius: 2px; background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .10) 0 6px, transparent 6px 8px); }
+.meter-fill { position: absolute; inset: 0; background: var(--el-a);
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 8px); mask: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 8px);
+  clip-path: inset(0 calc((1 - var(--p, 0)) * 100%) 0 0); transition: clip-path .6s var(--ease-out); }
+.meter-glow { position: absolute; inset: 0; background: var(--el-a); filter: blur(6px); opacity: .3; pointer-events: none;
+  transform-origin: left; transform: scaleX(var(--p, 0)); transition: transform .6s var(--ease-out), opacity var(--t-base) var(--ease-out); }
+/* без процента: сегмент 28% бежит слева направо */
+.meter.indet .meter-fill { clip-path: none; background: linear-gradient(var(--el-a), var(--el-a)) 0 0 / 28% 100% no-repeat; animation: meter-indet 1.6s linear infinite; }
+@keyframes meter-indet { from { background-position: -39% 0; } to { background-position: 139% 0; } }
+.meter.breathing { animation: meter-breath 2.4s ease-in-out infinite; }
+@keyframes meter-breath { 50% { opacity: .55; } }
+
+/* точка «жив/активен» с дыханием */
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--el-a); animation: breathe 2.4s ease-in-out infinite; }
+@keyframes breathe { 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .live-dot, .meter.breathing, .meter.indet .meter-fill { animation: none !important; } .meter.indet .meter-fill { opacity: .35; } }
+
+/* ============================================================
+   Диалоги (dialog / drawer / modal) — общая подложка §3.4
+   ============================================================ */
+
+dialog { padding: 0; border: 0; color: var(--ink); background: transparent; max-width: none; max-height: none; overflow: visible; }
+dialog::backdrop { background: rgba(0, 0, 0, .62); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); opacity: 0; transition: opacity var(--t-base) var(--ease-out); }
+dialog[open]::backdrop { opacity: 1; }
+@starting-style { dialog[open]::backdrop { opacity: 0; } }
+dialog.closing::backdrop { opacity: 0; }
+:root[data-theme="light"] dialog::backdrop { background: rgba(60, 60, 70, .3); }
+html:has(dialog[open]) { overflow: hidden; }
+
+.drawer-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.drawer-kicker { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font: 500 11px/1 var(--font-mono); letter-spacing: .24em; text-transform: uppercase; color: var(--ink-3); }
+.drawer-kicker svg { width: 14px; height: 14px; flex: none; color: var(--ink-3); }
+.drawer-head h3 { margin: 0; font: 700 22px/1.2 var(--font-display); letter-spacing: -.02em; color: var(--ink); }
+dialog .icon-btn[data-close] { width: 36px; height: 36px; flex: none; border-radius: var(--r-m); background: var(--s1); border: 1px solid var(--line-2); color: var(--ink-2);
+  transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast); }
+dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--line-3); color: var(--ink); }
+
+.drawer { width: 440px; height: calc(100dvh - 16px); margin: 8px 8px 8px auto; }
+.drawer-box { position: relative; height: 100%; display: flex; flex-direction: column; border-radius: var(--r-xl); overflow: hidden; background: var(--s-raised); border: 1px solid var(--line-2); box-shadow: var(--shadow); }
+.drawer-box > .drawer-head { padding: 24px 24px 16px; }
+.drawer-scroll { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-content: start; padding: 0 24px 24px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+/* хват для смахивания на телефоне (см. motion.js: attachSwipeToClose) */
+.grab { display: none; }
+
+.modal { margin: auto; width: min(520px, calc(100vw - 32px)); }
+.modal-box { display: grid; padding: 24px; border-radius: var(--r-xl); background: var(--s-raised); border: 1px solid var(--line-2); box-shadow: var(--shadow); }
+.modal-box > .drawer-head { padding: 0 0 16px; }
+.modal-text { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 24px 0 0; }
+
+@media (max-width: 680px) {
+  .drawer { width: 100vw; height: auto; max-height: 90dvh; margin: auto 0 0; }
+  .drawer-box { border-radius: 24px 24px 0 0; max-height: 90dvh; }
+  .grab { display: block; position: absolute; top: 8px; left: 50%; width: 42px; height: 5px; margin-left: -21px; border-radius: 3px; background: var(--line-2); z-index: 2; }
+  .drawer-head { padding-top: 26px; cursor: grab; touch-action: none; }
+  .modal { width: 100vw; margin: auto 0 0; }
+  .modal-box { border-radius: 22px 22px 0 0; }
+}
+
+/* клавиши: две колонки, разделители --line-1 */
+.cheat-list { display: grid; grid-template-columns: max-content minmax(0, 1fr); margin: 0; font-size: 14px; }
+.cheat-list dt, .cheat-list dd { display: flex; align-items: center; min-height: 32px; padding: 4px 0; border-top: 1px solid var(--line-1); }
+.cheat-list > :nth-child(-n + 2) { border-top: 0; }
+.cheat-list dt { gap: 4px; padding-right: 24px; font-size: 12px; color: var(--ink-3); }
+.cheat-list dd { margin: 0; line-height: 1.4; color: var(--ink-2); }
+.cheat-list kbd { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: var(--r-xs); font: 500 12px/1 var(--font-mono); color: var(--ink); }
+
+/* ============================================================
+   Контекстное меню
+   ============================================================ */
+
+.ctx { position: fixed; z-index: 140; min-width: 220px; padding: 6px; border-radius: 14px; box-shadow: var(--shadow); background: var(--s-raised); border: 1px solid var(--line-2); }
+.ctx button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border-radius: 9px; text-align: left; font-size: 14px; color: var(--ink); cursor: pointer; }
+.ctx button svg { width: 16px; height: 16px; color: var(--ink-2); }
+.ctx button:hover, .ctx button:focus-visible { background: var(--surface-2); outline: none; }
+.ctx button:disabled { opacity: .4; cursor: default; }
+.ctx button.danger, .ctx button.danger svg { color: var(--err); }
+.ctx hr { border: 0; border-top: 1px solid var(--line-1); margin: 6px 4px; }
+.ctx kbd { margin-left: auto; }
+
+/* ============================================================
+   Тосты
+   ============================================================ */
+
+.toasts { position: fixed; left: 50%; bottom: 18px; z-index: 110; display: grid; justify-items: center; gap: 8px; translate: -50% 0; width: min(560px, calc(100vw - 24px)); pointer-events: none; }
+.toast { display: flex; align-items: center; gap: 10px; padding: 11px 16px 11px 12px; border-radius: var(--r-l); max-width: 100%;
+  background: var(--s-raised); border: 1px solid var(--line-2); box-shadow: var(--shadow); font: 500 14px/1.4 var(--font-text); color: var(--ink); pointer-events: auto; }
+.toast .ti { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--surface-2); color: var(--tone, var(--ink-2)); }
+.toast .ti svg { width: 16px; height: 16px; }
+.toast .ti + .tt::before { content: ""; display: inline-block; width: 2px; height: 16px; margin: 0 10px -3px 0; border-radius: 1px; background: var(--tone, var(--ink-2));
+  box-shadow: 0 0 8px color-mix(in oklab, var(--tone, var(--ink-2)) 70%, transparent); }
+.toast.ok { --tone: var(--ok); }
+.toast.err { --tone: var(--err); }
+.toast.warn { --tone: var(--warn); }
+.toast .btn { height: 32px; padding: 0 12px; font-size: 13px; margin-left: 6px; flex: none; }
+#toasts, #toasts:popover-open {
+  position: fixed; top: auto; right: auto; left: 50%; bottom: 18px; margin: 0;
+  translate: -50% 0; border: none; padding: 0; background: none; overflow: visible;
+  width: min(560px, calc(100vw - 24px)); height: auto;
+}
+#toasts::backdrop { display: none; }
+
+/* ============================================================
+   Пустое состояние / скелетон загрузки
+   ============================================================ */
+
+.empty { position: relative; display: grid; justify-items: center; text-align: center; gap: 8px; padding: 56px 20px 40px; color: var(--ink-2); }
+.empty p { margin: 14px 0 0; font: 600 19px/1.3 var(--font-display); color: var(--ink); letter-spacing: -.02em; }
+.empty small { font-size: 14.5px; max-width: 440px; }
+.empty-mark { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line-2); color: var(--ink-3); }
+.empty-mark svg { width: 24px; height: 24px; stroke-width: 1.5; }
+
+.skel { position: relative; overflow: hidden; background: var(--surface-2); border-radius: var(--r-m); }
+.skel::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .05), transparent); animation: skel-shimmer 1.6s linear infinite; }
+@keyframes skel-shimmer { to { transform: translateX(100%); } }
+.skel-line { height: 12px; border-radius: var(--r-xs); }
+@keyframes fade-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .skel::after { animation: none; opacity: 0; } }
+
+/* ============================================================
+   Раскладка: колонка-датум (левая линия макета) и адаптив по умолчанию
+   ============================================================ */
+
+@media (max-width: 680px) {
+  html, body { overflow-x: hidden; }
+}

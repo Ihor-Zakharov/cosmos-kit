@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>cosmos-kit — витрина</title>
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="../src/fonts/fonts.css">
+<link rel="stylesheet" href="../src/css/tokens.css">
+<link rel="stylesheet" href="../src/css/components.css">
+<style>
+  /* стили самой витрины (не часть кита): секции, подписи, сетка примеров */
+  body { position: relative; }
+  .demo-wrap { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 40px var(--datum) 120px; display: grid; gap: 48px; }
+  .demo-head { display: grid; gap: 8px; padding-top: 8px; }
+  .demo-head h1 { margin: 0; font: 700 40px/1.1 var(--font-display); letter-spacing: -.03em; }
+  .demo-head p { margin: 0; color: var(--ink-2); max-width: 640px; line-height: 1.5; }
+  .demo-toolbar { position: sticky; top: 12px; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; border-radius: var(--r-l); background: var(--s-raised); border: 1px solid var(--line-2); width: fit-content; }
+  section.demo-section { display: grid; gap: 16px; }
+  section.demo-section h2 { margin: 0; font: 600 13px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .demo-note { margin: 0; font-size: 13px; color: var(--ink-3); }
+</style>
+</head>
+<body>
+  <!-- фон-сцена: чёрная дыра. cosmos-wrap фиксирован под всем содержимым (см. components.css/tokens.css — .grain,
+       и app-специфичные правила позиционирования .cosmos-wrap, которые каждый сайт задаёт сам под свой layout) -->
+  <div id="cosmos-wrap" aria-hidden="true" style="position:fixed;inset:0 0 auto 0;height:100svh;z-index:-1;overflow:hidden;background:#000;">
+    <canvas id="cosmos" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
+    <div class="cosmos-fallback" style="position:absolute;inset:0;opacity:0;background:radial-gradient(circle at 70% 54%, transparent 0 13.4svh, rgba(255,255,255,.85) 13.6svh 13.9svh, rgba(255,255,255,.22) 14.8svh, transparent 19svh), #000;"></div>
+    <div class="grain"></div>
+  </div>
+
+  <main class="demo-wrap">
+    <header class="demo-head">
+      <h1>cosmos-kit</h1>
+      <p>Переиспользуемый дизайн-кит визуального языка «чёрная дыра» (тёмная тема, монохромные поверхности,
+      цвет только в излучении). Токены, шрифты, иконки, фон-сцена, пружинная физика и базовые компоненты —
+      вынесены из проекта «выдра» и обобщены. Ниже — живая витрина всего, что есть в ките.</p>
+      <div class="demo-toolbar">
+        <button class="btn small" data-accent="none">Излучение: белое</button>
+        <button class="btn small" data-accent="a">Пресет A</button>
+        <button class="btn small" data-accent="b">Пресет B</button>
+        <button class="btn small" data-accent="c">Пресет C</button>
+        <button class="btn small" data-accent="d">Пресет D</button>
+        <button class="btn small" id="toggle-motion">Reduced motion: авто</button>
+      </div>
+    </header>
+
+    <section class="demo-section">
+      <h2>Поле ввода (field) — кайма-горизонт + свет курсора</h2>
+      <form class="field" id="demo-field">
+        <div class="field-ring" aria-hidden="true"></div>
+        <div class="field-body glass">
+          <span class="field-glyph accent" aria-hidden="true"><svg><use href="../src/icons/sprite.svg#i-link"/></svg></span>
+          <input type="text" placeholder="Вставьте ссылку — или просто наведите курсор" aria-label="Пример поля">
+          <button class="ghost-btn" type="button"><svg><use href="../src/icons/sprite.svg#i-clipboard"/></svg><span>Вставить</span></button>
+          <button class="go-btn" type="submit" aria-label="Отправить"><svg><use href="../src/icons/sprite.svg#i-arrow-down"/></svg></button>
+        </div>
+      </form>
+      <p class="demo-note">Наведите курсор на капсулу — кайма и поверхность подсвечиваются в точке указателя (motion.js: attachPointerGlow).</p>
+    </section>
+
+    <section class="demo-section">
+      <h2>Кнопки</h2>
+      <div class="demo-row">
+        <button class="btn primary">Основное действие</button>
+        <button class="btn">Обычная</button>
+        <button class="glass btn">Плита</button>
+        <button class="btn solid danger">Опасно</button>
+        <button class="btn" disabled>Недоступна</button>
+        <button class="chip-btn"><svg><use href="../src/icons/sprite.svg#i-download"/></svg>Скачать копию</button>
+        <button class="icon-btn glass" aria-label="Настройки"><svg><use href="../src/icons/sprite.svg#i-sliders"/></svg></button>
+        <button class="text-btn"><svg><use href="../src/icons/sprite.svg#i-keyboard"/></svg>клавиши</button>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Вкладки и сегментированный переключатель</h2>
+      <div class="demo-row">
+        <div class="tabs glass" role="tablist" id="demo-tabs">
+          <button role="tab" class="tab" aria-selected="true" type="button">По ссылке</button>
+          <button role="tab" class="tab" aria-selected="false" type="button">Конвертер</button>
+          <span class="tab-ink" aria-hidden="true"></span>
+        </div>
+        <div class="pills glass" role="radiogroup" id="demo-pills">
+          <button type="button" role="radio" aria-checked="true">Макс</button>
+          <button type="button" role="radio" aria-checked="false">1080p</button>
+          <button type="button" role="radio" aria-checked="false">720p</button>
+          <span class="pill-ink" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="demo-row">
+        <label class="switch"><input type="checkbox" checked><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Переключатель включён</span></label>
+        <label class="switch"><input type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Выключен</span></label>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Карточки, дерево, крошки</h2>
+      <div class="demo-grid">
+        <button class="card"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Обычная карточка</p><p class="card-sub">12 файлов</p></button>
+        <button class="card selected"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p class="card-title">Выбранная</p><p class="card-sub">3 файла</p></button>
+        <button class="card drop-target"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-move"/></svg></span><p class="card-title">Цель перетаскивания</p><p class="card-sub">—</p></button>
+      </div>
+      <div class="demo-row" style="align-items:flex-start; gap:32px;">
+        <nav class="tree-nav" style="width:200px;">
+          <div class="tnode open"><span class="tw"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></span><svg class="ti"><use href="../src/icons/sprite.svg#i-folder"/></svg><span class="tn">Раздел</span><span class="tc">8</span></div>
+          <div class="tkids">
+            <div class="tnode" aria-current="true"><span class="tw leaf"></span><svg class="ti"><use href="../src/icons/sprite.svg#i-file"/></svg><span class="tn">Текущий пункт</span></div>
+            <div class="tnode"><span class="tw leaf"></span><svg class="ti"><use href="../src/icons/sprite.svg#i-file"/></svg><span class="tn">Другой пункт</span></div>
+          </div>
+        </nav>
+        <nav class="crumbs"><span class="crumb" aria-current="page"><svg><use href="../src/icons/sprite.svg#i-home"/></svg>Главная</span><span class="crumb-sep"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></span><span class="crumb">Раздел</span><span class="crumb-sep"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></span><span class="crumb">Подраздел</span></nav>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Теги, чипы, прогресс</h2>
+      <div class="demo-row">
+        <span class="tag">по умолчанию</span>
+        <span class="tag accent">своя папка</span>
+        <span class="chip"><svg><use href="../src/icons/sprite.svg#i-film"/></svg>MP4 · 1080p</span>
+        <span class="chip mono accent">14:32</span>
+      </div>
+      <div style="width:320px;">
+        <div class="meter"><div class="meter-fill" style="--p:.62"></div><div class="meter-glow" style="--p:.62"></div></div>
+      </div>
+      <div class="demo-row"><span class="live-dot"></span><span class="demo-note">индикатор активности (дышит)</span></div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Листалка страниц</h2>
+      <nav class="pager">
+        <span class="pager-pos">3 из 12</span>
+        <div class="pager-pages">
+          <button class="pager-btn prev"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></button>
+          <button class="pager-btn">1</button>
+          <button class="pager-btn" aria-current="page">2</button>
+          <button class="pager-btn">3</button>
+          <span class="pager-gap">…</span>
+          <button class="pager-btn">12</button>
+          <button class="pager-btn"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></button>
+        </div>
+      </nav>
+    </section>
+
+    <section class="demo-section">
+      <h2>Диалоги, тосты</h2>
+      <div class="demo-row">
+        <button class="btn" id="open-modal">Модальное окно</button>
+        <button class="btn" id="open-drawer">Шторка</button>
+        <button class="btn" id="fire-toast-ok">Тост: успех</button>
+        <button class="btn" id="fire-toast-err">Тост: ошибка</button>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Фон-сцена: cosmos.js</h2>
+      <p class="demo-note">Управляйте сценой из консоли: <code>cosmosApi.pulse('go')</code>, <code>cosmosApi.setEnergy(1)</code>,
+      <code>cosmosApi.setAccent('#25f4ee')</code>. Если WebGL недоступен — показывается статичная CSS-заглушка (.cosmos-fallback).</p>
+      <div class="demo-row">
+        <button class="btn" id="pulse-go">pulse('go')</button>
+        <button class="btn" id="energy-up">energy → 1</button>
+        <button class="btn" id="energy-down">energy → 0</button>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="modal" id="demo-modal">
+    <div class="modal-box" tabindex="-1">
+      <header class="drawer-head">
+        <div><p class="drawer-kicker"><svg><use href="../src/icons/sprite.svg#i-question"/></svg>Пример</p><h3>Модальное окно</h3></div>
+        <button class="icon-btn" data-close type="button" aria-label="Закрыть"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button>
+      </header>
+      <p class="modal-text">Общий вид диалогов кита: подложка с блюром, плита, шапка-кикер, действия справа снизу.</p>
+      <div class="btn-row modal-actions"><button class="btn primary" data-close type="button">Понятно</button></div>
+    </div>
+  </dialog>
+
+  <dialog class="drawer" id="demo-drawer">
+    <div class="drawer-box" tabindex="-1">
+      <div class="grab" aria-hidden="true"></div>
+      <header class="drawer-head">
+        <div><p class="drawer-kicker"><svg><use href="../src/icons/sprite.svg#i-sliders"/></svg>Пример</p><h3>Шторка</h3></div>
+        <button class="icon-btn" data-close type="button" aria-label="Закрыть"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button>
+      </header>
+      <div class="drawer-scroll">
+        <div class="card-block"><h4><svg><use href="../src/icons/sprite.svg#i-info"/></svg>Блок настроек</h4><p class="modal-text">Содержимое шторки — секции card-block.</p></div>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script type="module">
+    import { createCosmos } from '../src/js/cosmos.js';
+    import { pressable, attachPointerGlow, moveInk, enter } from '../src/js/motion.js';
+
+    const reducedQuery = matchMedia('(prefers-reduced-motion: reduce)');
+    const canvas = document.getElementById('cosmos');
+    let cosmosApi = createCosmos(canvas, { reduced: reducedQuery.matches });
+    window.cosmosApi = cosmosApi; // для консоли — см. секцию "Фон-сцена"
+    new ResizeObserver(() => cosmosApi.resize()).observe(document.getElementById('cosmos-wrap'));
+    window.addEventListener('pointermove', (e) => {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      cosmosApi.setPointer((e.clientX / innerWidth - 0.5) * 2, (e.clientY / innerHeight - 0.5) * -2);
+    }, { passive: true });
+
+    attachPointerGlow(document, '.glass, .field-body');
+    pressable(document, '.btn, .chip-btn, .icon-btn, .tab, .pills button, .card, .crumb, .text-btn, .pager-btn', { scale: 0.97 });
+    pressable(document, '.go-btn, .field-body', { scale: 0.99 });
+
+    // сегментированные переключатели: кликом переключаем aria-checked/aria-selected и двигаем плашку
+    function wireSegmented(root, attr) {
+      const items = [...root.querySelectorAll(`[${attr}]`)];
+      const setActive = (el) => {
+        items.forEach((it) => it.setAttribute(attr, it === el ? 'true' : 'false'));
+        moveInk(root, el);
+      };
+      items.forEach((it) => it.addEventListener('click', () => setActive(it)));
+      requestAnimationFrame(() => setActive(items.find((it) => it.getAttribute(attr) === 'true') || items[0]));
+      new ResizeObserver(() => setActive(items.find((it) => it.getAttribute(attr) === 'true'))).observe(root);
+    }
+    wireSegmented(document.getElementById('demo-tabs'), 'aria-selected');
+    wireSegmented(document.getElementById('demo-pills'), 'aria-checked');
+
+    // акцентные пресеты (см. tokens.css: :root[data-accent])
+    document.querySelectorAll('[data-accent]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const v = btn.dataset.accent;
+        if (v === 'none') { document.documentElement.removeAttribute('data-accent'); cosmosApi.setAccent(null); }
+        else {
+          document.documentElement.setAttribute('data-accent', v);
+          const hex = getComputedStyle(document.documentElement).getPropertyValue('--el-a').trim();
+          cosmosApi.setAccent(hex, 1);
+        }
+      });
+    });
+
+    document.getElementById('toggle-motion').addEventListener('click', (e) => {
+      document.documentElement.classList.toggle('motion-off');
+      e.target.textContent = document.documentElement.classList.contains('motion-off') ? 'Reduced motion: включён' : 'Reduced motion: авто';
+    });
+
+    // диалоги
+    document.querySelectorAll('dialog').forEach((dlg) => {
+      dlg.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => dlg.close()));
+      dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+    });
+    document.getElementById('open-modal').addEventListener('click', () => document.getElementById('demo-modal').showModal());
+    document.getElementById('open-drawer').addEventListener('click', () => document.getElementById('demo-drawer').showModal());
+
+    // тосты
+    function toast(kind, text) {
+      const el = document.createElement('div');
+      el.className = `toast ${kind}`;
+      el.innerHTML = `<span class="ti"><svg><use href="../src/icons/sprite.svg#${kind === 'ok' ? 'i-check' : 'i-alert'}"/></svg></span><span class="tt">${text}</span>`;
+      document.getElementById('toasts').append(el);
+      enter(el, { dy: 20, response: 0.5 });
+      setTimeout(() => el.remove(), 3200);
+    }
+    document.getElementById('fire-toast-ok').addEventListener('click', () => toast('ok', 'Готово'));
+    document.getElementById('fire-toast-err').addEventListener('click', () => toast('err', 'Не получилось'));
+
+    document.getElementById('pulse-go').addEventListener('click', () => cosmosApi.pulse('go'));
+    document.getElementById('energy-up').addEventListener('click', () => cosmosApi.setEnergy(1));
+    document.getElementById('energy-down').addEventListener('click', () => cosmosApi.setEnergy(0));
+
+    document.getElementById('demo-field').addEventListener('submit', (e) => e.preventDefault());
+  </script>
+</body>
+</html>
