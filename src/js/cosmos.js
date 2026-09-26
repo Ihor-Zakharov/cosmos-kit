@@ -722,3 +722,22 @@ export function createCosmos(canvas, opts = {}) {
 
 /** Алиас с именем, требуемым API-контрактом кита: init(canvas, opts) === createCosmos(canvas, opts). */
 export const init = createCosmos;
+
+/** Поведение сцены при прокрутке (правило из components.css, «Фон-сцена»): пока герой на экране —
+    сцена живая; по мере его ухода вверх шейдер гасит кадр (uScroll → 0..1 на 85 % высоты героя),
+    дыра уплывает вверх медленнее страницы; когда герой ушёл целиком — рендер на паузе и на обёртке
+    класс .past. Возвращается функция пересчёта (дёрните после смены раскладки). */
+export function attachSceneScroll(api, { hero, wrap } = {}) {
+  const heroH = () => (hero?.getBoundingClientRect().height || innerHeight) * 0.85;
+  let raf = 0;
+  const update = () => {
+    raf = 0;
+    const v = Math.max(0, Math.min(1, scrollY / Math.max(1, heroH())));
+    api.setScroll(v);
+    if (v >= 1) api.pause(); else api.resume();
+    wrap?.classList.toggle('past', v >= 1);
+  };
+  addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+  update();
+  return update;
+}

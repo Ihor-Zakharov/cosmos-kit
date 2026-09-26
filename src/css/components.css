@@ -22,7 +22,7 @@
    Кнопки
    ============================================================ */
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: var(--r-m); font-weight: 500; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--ink);
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: var(--r-m); font-weight: 500; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--ink); text-decoration: none;
   transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast), box-shadow var(--t-base) var(--ease-out); }
 .btn svg { width: 16px; height: 16px; }
 .btn:not(.glass) { background: var(--s1); border: 1px solid var(--line-2); }
@@ -122,8 +122,9 @@
 @media (prefers-reduced-motion: reduce) { .field-body::before, .field-body::after { transition: none; } }
 .field-glyph { display: grid; place-items: center; transition: background var(--t-base) var(--ease-out), color var(--t-base) var(--ease-out), box-shadow var(--t-base) var(--ease-out); width: 44px; height: 44px; border-radius: var(--r-m); background: var(--s2); color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line-1); }
 .field-glyph svg { width: 20px; height: 20px; }
-/* акцентный глиф — единственная плита формы, залитая цветом излучения */
-.field-glyph.accent { color: #fff; background: linear-gradient(135deg, var(--el-a), var(--el-b)); box-shadow: var(--el-glow-soft); }
+/* акцентный глиф — единственная плита формы, залитая цветом излучения. Глиф на ней тёмный, как текст
+   на .btn.primary: раскалённая плита всегда несёт тёмный знак (белый на белом излучении исчезал) */
+.field-glyph.accent { color: #000; background: linear-gradient(135deg, var(--el-a), var(--el-b)); box-shadow: var(--el-glow-soft); }
 .field-body input, .field-body textarea { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 17px; padding: 10.5px 4px 9.5px; resize: none; }
 .field-body input::placeholder, .field-body textarea::placeholder { color: var(--ink-3); }
 .field-body input:focus-visible, .field-body textarea:focus-visible { outline: none; box-shadow: none; }
@@ -140,6 +141,8 @@
 .ghost-btn { display: inline-flex; align-items: center; gap: 7px; font-weight: 500; transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out); height: 44px; padding: 0 12px; border-radius: var(--r-m); color: var(--ink-2); font-size: 13.5px; cursor: pointer; }
 .ghost-btn:hover { background: var(--s3); color: var(--ink); }
 .ghost-btn svg { width: 17px; height: 17px; }
+/* на телефоне вспомогательная кнопка поля — только глиф: место отдаётся вводу */
+@media (max-width: 680px) { .field-body .ghost-btn { padding: 0 10px; } .field-body .ghost-btn span { display: none; } }
 
 /* ============================================================
    Зона перетаскивания (dropzone)
@@ -170,6 +173,11 @@
 .card-glyph svg { width: 22px; height: 22px; }
 .card-title { font: 600 16.5px/1.2 var(--font-display); letter-spacing: -.02em; color: var(--ink); margin: 0; }
 .card-sub { font: 500 12px/1.4 var(--font-mono); color: var(--ink-3); letter-spacing: .02em; margin: 4px 0 0; }
+/* карточка-утверждение (контентная, не кликабельная): глиф → заголовок → абзац; используйте в секциях «как устроено» */
+.card.static { cursor: default; }
+.card.static:hover { border-color: var(--line-1); background: var(--s1); }
+.card-glyph + .card-title { margin-top: 18px; }
+.card-text { margin: 8px 0 0; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
 
 /* карточка-«блок» с заголовком-иконкой (например настройки, диагностика) */
 .card-block { display: grid; gap: 12px; padding: 16px; border-radius: var(--r-l); background: var(--s1); border: 1px solid var(--line-1); }
@@ -360,9 +368,154 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 @media (prefers-reduced-motion: reduce) { .skel::after { animation: none; opacity: 0; } }
 
 /* ============================================================
-   Раскладка: колонка-датум (левая линия макета) и адаптив по умолчанию
+   Фон-сцена: обёртка холста и три её состояния (дизайнерское правило, проход 09.2026)
+   Сцена живёт в первом экране и только там является сюжетом. Состояния:
+     · «живая»       — герой на экране: полная яркость, параллакс от указателя, дыхание кольца;
+     · «за горизонтом» (.past, ставит attachSceneScroll из cosmos.js) — герой ушёл вверх: шейдер сам
+       гасит кадр до ~8 % по uScroll, дыра уплывает вверх на 16 % высоты (параллакс медленнее страницы),
+       рендер ставится на паузу. Остаток звёзд под контентом — «вселенная никуда не делась», но не спорит
+       с текстом. Никакого блюра: блюр на скролле дорог и делает остаток мутным пятном;
+     · «спит»        (.asleep) — внутренние страницы и экраны данных: размыта и погашена с первого кадра,
+       без анимации появления. Так «выдра» вела себя на экранах очереди и библиотеки.
+   Сцена одна на сайт, position: fixed, под всем содержимым (.site — над ней). Не кладите вторую сцену
+   в подвал или в секцию — дыра не орнамент, а ориентир.
    ============================================================ */
 
+.cosmos-wrap { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: var(--bg); pointer-events: none;
+  transition: filter var(--t-scene) var(--ease-out), opacity var(--t-scene) var(--ease-out); }
+.cosmos-wrap .cosmos { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* CSS-заглушка без WebGL: кольцо там же, где была бы дыра (те же токены композиции) */
+.cosmos-wrap .cosmos-fallback { position: absolute; inset: 0; opacity: 0; transition: opacity var(--t-scene) var(--ease-out);
+  background: radial-gradient(circle at calc(var(--bh-x, .7) * 100%) calc(var(--bh-y, .54) * 100%),
+    transparent 0 calc(var(--bh-r, .13) * 100svh), rgba(255, 255, 255, .85) calc(var(--bh-r, .13) * 103svh) calc(var(--bh-r, .13) * 106svh),
+    rgba(255, 255, 255, .22) calc(var(--bh-r, .13) * 114svh), transparent calc(var(--bh-r, .13) * 146svh)), var(--bg); }
+.cosmos-wrap.fallback .cosmos-fallback { opacity: 1; }
+.cosmos-wrap.asleep { filter: blur(24px) brightness(.16); }
+.site { position: relative; z-index: 1; }
+
+/* Композиции дыры (одна текстура плана scene/plate.webp, привязана к дыре и следует за ней —
+   свой план нужен, только если нужна другая ФОРМА подсвеченной плоскости, не другое место дыры):
+     · [data-comp="right"] (по умолчанию) — «витрина»: дыра справа (70 %/54 %), колонка текста слева;
+     · [data-comp="center"] — «ось»: дыра по центру в нижней трети, текст над ней по центру (одна фраза, поиск, вход);
+     · [data-comp="far"]    — «далеко»: дыра маленькая, высоко справа, больше дымки — фон для короткого героя
+       (60–70 svh), когда контент начинается сразу и сцена — задник, а не сюжет.
+   На телефоне (≤ 680px) любая композиция становится «под текстом»: дыра по центру в нижней трети. */
+.cosmos-wrap[data-comp="center"] { --bh-anchor: custom; --bh-x: .5; --bh-y: .70; --bh-r: .11; --bh-beam: 90; --bh-plane: .8; }
+.cosmos-wrap[data-comp="far"] { --bh-anchor: custom; --bh-x: .76; --bh-y: .40; --bh-r: .075; --bh-halo: .85; --bh-mist: 1.3; --bh-near: .5; --bh-flare: .6; --bh-plane: .8; }
+@media (max-width: 680px) {
+  .cosmos-wrap, .cosmos-wrap[data-comp] { --bh-anchor: custom; --bh-x: .5; --bh-y: .80; --bh-r: .08; --bh-beam: 90; --bh-plane: .8; --bh-near: .5; }
+}
+
+/* ============================================================
+   Верхняя навигация — две композиции (дизайнерское правило, проход 09.2026)
+   «Линия» (.topbar): полоса на всю ширину, над героем прозрачная, после первых ~40px прокрутки —
+   плита с волосяной линией снизу (.topbar.solid ставит JS). Слева бренд, справа ссылки и одно действие.
+   «Остров» (.island): плавающая пилюля по центру с бренд-знаком, сегментными ссылками (.tab-ink) и
+   действием. Для сайтов-приложений и одностраничников с 3–5 якорями; на телефоне остров не помещается —
+   вместо него та же «линия» с кнопкой меню.
+   Активный пункт в обеих — цвет --ink и волосяная полоска излучения снизу (1px, слабое свечение):
+   это единственное излучение в навигации. Кнопка в навигации — обычная плита, не .primary:
+   раскалённое действие на первом экране — у героя.
+   ============================================================ */
+
+.topbar { position: fixed; inset: 0 0 auto; z-index: 60; height: var(--topbar-h); display: flex; align-items: center; gap: 20px; padding: 0 var(--datum);
+  color: var(--ink); background: transparent; border-bottom: 1px solid transparent;
+  transition: background-color var(--t-slow) var(--ease-out), border-color var(--t-slow) var(--ease-out), backdrop-filter var(--t-slow) var(--ease-out); }
+.topbar.solid { background: var(--plate); border-bottom-color: var(--line-1); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 500 15px/1 var(--font-brand); letter-spacing: .02em; }
+.brand svg { width: 22px; height: 22px; color: var(--ink); }
+.nav { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+.nav a { position: relative; display: inline-flex; align-items: center; height: 36px; padding: 0 12px; border-radius: var(--r-s); color: var(--ink-2); font-size: 14px; font-weight: 500; text-decoration: none;
+  transition: color var(--t-fast), background-color var(--t-fast); }
+.nav a:hover { color: var(--ink); background: var(--surface); }
+.nav a[aria-current="page"] { color: var(--ink); }
+.nav a[aria-current="page"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 3px; height: 1px; background: var(--el-a); box-shadow: 0 0 8px color-mix(in oklab, var(--el-a) 45%, transparent); }
+.topbar-actions { display: flex; align-items: center; gap: 8px; }
+.topbar .menu-btn { display: none; }
+
+.island { display: inline-flex; align-items: center; gap: 6px; padding: 5px 5px 5px 14px; border-radius: 999px; background: var(--plate); border: 1px solid var(--line-2); box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.island.fixed { position: fixed; top: 12px; left: 50%; translate: -50% 0; z-index: 60; }
+.island .brand { margin-right: 6px; }
+.island .tabs { border: 0; background: transparent; padding: 0; }
+.island .tab { padding: 7px 12px; border-radius: 999px; }
+.island .tab-ink { top: 0; bottom: 0; border-radius: 999px; }
+.island .tab[aria-selected="true"]::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 3px; height: 1px; background: var(--el-a); box-shadow: 0 0 8px color-mix(in oklab, var(--el-a) 45%, transparent); }
+.island .btn { border-radius: 999px; height: 34px; }
+
+@media (max-width: 680px) {
+  .topbar { gap: 12px; }
+  .topbar .nav, .topbar .btn { display: none; }
+  .topbar .menu-btn { display: grid; margin-left: auto; }
+  .island.fixed { display: none; }
+}
+
+/* ============================================================
+   Каркас страницы: герой, секции, подвал (дизайнерское правило, проход 09.2026)
+   Один датум (--datum) — левая линия всего: бренд, заголовок героя, заголовки секций, подвал.
+   Ритм по вертикали: секция 96px (телефон 64px), внутри секции шкала 8/16/24/40.
+   ============================================================ */
+
+.container { max-width: var(--content-max); margin: 0 auto; }
+.hero { position: relative; min-height: 100svh; display: grid; align-content: center; padding: calc(var(--topbar-h) + 40px) var(--datum) 72px; }
+.hero-inner { display: grid; gap: 22px; max-width: 640px; }
+/* «ось» (композиция center): одна фраза по центру над дырой, без статистики — под дырой только горизонт */
+.hero.axis { align-content: start; justify-items: center; text-align: center; padding-top: calc(var(--topbar-h) + 72px); }
+.hero.axis .hero-inner { justify-items: center; max-width: 760px; }
+.hero.axis .display { font-size: clamp(36px, 4.8vw, 58px); }
+.hero.axis .hero-stats { display: none; }
+.hero.short { min-height: 64svh; }
+.kicker { display: flex; align-items: center; gap: 12px; margin: 0; font: 500 11.5px/1 var(--font-mono); letter-spacing: .24em; text-transform: uppercase; color: var(--ink-3); }
+.kicker::before { content: ""; width: 20px; height: 1px; background: var(--line-3); }
+.hero.axis .kicker::before { display: none; }
+.display { margin: 0; font: 700 clamp(40px, 6vw, 76px)/1.02 var(--font-display); letter-spacing: -.035em; color: var(--ink); text-wrap: balance; }
+/* одно «освещённое» слово заголовка — единственное излучение в тексте; больше одного не бывает */
+.display .lit { background: var(--el); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lead { margin: 0; max-width: 560px; font-size: 18px; line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.hero-stats { display: flex; flex-wrap: wrap; gap: 12px 36px; margin-top: 18px; padding-top: 22px; border-top: 1px solid var(--line-1); }
+.stat { display: grid; gap: 6px; }
+.stat b { font: 600 24px/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.stat span { font: 500 11px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+
+.section { padding: 96px var(--datum); }
+.section + .section { padding-top: 0; }
+.section-head { display: grid; gap: 12px; max-width: 640px; margin: 0 0 40px; }
+.section-head h2 { margin: 0; font: 700 clamp(28px, 3.2vw, 40px)/1.1 var(--font-display); letter-spacing: -.03em; color: var(--ink); text-wrap: balance; }
+.section-head h2 code, .display code { font-size: .78em; font-weight: 500; padding: .04em .3em; letter-spacing: 0; vertical-align: .04em; }
+.section-head p { margin: 0; color: var(--ink-2); line-height: 1.55; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.prose { max-width: 640px; color: var(--ink-2); line-height: 1.6; }
+.prose p { margin: 0 0 16px; }
+.prose strong { color: var(--ink); font-weight: 600; }
+.prose h3 { margin: 32px 0 10px; font: 600 20px/1.25 var(--font-display); letter-spacing: -.02em; color: var(--ink); }
+
+.site-footer { padding: 56px var(--datum) 32px; border-top: 1px solid var(--line-1); display: grid; gap: 40px; }
+.footer-grid { display: grid; grid-template-columns: 1.6fr repeat(3, minmax(0, 1fr)); gap: 32px; }
+.footer-about { display: grid; gap: 14px; align-content: start; max-width: 320px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.footer-col { display: grid; gap: 2px; align-content: start; }
+.footer-col h5 { margin: 0 0 8px; font: 500 11px/1 var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-3); }
+.footer-col a { display: block; padding: 5px 0; color: var(--ink-2); font-size: 14px; text-decoration: none; transition: color var(--t-fast); }
+.footer-col a:hover { color: var(--ink); }
+.footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding-top: 20px; border-top: 1px solid var(--line-1); font: 500 11.5px/1.6 var(--font-mono); letter-spacing: .06em; color: var(--ink-3); }
+
+@media (max-width: 980px) {
+  .grid-3 { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
 @media (max-width: 680px) {
   html, body { overflow-x: hidden; }
+  :root { --datum: 16px; }
+  /* телефон: текст сверху, дыра в нижней трети; всё, что ниже кнопок (статистика), не помещается над дырой — прячем */
+  .hero { min-height: 100svh; align-content: start; padding: calc(var(--topbar-h) + 32px) var(--datum) 56px; }
+  .hero.axis { justify-items: start; text-align: left; padding-top: calc(var(--topbar-h) + 32px); }
+  .hero.axis .hero-inner { justify-items: start; }
+  .hero-stats { display: none; }
+  .hero-inner { gap: 16px; }
+  .display { font-size: clamp(34px, 10.5vw, 44px); }
+  .lead { font-size: 16px; }
+  .section { padding: 64px var(--datum); }
+  .section-head { margin-bottom: 28px; }
+  .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+  .site-footer { padding-top: 40px; }
 }
