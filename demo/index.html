@@ -178,6 +178,7 @@
           <h3>Карточки, дерево, крошки</h3>
           <div class="demo-grid">
             <button class="card"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Обычная карточка</p><p class="card-sub">12 файлов</p></button>
+            <button class="card" data-glow><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p class="card-title">Карточка со светом</p><p class="card-sub">свет у курсора · data-glow</p></button>
             <div class="card static"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Дефолтная карточка</p><p class="card-sub">без эффектов · .card.static</p></div>
           </div>
           <div class="demo-row" style="align-items:flex-start; gap:32px;">
@@ -385,12 +386,12 @@
           <h3>Карточки: наклон и свет</h3>
           <div class="sample-stage">
             <div class="demo-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
-              <button class="card"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Обычная карточка</p><p class="card-sub">виньетка у курсора</p></button>
-              <div class="card static"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-film"/></svg></span><p class="card-title">Дефолтная карточка</p><p class="card-sub">без эффектов</p></div>
+              <button class="card" data-glow><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p class="card-title">Со светом</p><p class="card-sub">data-glow</p></button>
+              <button class="card"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Обычная</p><p class="card-sub">виньетка у курсора</p></button>
             </div>
           </div>
           <p class="sample-spec"><b>наклон</b> rotateX/Y до ±4° к курсору · response .35 · damping .80 · <b>подъём</b> s 1.015 · response .40
-            <br><b>уход</b> response .50 · damping .70 · только мышь · <code>attachCards()</code>; у обычной — совсем слабая виньетка с центром у курсора; <code>.card.static</code> — без эффектов</p>
+            <br><b>уход</b> response .50 · damping .70 · только мышь · <code>attachCards()</code>; <code>.card[data-glow]</code> — мягкий свет у курсора; обычная — слабая плавная виньетка с центром у курсора; <code>.card.static</code> — без эффектов</p>
         </div>
 
         <div class="sample">
