@@ -95,20 +95,16 @@ export function wireTree(tree) {
   requestAnimationFrame(() => setActive(nodes.find((n) => n.getAttribute('aria-current') === 'true') || nodes[0], true));
 }
 
-/** общая шапка + меню + подвал витрины (одна разметка на все страницы) */
-export function shell(page) {
-  const nav = [
-    ['index.html#language', 'Язык'], ['index.html#accents', 'Акценты'], ['index.html#components', 'Компоненты'],
-    ['motion.html', 'Движение'], ['kosmos.html', 'KOCMOC'],
-  ];
-  const isCur = (href) => (page === 'index' ? href === 'index.html#language' : href === `${page}.html`);
-  const links = nav.map(([h, t]) => `<a href="${h.replace('index.html', page === 'index' ? '' : 'index.html')}"${isCur(h) ? ' aria-current="page"' : ''}>${t}</a>`).join('');
+/** шапка + меню витрины: одна страница, все разделы — якоря */
+export function shell() {
+  const nav = [['#language', 'Язык'], ['#accents', 'Акценты'], ['#components', 'Компоненты'], ['#motion', 'Движение'], ['#kosmos', 'KOCMOC'], ['#scene', 'Сцена']];
+  const links = nav.map(([h, t], i) => `<a href="${h}"${i === 0 ? ' aria-current="page"' : ''}>${t}</a>`).join('');
   document.getElementById('topbar').innerHTML = `
-    <a class="brand" href="index.html"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>cosmos</a>
+    <a class="brand" href="#top"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>cosmos</a>
     <nav class="nav" aria-label="Разделы">${links}</nav>
     <div class="topbar-actions">
-      <a class="btn small" href="index.html#connect">Подключить</a>
+      <a class="btn small" href="#connect">Подключить</a>
       <button class="icon-btn menu-btn" type="button" data-open="#menu-drawer" aria-label="Меню"><svg><use href="../src/icons/sprite.svg#i-menu"/></svg></button>
     </div>`;
-  document.getElementById('menu-drawer').querySelector('.drawer-links').innerHTML = nav.map(([h, t]) => `<a href="${h}" data-close${isCur(h) ? ' aria-current="page"' : ''}>${t}</a>`).join('') + '<a href="index.html#connect" data-close>Подключить</a>';
+  document.getElementById('menu-drawer').querySelector('.drawer-links').innerHTML = nav.map(([h, t]) => `<a href="${h}" data-close>${t}</a>`).join('') + '<a href="#connect" data-close>Подключить</a>';
 }

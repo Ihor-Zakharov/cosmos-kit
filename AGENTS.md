@@ -36,8 +36,8 @@
 - `src/fonts/` — Geologica, Onest, Unbounded, JetBrains Mono (Google Fonts, OFL) + `fonts.css`.
 - `src/icons/sprite.svg` — общие UI-глифы (без брендов платформ).
 - `src/scene/plate.webp` — текстура дальнего плана для сцены чёрной дыры.
-- `demo/` — витрина: `index.html` (сайт + каталог), `motion.html` («Движение» — живые образцы с параметрами пружин),
-  `kosmos.html`; общие `demo.css`/`demo.js`.
+- `demo/index.html` — витрина, одна страница: сайт, каталог, «Движение» (живые образцы с параметрами пружин),
+  KOCMOC, сцена; общие `demo.css`/`demo.js`.
 - `.agents/skills/cosmos-site/SKILL.md` — воркфлоу «сделать новый сайт в этом стиле».
 - `DESIGN-TODO.md` — журнал дизайнерских решений: что решено (и где искать), что отложено
   (светлая тема), что открыто.
