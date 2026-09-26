@@ -58,8 +58,9 @@ export function bootSite({ page = 'home', accent = null, plateUrl = null } = {})
       raf = 0;
       topbar.classList.toggle('solid', scrollY > 40);
       if (!links.length || !targets.some(Boolean)) return;
-      let cur = curIndex();
-      targets.forEach((t, i) => { if (t && t.getBoundingClientRect().top <= innerHeight * 0.34) cur = i; });
+      // активна секция, чей верх ближе всего над линией; порядок пунктов меню не важен
+      let cur = curIndex(), best = -Infinity;
+      targets.forEach((t, i) => { const top = t?.getBoundingClientRect().top; if (top != null && top <= innerHeight * 0.34 && top > best) { best = top; cur = i; } });
       if (!links[cur].hasAttribute('aria-current')) setCurrent(cur, false);
     };
     addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(sync); }, { passive: true });
