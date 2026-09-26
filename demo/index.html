@@ -178,8 +178,7 @@
           <h3>Карточки, дерево, крошки</h3>
           <div class="demo-grid">
             <button class="card"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Обычная карточка</p><p class="card-sub">12 файлов</p></button>
-            <button class="card selected"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p class="card-title">Выбранная</p><p class="card-sub">3 файла</p></button>
-            <button class="card drop-target"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-move"/></svg></span><p class="card-title">Цель перетаскивания</p><p class="card-sub">—</p></button>
+            <div class="card static"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Дефолтная карточка</p><p class="card-sub">без эффектов · .card.static</p></div>
           </div>
           <div class="demo-row" style="align-items:flex-start; gap:32px;">
             <nav class="tree-nav" style="width:200px;">
@@ -417,12 +416,12 @@
           <h3>Карточки: наклон и свет</h3>
           <div class="sample-stage">
             <div class="demo-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
-              <button class="card" data-glow><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Проекты</p><p class="card-sub">12 папок · data-glow</p></button>
-              <button class="card"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-film"/></svg></span><p class="card-title">Видео</p><p class="card-sub">48 файлов</p></button>
+              <button class="card"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Обычная карточка</p><p class="card-sub">виньетка у курсора</p></button>
+              <div class="card static"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-film"/></svg></span><p class="card-title">Дефолтная карточка</p><p class="card-sub">без эффектов</p></div>
             </div>
           </div>
           <p class="sample-spec"><b>наклон</b> rotateX/Y до ±4° к курсору · response .35 · damping .80 · <b>подъём</b> s 1.015 · response .40
-            <br><b>уход</b> response .50 · damping .70 · только мышь · <code>attachCards()</code>; свет по поверхности — только у <code>.card[data-glow]</code> (левая), 1–3 на экран</p>
+            <br><b>уход</b> response .50 · damping .70 · только мышь · <code>attachCards()</code>; у обычной — совсем слабая виньетка с центром у курсора; <code>.card.static</code> — без эффектов</p>
         </div>
 
         <div class="sample">
@@ -623,6 +622,20 @@
     </div>
   </dialog>
 
+  <!-- панель сцены: кручение и дым — видно над героем, где сцена живая -->
+  <div class="scene-dock" id="scene-dock">
+    <button class="btn small" id="dock-spin" type="button">Крутить</button>
+    <div class="pills glass small" id="dock-smoke" role="radiogroup" aria-label="Дым">
+      <button type="button" role="radio" data-smoke="neutral" aria-checked="true">Дым: нет</button>
+      <button type="button" role="radio" data-smoke="cold" aria-checked="false">холодный</button>
+      <button type="button" role="radio" data-smoke="moon" aria-checked="false">лунный</button>
+      <button type="button" role="radio" data-smoke="warm" aria-checked="false">тёплый</button>
+      <button type="button" role="radio" data-smoke="violet" aria-checked="false">фиолетовый</button>
+      <button type="button" role="radio" data-smoke="ember" aria-checked="false">угли</button>
+      <span class="pill-ink" aria-hidden="true"></span>
+    </div>
+  </div>
+
   <div class="toasts" id="toasts" aria-live="polite"></div>
 
   <script type="module">
@@ -680,6 +693,15 @@
       e.currentTarget.querySelector('.btn-label').textContent = spinning ? 'Остановить' : 'Крутить';
       e.currentTarget.classList.toggle('busy', spinning);
       document.getElementById('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' });
+    });
+    // панель сцены внизу: те же кручение и дым, что в секции «Сцена», но видны над живой сценой
+    document.getElementById('dock-spin').addEventListener('click', (e) => {
+      document.getElementById('spin-btn').click();
+      e.currentTarget.textContent = spinning ? 'Остановить' : 'Крутить';
+    });
+    wireSegmented(document.getElementById('dock-smoke'), 'aria-checked', (it) => {
+      cosmosApi.setSmoke(it.dataset.smoke);
+      document.querySelectorAll('#smoke-row [data-smoke]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.smoke === it.dataset.smoke)));
     });
     // оттенки дыма
     document.querySelectorAll('#smoke-row [data-smoke]').forEach((b) => b.addEventListener('click', () => {
