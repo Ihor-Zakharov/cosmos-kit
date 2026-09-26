@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- ЗАМЕНИТЬ: название сайта и описание -->
+<title>Название сайта</title>
+<meta name="description" content="Одна фраза о сайте.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="kit/icons/mark.svg" type="image/svg+xml">
+<link rel="preload" href="kit/scene/plate.webp" as="image">
+<!-- порядок важен: шрифты → токены → компоненты кита → свои стили -->
+<link rel="stylesheet" href="kit/fonts/fonts.css">
+<link rel="stylesheet" href="kit/css/tokens.css">
+<link rel="stylesheet" href="kit/css/components.css">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <!-- фон-сцена «чёрная дыра»: одна на сайт, не трогать; положение дыры — data-comp="right|center|far" -->
+  <div class="cosmos-wrap" id="cosmos-wrap" data-comp="right" aria-hidden="true">
+    <canvas class="cosmos" id="cosmos"></canvas>
+    <div class="cosmos-fallback"></div>
+    <div class="grain"></div>
+  </div>
+
+  <header class="topbar" id="topbar">
+    <!-- ЗАМЕНИТЬ: имя бренда -->
+    <a class="brand" href="#top"><svg><use href="kit/icons/sprite.svg#i-mark"/></svg>бренд</a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#about" aria-current="page">О нас</a>
+      <a href="#features">Возможности</a>
+      <a href="#contact">Контакты</a>
+    </nav>
+    <div class="topbar-actions">
+      <a class="btn small" href="#contact">Связаться</a>
+      <button class="icon-btn menu-btn" type="button" data-open="#menu-drawer" aria-label="Меню"><svg><use href="kit/icons/sprite.svg#i-menu"/></svg></button>
+    </div>
+  </header>
+
+  <div class="site" id="top">
+    <!-- ГЕРОЙ: единственное место, где текст стоит слева; одна фраза, одно раскалённое действие -->
+    <section class="hero" id="hero">
+      <div class="hero-inner">
+        <p class="kicker">кикер · 2–4 слова</p>
+        <h1 class="display">Главная мысль сайта с одним <span class="lit">освещённым</span> словом.</h1>
+        <p class="lead">Подзаголовок в одно-два предложения: что это и для кого.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#contact">Главное действие</a>
+          <a class="btn" href="#features">Второе действие</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="section-head">
+        <p class="kicker">о нас</p>
+        <h2>Заголовок секции</h2>
+        <p>Один абзац, который объясняет секцию.</p>
+      </div>
+      <div class="prose">
+        <p>Длинный текст. Здесь выравнивание по левому краю — длинный текст исключение из правила «всё по центру».</p>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <div class="section-head">
+        <p class="kicker">возможности</p>
+        <h2>Три главные вещи</h2>
+      </div>
+      <div class="grid-3">
+        <div class="card static">
+          <span class="card-glyph"><svg><use href="kit/icons/sprite.svg#i-layers"/></svg></span>
+          <p class="card-title">Первое</p>
+          <p class="card-text">Коротко — одно-два предложения.</p>
+        </div>
+        <div class="card static">
+          <span class="card-glyph"><svg><use href="kit/icons/sprite.svg#i-pulse"/></svg></span>
+          <p class="card-title">Второе</p>
+          <p class="card-text">Коротко — одно-два предложения.</p>
+        </div>
+        <div class="card static">
+          <span class="card-glyph"><svg><use href="kit/icons/sprite.svg#i-wave"/></svg></span>
+          <p class="card-title">Третье</p>
+          <p class="card-text">Коротко — одно-два предложения.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact">
+      <div class="section-head">
+        <p class="kicker">контакты</p>
+        <h2>Как с нами связаться</h2>
+        <p>Одна фраза и одно действие.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="btn primary" href="mailto:hello@example.com">Написать</a>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="brand" href="#top"><svg><use href="kit/icons/sprite.svg#i-mark"/></svg>бренд</a>
+          <p style="margin:0">Одна фраза о проекте.</p>
+        </div>
+        <div class="footer-col">
+          <h5>Разделы</h5>
+          <a href="#about">О нас</a><a href="#features">Возможности</a><a href="#contact">Контакты</a>
+        </div>
+        <div class="footer-col">
+          <h5>Страницы</h5>
+          <a href="page.html">Внутренняя страница</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>бренд · 2026</span>
+        <span>Дизайн — cosmos-kit</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- меню на телефоне -->
+  <dialog class="drawer" id="menu-drawer">
+    <div class="drawer-box" tabindex="-1">
+      <div class="grab" aria-hidden="true"></div>
+      <header class="drawer-head">
+        <div><p class="drawer-kicker"><svg><use href="kit/icons/sprite.svg#i-mark"/></svg>бренд</p><h3>Разделы</h3></div>
+        <button class="icon-btn" data-close type="button" aria-label="Закрыть"><svg><use href="kit/icons/sprite.svg#i-x"/></svg></button>
+      </header>
+      <div class="drawer-scroll">
+        <nav class="drawer-links">
+          <a href="#about" data-close>О нас</a><a href="#features" data-close>Возможности</a><a href="#contact" data-close>Контакты</a>
+        </nav>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script type="module">
+    import { bootSite } from './kit/js/site.js';
+    bootSite(); // ступень излучения: bootSite({ accent: 'ice' | 'violet' | 'gold' | 'ember' }), по умолчанию белая
+  </script>
+</body>
+</html>

@@ -519,3 +519,8 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
   .footer-grid { grid-template-columns: 1fr; gap: 24px; }
   .site-footer { padding-top: 40px; }
 }
+
+/* ---------- Меню-шторка на телефоне: ссылки разделов ---------- */
+.drawer-links { display: grid; gap: 2px; }
+.drawer-links a { display: block; padding: 11px 12px; border-radius: var(--r-m); color: var(--ink-2); font-size: 16px; font-weight: 500; text-decoration: none; transition: background-color var(--t-fast), color var(--t-fast); }
+.drawer-links a:hover, .drawer-links a[aria-current="page"] { color: var(--ink); background: var(--surface-2); }
