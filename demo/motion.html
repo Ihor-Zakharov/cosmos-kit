@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>cosmos-kit — движение</title>
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="../src/fonts/fonts.css">
+<link rel="stylesheet" href="../src/css/tokens.css">
+<link rel="stylesheet" href="../src/css/components.css">
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+  <div class="cosmos-wrap" id="cosmos-wrap" aria-hidden="true"><canvas class="cosmos" id="cosmos"></canvas><div class="cosmos-fallback"></div><div class="grain"></div></div>
+  <header class="topbar" id="topbar"></header>
+
+  <div class="site">
+    <section class="hero short axis" id="hero-static">
+      <div class="hero-inner">
+        <p class="kicker">движение</p>
+        <h1 class="display">Всё, что двигается, — <span class="lit">пружина</span>.</h1>
+        <p class="lead">Каждый образец живой: нажмите, наведите, переключите. Под ним — параметры пружины из motion.js:
+        <code>response</code> — период в секундах (меньше — резче), <code>damping</code> — доля критического демпфирования (1 — без отскока).</p>
+      </div>
+    </section>
+
+    <section class="section" id="samples">
+      <div class="samples">
+
+        <div class="sample">
+          <h3>Нажатие, подъём, магнит</h3>
+          <div class="sample-stage">
+            <div class="demo-row">
+              <button class="btn primary">Раскалённая</button>
+              <button class="btn" data-magnetic>Магнитная плита</button>
+              <button class="chip-btn"><svg><use href="../src/icons/sprite.svg#i-download"/></svg>Чип</button>
+              <button class="icon-btn glass" aria-label="Иконка"><svg><use href="../src/icons/sprite.svg#i-sliders"/></svg></button>
+            </div>
+            <p class="hint">Главное действие за курсором не двигается; магнит — только явный opt-in <code>data-magnetic</code>. Увод указателя во время нажатия — отмена без отскока.</p>
+          </div>
+          <p class="sample-spec"><b>вниз</b> s .97 (иконки .90, крупные плиты .985) · response .09 · damping 1
+            <br><b>отпускание</b> response .36 · damping .68 — один лёгкий перелёт; отмена — damping 1
+            <br><b>подъём</b> s 1.02 (иконки 1.06) · response .34 · damping .72 — только мышь
+            <br><b>магнит</b> (только <code>[data-magnetic]</code>) сдвиг 18 % от смещения курсора, до 6px · response .40 · damping .80; возврат response .5 · damping .62
+            <br><b>свет курсора</b> — не у рядовых кнопок: только <code>[data-glow]</code>, 1–3 элемента на экран · <code>attachButtons()</code></p>
+        </div>
+
+        <div class="sample">
+          <h3>Состояние без скачка ширины</h3>
+          <div class="sample-stage">
+            <div class="demo-row">
+              <button class="btn primary" id="state-btn"><span class="btn-label">Сохранить изменения</span></button>
+              <button class="btn" id="state-btn-2"><span class="btn-label">Отправить</span></button>
+            </div>
+            <p class="hint">Подпись остаётся в потоке (ширина заперта), поверх — спиннер, потом галочка рисует себя.</p>
+          </div>
+          <p class="sample-spec"><b>подпись уходит</b> o 0 · y −6 · s .92 · response .30 · damping 1
+            <br><b>спиннер/галочка</b> s .8 → 1 · o 1 · response .40 · damping .72 (галочка .60)
+            <br><b>галочка</b> stroke-dashoffset 24 → 0 за .45 s --ease-out · <code>buttonState(el, 'busy' | 'done' | 'idle')</code></p>
+        </div>
+
+        <div class="sample">
+          <h3>Фокус с клавиатуры</h3>
+          <div class="sample-stage">
+            <div class="demo-row">
+              <button class="btn">Первая</button><button class="btn">Вторая</button><button class="btn">Третья</button>
+            </div>
+            <p class="hint">Нажмите Tab: кольцо фокуса цвета излучения и короткий «вдох» кнопки. Space/Enter нажимают её так же, как палец.</p>
+          </div>
+          <p class="sample-spec"><b>вдох</b> s 1.06 → 1 · response .45 · damping .60
+            <br><b>кольцо</b> outline 2px --el-a, offset 3px, тень --focus-ring за --t-base</p>
+        </div>
+
+        <div class="sample">
+          <h3>Переключатель — капля</h3>
+          <div class="sample-stage">
+            <div class="demo-row" style="gap:24px">
+              <label class="switch"><input type="checkbox" checked><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Уведомления</span></label>
+              <label class="switch"><input type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Тихий режим</span></label>
+            </div>
+            <p class="hint">Ползунок растягивается по ходу движения и, доехав, собирается обратно; пока палец на нём — чуть шире.</p>
+          </div>
+          <p class="sample-spec"><b>переезд</b> sx 1.45 → 1 · x 0 ↔ 14 · response .36 · damping .66
+            <br><b>удержание</b> sx 1.2 · response .16 · damping 1; отпускание response .30 · damping .70 · <code>attachSwitches()</code></p>
+        </div>
+
+        <div class="sample">
+          <h3>Сегменты и вкладки — капля</h3>
+          <div class="sample-stage">
+            <div class="pills glass" role="radiogroup" id="m-pills">
+              <button type="button" role="radio" aria-checked="true">День</button>
+              <button type="button" role="radio" aria-checked="false">Неделя</button>
+              <button type="button" role="radio" aria-checked="false">Месяц</button>
+              <button type="button" role="radio" aria-checked="false">Год</button>
+              <span class="pill-ink" aria-hidden="true"></span>
+            </div>
+            <div class="tabs glass" role="tablist" id="m-tabs">
+              <button role="tab" class="tab" aria-selected="true" type="button">Обзор</button>
+              <button role="tab" class="tab" aria-selected="false" type="button">Файлы</button>
+              <button role="tab" class="tab" aria-selected="false" type="button">История</button>
+              <span class="tab-ink" aria-hidden="true"></span>
+            </div>
+            <p class="hint">У плашки две кромки на своих пружинах: ведущая быстрее, ведомая догоняет — плашка перетекает, а не прыгает.</p>
+          </div>
+          <p class="sample-spec"><b>ведущая кромка</b> response .26 · damping .84 · <b>ведомая</b> response .42 · damping .80
+            <br>то же для полоски навигации в шапке (.nav-ink) · <code>moveInk(group, el)</code></p>
+        </div>
+
+        <div class="sample">
+          <h3>Чекбокс и радио</h3>
+          <div class="sample-stage">
+            <div class="demo-row" style="gap:24px">
+              <label class="check"><input type="checkbox" checked><span class="check-box"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Сохранять копию</span></label>
+              <label class="check"><input type="checkbox"><span class="check-box"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Открывать папку</span></label>
+            </div>
+            <div class="demo-row" style="gap:24px">
+              <label class="radio"><input type="radio" name="q" checked><span class="radio-dot"><i></i></span><span>Макс</span></label>
+              <label class="radio"><input type="radio" name="q"><span class="radio-dot"><i></i></span><span>1080p</span></label>
+              <label class="radio"><input type="radio" name="q"><span class="radio-dot"><i></i></span><span>720p</span></label>
+            </div>
+          </div>
+          <p class="sample-spec"><b>коробка</b> s .85 → 1 · response .36 · damping .55; галочка dashoffset .35 s
+            <br><b>точка радио</b> s 0 → 1 · response .42 · damping .50; у соседей s → 0 · response .25 · damping 1 · <code>attachChecks()</code></p>
+        </div>
+
+        <div class="sample">
+          <h3>Раскрытие</h3>
+          <div class="sample-stage rows" style="justify-items: stretch">
+            <div class="disclosure"><button class="disclosure-head" aria-expanded="false">Что внутри кита<svg class="disclosure-chev"><use href="../src/icons/sprite.svg#i-chev-r"/></svg></button>
+              <div class="disclosure-body"><div class="disclosure-inner"><p>Три CSS, два ES-модуля, четыре шрифта, спрайт и одна текстура. Никакой сборки.</p></div></div></div>
+            <div class="disclosure"><button class="disclosure-head" aria-expanded="false">Можно ли светлую тему<svg class="disclosure-chev"><use href="../src/icons/sprite.svg#i-chev-r"/></svg></button>
+              <div class="disclosure-body"><div class="disclosure-inner"><p>Отложена: сначала устоится тёмный язык, потом «отпечаток» проектируется заново.</p></div></div></div>
+          </div>
+          <p class="sample-spec"><b>тело</b> grid-template-rows 0fr → 1fr за --t-base --ease-out
+            <br><b>шеврон</b> r 0 → 90° · response .42 · damping .60 · <b>содержимое</b> y −8 → 0, o 0 → 1 · response .50 · damping .80 · <code>attachDisclosures()</code></p>
+        </div>
+
+        <div class="sample">
+          <h3>Модалка, шторка, тост</h3>
+          <div class="sample-stage">
+            <div class="demo-row">
+              <button class="btn" data-open="#m-modal">Модальное окно</button>
+              <button class="btn" data-open="#m-drawer">Шторка</button>
+              <button class="btn" id="m-toast">Тост</button>
+            </div>
+            <p class="hint">Плита въезжает и уходит тем же путём; диалог закрывается только после ухода. Esc — так же.</p>
+          </div>
+          <p class="sample-spec"><b>модалка</b> y 18 · s .96 · blur 6 → 0 · response .48 · damping .78; уход y 10 · response .28
+            <br><b>шторка</b> x 40 (телефон: y 48) · response .50 · damping .82 · <b>тост</b> y 20 → 0 · response .50 · damping .78; уход y 12
+            <br><b>подложка</b> opacity за --t-base · <code>openDialog()</code>, <code>closeDialog()</code>, <code>pushToast()</code></p>
+        </div>
+
+        <div class="sample">
+          <h3>Карточки: наклон и свет</h3>
+          <div class="sample-stage">
+            <div class="demo-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
+              <button class="card" data-glow><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Проекты</p><p class="card-sub">12 папок · data-glow</p></button>
+              <button class="card"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-film"/></svg></span><p class="card-title">Видео</p><p class="card-sub">48 файлов</p></button>
+            </div>
+          </div>
+          <p class="sample-spec"><b>наклон</b> rotateX/Y до ±4° к курсору · response .35 · damping .80 · <b>подъём</b> s 1.015 · response .40
+            <br><b>уход</b> response .50 · damping .70 · только мышь · <code>attachCards()</code>; свет по поверхности — только у <code>.card[data-glow]</code> (левая), 1–3 на экран</p>
+        </div>
+
+        <div class="sample">
+          <h3>Дерево: подсветка переезжает</h3>
+          <div class="sample-stage rows" style="justify-items: stretch">
+            <nav class="tree-nav" id="m-tree" style="width:100%;max-width:280px;margin:0 auto">
+              <div class="tnode open"><span class="tw"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></span><svg class="ti"><use href="../src/icons/sprite.svg#i-folder"/></svg><span class="tn">Библиотека</span><span class="tc">8</span></div>
+              <div class="tkids">
+                <div class="tnode" aria-current="true"><span class="tw leaf"></span><svg class="ti"><use href="../src/icons/sprite.svg#i-file"/></svg><span class="tn">Лекции</span></div>
+                <div class="tnode"><span class="tw leaf"></span><svg class="ti"><use href="../src/icons/sprite.svg#i-file"/></svg><span class="tn">Подкасты</span></div>
+                <div class="tnode"><span class="tw leaf"></span><svg class="ti"><use href="../src/icons/sprite.svg#i-file"/></svg><span class="tn">Музыка</span></div>
+              </div>
+            </nav>
+          </div>
+          <p class="sample-spec"><b>плашка .tree-ink</b> ось y, две кромки: ведущая response .26 · ведомая .42 · <code>moveInk(tree, node, ink, { axis: 'y' })</code></p>
+        </div>
+
+        <div class="sample">
+          <h3>Числа: счётчик и барабан</h3>
+          <div class="sample-stage">
+            <div class="demo-row" style="gap:40px">
+              <div class="stat-big count" id="m-count">0</div>
+              <div class="odometer big" id="m-odo"></div>
+            </div>
+            <div class="demo-row"><button class="btn small" id="m-num">Новое значение</button></div>
+          </div>
+          <p class="sample-spec"><b>счётчик</b> одна пружина на число · response 1.2 · damping 1 — без перелёта, долгий выбег
+            <br><b>барабан</b> колонка 0–9 на translateY · response .55 + .03/разряд · damping .78 · <code>countTo()</code>, <code>odometer()</code></p>
+        </div>
+
+      </div>
+    </section>
+    <footer class="site-footer"><div class="footer-bottom"><span>cosmos-kit · движение</span><span>все параметры — в motion.js рядом с функциями</span></div></footer>
+  </div>
+
+  <dialog class="modal" id="m-modal"><div class="modal-box" tabindex="-1">
+    <header class="drawer-head"><div><p class="drawer-kicker"><svg><use href="../src/icons/sprite.svg#i-question"/></svg>Пример</p><h3>Модальное окно</h3></div>
+      <button class="icon-btn" data-close type="button" aria-label="Закрыть"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></header>
+    <p class="modal-text">Въехала снизу на 18px из 0.96 с размытием; уйдёт тем же путём.</p>
+    <div class="btn-row modal-actions"><button class="btn primary" data-close type="button">Понятно</button></div>
+  </div></dialog>
+  <dialog class="drawer" id="m-drawer"><div class="drawer-box" tabindex="-1"><div class="grab" aria-hidden="true"></div>
+    <header class="drawer-head"><div><p class="drawer-kicker"><svg><use href="../src/icons/sprite.svg#i-sliders"/></svg>Пример</p><h3>Шторка</h3></div>
+      <button class="icon-btn" data-close type="button" aria-label="Закрыть"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></header>
+    <div class="drawer-scroll"><div class="card-block"><h4><svg><use href="../src/icons/sprite.svg#i-info"/></svg>Блок</h4><p class="modal-text">На телефоне смахивается вниз за хват.</p></div></div>
+  </div></dialog>
+  <dialog class="drawer" id="menu-drawer"><div class="drawer-box" tabindex="-1"><div class="grab" aria-hidden="true"></div>
+    <header class="drawer-head"><div><p class="drawer-kicker"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>cosmos</p><h3>Разделы</h3></div>
+      <button class="icon-btn" data-close type="button" aria-label="Закрыть"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></header>
+    <div class="drawer-scroll"><nav class="drawer-links"></nav></div>
+  </div></dialog>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script type="module">
+    import { boot, shell, wireSegmented, wireTree } from './demo.js';
+    import { buttonState, countTo, odometer } from '../src/js/motion.js';
+    shell('motion');
+    const { toast } = boot();
+    wireSegmented(document.getElementById('m-pills'), 'aria-checked');
+    wireSegmented(document.getElementById('m-tabs'), 'aria-selected');
+    wireTree(document.getElementById('m-tree'));
+    // состояние кнопки: busy 1.4 s → done 1.2 s → idle
+    for (const id of ['state-btn', 'state-btn-2']) {
+      const b = document.getElementById(id);
+      b.addEventListener('click', async () => {
+        if (b.dataset.state && b.dataset.state !== 'idle') return;
+        await buttonState(b, 'busy'); await new Promise((r) => setTimeout(r, 1400));
+        await buttonState(b, 'done'); await new Promise((r) => setTimeout(r, 1200));
+        buttonState(b, 'idle');
+      });
+    }
+    document.getElementById('m-toast').addEventListener('click', () => toast('ok', 'Сохранено'));
+    // числа
+    const cnt = document.getElementById('m-count'), odo = document.getElementById('m-odo');
+    let v = 1284;
+    const roll = () => { countTo(cnt, v); odometer(odo, v, { digits: 4 }); v = 100 + Math.floor(Math.random() * 9800); };
+    roll(); setTimeout(roll, 600);
+    document.getElementById('m-num').addEventListener('click', roll);
+  </script>
+</body>
+</html>

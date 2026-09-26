@@ -31,15 +31,17 @@ cosmos-kit/
 ├── src/
 │   ├── css/
 │   │   ├── tokens.css        — переменные + база (подключать первым); ось акцентов data-accent
-│   │   └── components.css    — компоненты (кнопки, поле, вкладки, карточки, диалоги, тосты…),
-│   │                           фон-сцена (.cosmos-wrap, состояния, композиции), навигация, каркас
+│   │   ├── components.css    — компоненты (кнопки, поле, вкладки, карточки, диалоги, тосты…),
+│   │   │                       фон-сцена (.cosmos-wrap, состояния, композиции), навигация, каркас
+│   │   └── kosmos.css        — необязательно: три компонента по мотивам KOCMOC (глифы, пульс, HUD)
 │   ├── js/
 │   │   ├── cosmos.js         — фон «чёрная дыра» (WebGL), createCosmos()/init(), attachSceneScroll()
-│   │   └── motion.js         — пружины + пойнтер-свет + сегментные ink-плашки
+│   │   ├── motion.js         — пружины, механика кнопок/переключателей/диалогов/чисел (attach*, buttonState…)
+│   │   └── kosmos.js         — необязательно: движение компонентов KOCMOC (pulse, hudRing, hudType)
 │   ├── fonts/                — Geologica, Onest, Unbounded, JetBrains Mono + fonts.css
 │   ├── icons/sprite.svg       — общие UI-иконки (без брендов платформ)
 │   └── scene/plate.webp       — текстура дальнего плана сцены
-├── demo/index.html           — витрина: целый сайт (шапка, герой, секции, подвал) + каталог компонентов
+├── demo/                     — витрина: index.html (сайт + каталог), motion.html («Движение»), kosmos.html (KOCMOC)
 ├── .agents/skills/cosmos-site/SKILL.md — воркфлоу «сделать сайт в этом стиле» + правила композиции и тона
 └── DESIGN-TODO.md            — журнал дизайнерских решений: что решено, что отложено, что открыто
 ```
