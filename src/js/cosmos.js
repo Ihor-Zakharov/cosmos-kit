@@ -17,6 +17,8 @@
 //     шире радужная кайма, живее нити; средняя яркость обода та же, что у calm при том же ringBrightness (хаос не прибавляет света).
 //   rays: false (по умолчанию) | true — лучи RTX: рассеяние кольца в дымке перераспределяется в тонкие радиальные лучи,
 //     средняя яркость кадра не меняется. Живая смена — api.setHalo('chaotic'), api.setRays(true).
+//   Живой процесс сайта: setEnergy(0..1) — вихрь и нити быстрее (у кольца 2,6°/с → 5,5°/с), время сцены ×1,3, ореол дышит
+//     шире; pulse('go') на старте, pulse('done') на финише (см. SKILL.md «Сцена и процесс»). setSmoke(name) — оттенок дыма.
 //   ringBrightness — яркость первого ореола (раскалённый пояс у кромки тени + фотонное кольцо); по умолчанию 0.88,
 //   1.0 = пиксель в пиксель как в v0.1.0. Внешнее гало, диск, отражение и звёзды не трогает. Переопределяется CSS-токеном --bh-ring.
 //   { ok, setAccent(hex, amt), setPointer(x, y), setScroll(v), setEnergy(v), pulse('go' | 'done'), pause(), resume(), resize(),
@@ -515,13 +517,16 @@ export function createCosmos(canvas, opts = {}) {
     tint: [1, 1, 1], tintT: [1, 1, 1], tintAmt: 0, tintAmtT: 0,
     energy: 0, energyT: 0,
     swell: 0, _attack: 0, _peak: 1, lastPulse: -10,
-    /** Оттенок тумана и каймы по цвету источника; null — нейтральный белый. */
+    /** Оттенок тумана и каймы по цвету источника; null — нейтральный белый. amt 1 — как в «выдре» под платформу,
+        для лёгкого дыма — 0.2–0.45 (см. SMOKE). */
     setAccent(hex, amt = 1) {
       if (hex) api.tintT = hexToRgb(hex);
       api.tintAmtT = hex ? 0.55 * amt : 0;
       api.wake();
     },
     setInvert(v) { api.invert = v ? 1 : 0; api.wake(); },
+    /** Оттенок дыма по имени из SMOKE ('neutral' | 'cold' | 'moon' | 'warm' | 'violet' | 'ember'). */
+    setSmoke(name) { const s = SMOKE[name]; api.setAccent(s ? s.hex : null, s ? s.amt : 0); },
     /** Ореол: 'calm' | 'chaotic' — плавно за ~0,9 с. */
     setHalo(mode) { api.chaosT = mode === 'chaotic' ? 1 : 0; api.wake(); },
     /** Лучи RTX вкл/выкл — плавно за ~0,9 с. */
@@ -759,6 +764,19 @@ export function createCosmos(canvas, opts = {}) {
   api.wake();
   return api;
 }
+
+/** Оттенки дыма — лёгкая подкраска тумана, рассеяния и радужной каймы (setAccent(hex, amt): amt 1 = полная
+    подкраска «выдры» под платформу, здесь 0.2–0.45 — едва заметный тон). Оттенки лежат на оси излучения
+    (violet → ice → white → gold → ember), но сильно разбавлены: дым не спорит с белым кольцом.
+    Применение: api.setSmoke('cold') или setAccent(SMOKE.cold.hex, SMOKE.cold.amt); null — нейтральный. */
+export const SMOKE = {
+  neutral: null,
+  cold:   { hex: '#a9ccff', amt: 0.35, name: 'холодный' },        // лёд: голубоватая дымка
+  moon:   { hex: '#d9dcf2', amt: 0.45, name: 'лунный' },          // почти белый с лавандовой тенью
+  warm:   { hex: '#ffc76a', amt: 0.28, name: 'тёплый' },          // золото: как свет свечи в тумане
+  violet: { hex: '#b49cff', amt: 0.30, name: 'дымчато-фиолетовый' },
+  ember:  { hex: '#ff9448', amt: 0.22, name: 'угольный' },        // самый осторожный: оранжевый быстро становится грязным
+};
 
 /** Алиас с именем, требуемым API-контрактом кита: init(canvas, opts) === createCosmos(canvas, opts). */
 export const init = createCosmos;

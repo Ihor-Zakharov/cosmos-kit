@@ -240,9 +240,9 @@ export function flip(container, mutate, removed = [], { stagger = 32, response =
 // ---------------------------------------------------------------------------
 
 /** Свет курсора по кайме/поверхности: следит за указателем и выставляет --mx/--my на ближайшем предке, matching
-    selector. По умолчанию — только .field-body и явный [data-glow]: свет курсора — акцент, 1–3 элемента на экран (главное
-    поле, главная карточка), не рядовые кнопки, списки и навигация (SKILL.md «Движение»). Один слушатель, throttled через rAF. */
-export function attachPointerGlow(root = document, selector = '.field-body, [data-glow]') {
+    selector. По умолчанию — .field-body, .card и явный [data-glow]: у карточек это тихое стандартное пятно, а яркий свет
+    (кайма + поверхность поля, [data-glow]) — акцент, 1–3 элемента на экран (SKILL.md «Движение»). Один слушатель, throttled через rAF. */
+export function attachPointerGlow(root = document, selector = '.field-body, .card, [data-glow]') {
   let ev = null, ticking = 0;
   root.addEventListener('pointermove', (e) => {
     ev = e;

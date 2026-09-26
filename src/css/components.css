@@ -53,7 +53,8 @@
 /* «раскалённая» плита — единственное сильное свечение экрана, приберегите на одно главное действие */
 .btn.primary { color: #000; border-color: transparent; background: var(--white-hot); box-shadow: var(--white-glow); }
 :root[data-theme="light"] .btn.primary { color: #fff; }
-.btn.primary:hover:not(:disabled) { background: var(--white-hot); box-shadow: 0 0 0 1px #fff, 0 0 34px rgba(255, 255, 255, .5), 0 0 100px rgba(255, 255, 255, .2); }
+/* наведение на раскалённую — только подъём (attachButtons) и та же заливка: свечение НЕ растёт (решение пользователя) */
+.btn.primary:hover:not(:disabled) { background: var(--white-hot); box-shadow: var(--white-glow); }
 /* разрушительное действие — «красная плита»: тёмный текст на err (контраст держит текст, не белый) */
 .btn.solid.danger { color: #14040a; background: var(--err); border-color: transparent; box-shadow: 0 0 22px rgba(255, 95, 115, .28); }
 /* Правило: красная плита — только для необратимого разрушительного действия и только внутри подтверждения
@@ -172,7 +173,7 @@
 .go-btn { flex: none; width: auto; height: 48px; padding: 0 20px 0 16px; border-radius: var(--r-m); display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; color: #000; background: #fff; font: 600 15px/1 var(--font-text); letter-spacing: .005em; box-shadow: 0 0 0 1px rgba(255, 255, 255, .9), 0 0 26px rgba(255, 255, 255, .34), 0 0 80px rgba(255, 255, 255, .14); transition: box-shadow var(--t-base) var(--ease-out), filter var(--t-fast) var(--ease-out); cursor: pointer; }
 :root[data-theme="light"] .go-btn { color: #fff; }
 .go-btn svg { width: 18px; height: 18px; stroke-width: 2.4; }
-.go-btn:hover { box-shadow: 0 0 0 1px #fff, 0 0 34px rgba(255, 255, 255, .5), 0 0 100px rgba(255, 255, 255, .2); }
+.go-btn:hover { box-shadow: 0 0 0 1px rgba(255, 255, 255, .9), 0 0 26px rgba(255, 255, 255, .34), 0 0 80px rgba(255, 255, 255, .14); }   /* как в покое: свечение не растёт */
 .go-btn.fire svg { animation: go-dive .7s var(--ease-out); }
 .go-btn:disabled { filter: opacity(.72); cursor: default; }
 @keyframes go-dive { 0% { transform: none; } 40% { transform: translateY(18px); opacity: 0; } 41% { transform: translateY(-18px); opacity: 0; } 100% { transform: none; opacity: 1; } }
@@ -205,19 +206,18 @@
 
 .card { position: relative; isolation: isolate; display: block; padding: 18px; border: 1px solid var(--line-1); text-align: left; color: inherit; cursor: pointer; border-radius: var(--r-l); background: var(--s1);
   transition: border-color .3s, background-color .3s, box-shadow .35s; will-change: transform; }
-.card:hover { border-color: var(--line-2); background: var(--surface-2); }
-/* свет по поверхности карточки в точке курсора — только у .card[data-glow] (главная карточка экрана); наклон (attachCards) — у всех */
-.card[data-glow]::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: -1;
-  background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .09), transparent 70%); transition: opacity var(--t-base) var(--ease-out); }
-@media (hover: hover) { .card[data-glow]:hover::after { opacity: 1; } }
-/* выбранное и цель перетаскивания — отметка (--el-mark: gold в белом мире, иначе ступень излучения).
-   Золото — только ВНУТРИ плиты, как свет по поверхности у .card[data-glow], но неподвижный, теплее и глубже: мягкое
-   пятно тёплого света в верхней части плиты, растворяющееся к краям; кайма обычная монохромная, снаружи ничего не
-   светится. Читается тихо, «дорого, не ярко»; один индикатор — тёплая поверхность (эталон пользователя) */
-.card.selected { border-color: var(--line-2);
-  background: radial-gradient(240px circle at 50% 28%, color-mix(in oklab, var(--el-mark) 18%, var(--s2)), color-mix(in oklab, var(--el-mark) 5%, var(--s2)) 55%, var(--s2) 82%); }
-.card.drop-target { border-color: var(--line-3);
-  background: radial-gradient(260px circle at 50% 28%, color-mix(in oklab, var(--el-mark) 26%, var(--s2)), color-mix(in oklab, var(--el-mark) 8%, var(--s2)) 55%, var(--s2) 85%); }
+/* наведение — только пятно света вокруг курсора (::after ниже), карточка целиком не меняется: вне пятна она как в покое.
+   Стандартный hover: тихое пятно в точке курсора (--mx/--my от attachPointerGlow — .card в селекторе по умолчанию),
+   мягкий радиальный спад, без каймы по периметру; дёшево — один градиент и opacity. [data-glow] — пятно заметнее
+   (главная карточка экрана). Наклон (attachCards) — у всех. На сенсоре hover нет — пятна нет */
+.card:not(.static)::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: -1;
+  background: radial-gradient(170px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .07), transparent 70%); transition: opacity var(--t-base) var(--ease-out); }
+.card[data-glow]::after { background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .11), transparent 70%); }
+@media (hover: hover) { .card:not(.static):hover::after { opacity: 1; } }
+/* выбранное и цель перетаскивания — монохромно, в духе обычной карточки, один индикатор:
+   выбранное — чуть светлее поверхность; цель перетаскивания — чуть ярче кайма */
+.card.selected { background: var(--s3); }
+.card.drop-target { border-color: var(--line-3); }
 .card-glyph { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-1); border-radius: var(--r-m); }
 .card-glyph svg { width: 22px; height: 22px; }
 .card-title { font: 600 16.5px/1.2 var(--font-display); letter-spacing: -.02em; color: var(--ink); margin: 0; }
@@ -242,7 +242,7 @@
 .tnode:hover { background: var(--surface); color: var(--ink); }
 .tnode[aria-current="true"] { color: var(--ink); background: var(--surface-2); }
 .tnode[aria-disabled="true"] { opacity: .45; cursor: default; }
-.tnode.drop-target { background: color-mix(in oklab, var(--el-mark) 9%, var(--surface-2)); box-shadow: inset 0 0 0 1px var(--line-3); color: var(--ink); }
+.tnode.drop-target { box-shadow: inset 0 0 0 1px var(--line-3); color: var(--ink); }
 .tnode .tw { width: 16px; height: 16px; display: grid; place-items: center; color: var(--ink-3); flex: none; }
 .tnode .tw svg { width: 12px; height: 12px; transition: transform .3s var(--ease-out); }
 .tnode.open .tw svg { transform: rotate(90deg); }
@@ -280,7 +280,7 @@
 .crumb svg { width: 15px; height: 15px; }
 .crumb:hover { background: var(--surface-2); color: var(--ink); }
 .crumb[aria-current="page"] { color: var(--ink); font-weight: 600; }
-.crumb.drop-target { background: color-mix(in oklab, var(--el-mark) 9%, var(--surface-2)); box-shadow: inset 0 0 0 1px var(--line-3); color: var(--ink); }
+.crumb.drop-target { box-shadow: inset 0 0 0 1px var(--line-3); color: var(--ink); }
 .crumb-sep { color: var(--ink-3); }
 .crumb-sep svg { width: 14px; height: 14px; }
 

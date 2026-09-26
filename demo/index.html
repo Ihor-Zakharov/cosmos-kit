@@ -261,11 +261,22 @@
       </div>
       <div class="demo-row" style="margin-top:12px">
         <button class="btn" id="toggle-asleep" type="button">Сцена: усыпить</button>
+        <button class="btn" id="spin-btn" type="button"><span class="btn-label">Крутить</span></button>
         <button class="btn" id="pulse-go" type="button">pulse('go')</button>
         <button class="btn" id="energy-up" type="button">energy → 1</button>
         <button class="btn" id="energy-down" type="button">energy → 0</button>
       </div>
+      <div class="demo-row" style="margin-top:12px" id="smoke-row" aria-label="Дым">
+        <span class="demo-note">Дым:</span>
+        <button class="btn small" data-smoke="neutral" aria-pressed="true" type="button">нейтральный</button>
+        <button class="btn small" data-smoke="cold" type="button">холодный</button>
+        <button class="btn small" data-smoke="moon" type="button">лунный</button>
+        <button class="btn small" data-smoke="warm" type="button">тёплый</button>
+        <button class="btn small" data-smoke="violet" type="button">дымчато-фиолетовый</button>
+        <button class="btn small" data-smoke="ember" type="button">угольный</button>
+      </div>
       <p class="demo-note" style="margin-top:16px">Варианты: ореол <code>halo: 'calm' | 'chaotic'</code> (хаос — неровная яркость, дрожь кромки, шире радужная кайма; средняя яркость обода та же) и <code>rays: true</code> (лучи RTX — рассеяние кольца в дымке перераспределяется в тонкие радиальные лучи, общий свет тот же). Сочетаются как угодно.</p>
+      <p class="demo-note" style="margin-top:16px"><strong>Крутить</strong> — как загрузка в «выдре»: <code>pulse('go')</code> на старте, <code>setEnergy(1)</code> на время процесса (вихрь и нити быстрее, время сцены ×1,3, ореол дышит шире), <code>pulse('done')</code> и <code>setEnergy(0)</code> на финише. <strong>Дым</strong> — <code>setSmoke(name)</code>: лёгкие оттенки тумана и каймы на оси излучения, amt 0.2–0.45 (полная подкраска «выдры» — 1).</p>
       <p class="demo-note" style="margin-top:16px">Состояния: <strong>живая</strong> — герой на экране; <strong>за горизонтом</strong> — герой ушёл вверх, кадр
       гаснет до 8 % и рендер на паузе (вы сейчас в нём); <strong>спит</strong> — внутренние страницы: размыта и погашена с первого кадра. Из
       консоли: <code>cosmosApi.pulse('go')</code>, <code>cosmosApi.setEnergy(1)</code>, <code>cosmosApi.setAccent('#ffc76a')</code>.</p>
@@ -661,6 +672,21 @@
     document.getElementById('fire-toast-ok').addEventListener('click', () => toast('ok', 'Готово'));
     document.getElementById('fire-toast-err').addEventListener('click', () => toast('err', 'Не получилось'));
     document.getElementById('pulse-go').addEventListener('click', () => cosmosApi.pulse('go'));
+    // «Крутить»: энергия 0 ↔ 1 с пульсом на старте и финише — как загрузка в «выдре»
+    let spinning = false;
+    document.getElementById('spin-btn').addEventListener('click', (e) => {
+      spinning = !spinning;
+      if (spinning) { cosmosApi.pulse('go'); cosmosApi.setEnergy(1); } else { cosmosApi.setEnergy(0); cosmosApi.pulse('done'); }
+      e.currentTarget.querySelector('.btn-label').textContent = spinning ? 'Остановить' : 'Крутить';
+      e.currentTarget.classList.toggle('busy', spinning);
+      document.getElementById('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' });
+    });
+    // оттенки дыма
+    document.querySelectorAll('#smoke-row [data-smoke]').forEach((b) => b.addEventListener('click', () => {
+      document.querySelectorAll('#smoke-row [data-smoke]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      cosmosApi.setSmoke(b.dataset.smoke);
+      document.getElementById('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' });
+    }));
     document.getElementById('energy-up').addEventListener('click', () => cosmosApi.setEnergy(1));
     document.getElementById('energy-down').addEventListener('click', () => cosmosApi.setEnergy(0));
     document.getElementById('demo-field').addEventListener('submit', (e) => e.preventDefault());
