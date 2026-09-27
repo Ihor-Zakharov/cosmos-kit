@@ -221,6 +221,13 @@
    выбранное — чуть светлее поверхность; цель перетаскивания — чуть ярче кайма */
 .card.selected { background: var(--s3); }
 .card.drop-target { border-color: var(--line-3); }
+/* отметка светом внутри поверхности (снаружи ничего): .mark-gold — тёплое золото, .mark-silver — холодное серебро;
+   тихо — .mark-*, ярче — .mark-* .strong. Кайма монохромная */
+.card.mark-gold { --mark: #ffc76a; } .card.mark-silver { --mark: #dfe6f2; }
+.card.mark-gold, .card.mark-silver { border-color: var(--line-2);
+  background: radial-gradient(240px circle at 50% 28%, color-mix(in oklab, var(--mark) 18%, var(--s2)), color-mix(in oklab, var(--mark) 5%, var(--s2)) 55%, var(--s2) 82%); }
+.card.mark-gold.strong, .card.mark-silver.strong { border-color: var(--line-3);
+  background: radial-gradient(260px circle at 50% 28%, color-mix(in oklab, var(--mark) 26%, var(--s2)), color-mix(in oklab, var(--mark) 8%, var(--s2)) 55%, var(--s2) 85%); }
 .card-glyph { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-1); border-radius: var(--r-m); }
 .card-glyph svg { width: 22px; height: 22px; }
 .card-title { font: 600 16.5px/1.2 var(--font-display); letter-spacing: -.02em; color: var(--ink); margin: 0; }
