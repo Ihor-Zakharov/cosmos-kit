@@ -647,7 +647,7 @@
         <button class="btn small" data-smoke="warm" type="button">тёплый</button>
         <button class="btn small" data-smoke="violet" type="button">дымчато-фиолетовый</button>
         <button class="btn small" data-smoke="ember" type="button">угольный</button>
-        <span class="demo-note" style="margin-left:8px">эталон выдры:</span>
+        <span class="dock-label dock-break">эталон выдры — цвета платформ</span>
         <button class="btn small" data-smoke="youtube" type="button">youtube</button>
         <button class="btn small" data-smoke="tiktok" type="button">tiktok</button>
         <button class="btn small" data-smoke="instagram" type="button">instagram</button>
@@ -661,7 +661,7 @@
 
   <script type="module">
     import { boot, shell, wireSegmented, wireTree } from './demo.js';
-    import { buttonState, countTo, odometer, enter, exit } from '../src/js/motion.js';
+    import { buttonState, countTo, odometer, enter, exit, moveInk } from '../src/js/motion.js';
     import { pulse, hudRing, hudType } from '../src/js/kosmos.js';
     shell('index');
     import('../src/js/motion.js').then(({ countTo }) => document.querySelectorAll('.hero-stats .count').forEach((el, i) => setTimeout(() => countTo(el, +el.dataset.to, { response: 1.4 }), 600 + i * 120)));
@@ -723,7 +723,9 @@
     });
     // панель «Фон»: открыть/закрыть с пружиной, Esc и клик мимо закрывают, фокус возвращается на кнопку
     const dock = document.getElementById('scene-dock'), dockBtn = document.getElementById('scene-dock-btn');
-    const openDock = () => { if (closing) return; dock.hidden = false; dockBtn.setAttribute('aria-expanded', 'true'); if (!reducedQuery.matches) enter(dock, { dy: 16, scale: 0.97, blur: 6, response: 0.42, damping: 0.82 }); dock.querySelector('button').focus({ preventScroll: true }); };
+    const openDock = () => { if (closing) return; dock.hidden = false; dockBtn.setAttribute('aria-expanded', 'true');
+      // плашки переключателей считались, пока панель была скрыта, — ставим их на место сразу, без анимации
+      dock.querySelectorAll('.pills').forEach((g) => { const on = g.querySelector('[aria-checked="true"]'); if (on) moveInk(g, on, undefined, { immediate: true }); }); if (!reducedQuery.matches) enter(dock, { dy: 16, scale: 0.97, blur: 6, response: 0.42, damping: 0.82 }); dock.querySelector('button').focus({ preventScroll: true }); };
     let closing = false;
     const closeDock = async () => {
       if (dock.hidden || closing) return; closing = true; dockBtn.setAttribute('aria-expanded', 'false');
