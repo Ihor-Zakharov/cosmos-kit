@@ -225,7 +225,7 @@
 .card.silver { --silver: #dfe6f2; border-color: color-mix(in oklab, var(--silver) 12%, var(--line-1));
   background: color-mix(in oklab, var(--silver) 6%, var(--s1)); }
 @media (hover: hover) {
-  .card.silver:not(.static):hover { border-color: color-mix(in oklab, var(--silver) 26%, var(--line-2)); background: color-mix(in oklab, var(--silver) 9%, transparent); }
+  .card.silver:not(.static):hover { border-color: color-mix(in oklab, var(--silver) 26%, var(--line-2)); background: rgba(223, 230, 242, .06); }   /* прозрачно, как у обычной: сквозь плиту видны зерно и крошки сцены */
   .card.silver.static:hover { border-color: color-mix(in oklab, var(--silver) 24%, var(--line-2)); background: color-mix(in oklab, var(--silver) 10%, var(--s1)); }
 }
 .card.silver[data-glow]::after { background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 50%),
