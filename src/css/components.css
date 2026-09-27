@@ -221,13 +221,16 @@
    выбранное — чуть светлее поверхность; цель перетаскивания — чуть ярче кайма */
 .card.selected { background: var(--s3); }
 .card.drop-target { border-color: var(--line-3); }
-/* отметка светом внутри поверхности (снаружи ничего): .mark-gold — тёплое золото, .mark-silver — холодное серебро;
-   тихо — .mark-*, ярче — .mark-* .strong. Кайма монохромная */
-.card.mark-gold { --mark: #ffc76a; } .card.mark-silver { --mark: #dfe6f2; }
-.card.mark-gold, .card.mark-silver { border-color: var(--line-2);
-  background: radial-gradient(240px circle at 50% 28%, color-mix(in oklab, var(--mark) 18%, var(--s2)), color-mix(in oklab, var(--mark) 5%, var(--s2)) 55%, var(--s2) 82%); }
-.card.mark-gold.strong, .card.mark-silver.strong { border-color: var(--line-3);
-  background: radial-gradient(260px circle at 50% 28%, color-mix(in oklab, var(--mark) 26%, var(--s2)), color-mix(in oklab, var(--mark) 8%, var(--s2)) 55%, var(--s2) 85%); }
+/* серебряная тема — те же три карточки (.card, .card[data-glow], .card.static), поверхность, кайма и свет серебристые */
+.card.silver { --silver: #dfe6f2; border-color: color-mix(in oklab, var(--silver) 12%, var(--line-1));
+  background: color-mix(in oklab, var(--silver) 6%, var(--s1)); }
+@media (hover: hover) {
+  .card.silver:not(.static):hover { border-color: color-mix(in oklab, var(--silver) 26%, var(--line-2)); background: color-mix(in oklab, var(--silver) 9%, transparent); }
+  .card.silver.static:hover { border-color: color-mix(in oklab, var(--silver) 24%, var(--line-2)); background: color-mix(in oklab, var(--silver) 10%, var(--s1)); }
+}
+.card.silver[data-glow]::after { background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 50%),
+  rgba(223, 230, 242, .07) 0, rgba(223, 230, 242, .055) 16%, rgba(223, 230, 242, .036) 34%, rgba(223, 230, 242, .018) 54%, rgba(223, 230, 242, .006) 76%, rgba(223, 230, 242, 0) 100%); }
+.card.silver .card-glyph { background: color-mix(in oklab, var(--silver) 10%, var(--surface-2)); }
 .card-glyph { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-1); border-radius: var(--r-m); }
 .card-glyph svg { width: 22px; height: 22px; }
 .card-title { font: 600 16.5px/1.2 var(--font-display); letter-spacing: -.02em; color: var(--ink); margin: 0; }

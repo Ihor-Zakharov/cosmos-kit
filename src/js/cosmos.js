@@ -13,12 +13,12 @@
 // плоский вид без параллакса и без частиц — самый дешёвый режим.
 //
 // API: createCosmos(canvas, { reduced, seed, resScale, plateUrl, ringBrightness, halo, rays }) — он же init(canvas, opts) —→
-//   halo: 'calm' (по умолчанию) | 'chaotic' — ореол как в старом виде: неровная яркость по окружности, дрожь кромки,
+//   halo: 'chaotic' (по умолчанию) | 'calm' — ореол как в старом виде: неровная яркость по окружности, дрожь кромки,
 //     шире радужная кайма, живее нити; средняя яркость обода та же, что у calm при том же ringBrightness (хаос не прибавляет света).
 //   rays: false (по умолчанию) | true — лучи RTX: рассеяние кольца в дымке перераспределяется в тонкие радиальные лучи,
 //     средняя яркость кадра не меняется. Живая смена — api.setHalo('chaotic'), api.setRays(true).
 //   Живой процесс сайта: setEnergy(0..1) — вихрь и нити быстрее (у кольца 2,6°/с → 5,5°/с), время сцены ×1,3, ореол дышит
-//     шире; pulse('go') на старте, pulse('done') на финише (см. SKILL.md «Сцена и процесс»). setSmoke(name) — оттенок дыма.
+//     шире; pulse('go') на старте, pulse('done') на финише (см. SKILL.md «Сцена и процесс»). setSmoke(name, k) — оттенок дыма (k — доля силы); по умолчанию включён едва заметный SMOKE_DEFAULT, opts.smoke: null — без оттенка.
 //   ringBrightness — яркость первого ореола (раскалённый пояс у кромки тени + фотонное кольцо); по умолчанию 0.88,
 //   1.0 = пиксель в пиксель как в v0.1.0. Внешнее гало, диск, отражение и звёзды не трогает. Переопределяется CSS-токеном --bh-ring.
 //   { ok, setAccent(hex, amt), setPointer(x, y), setScroll(v), setEnergy(v), pulse('go' | 'done'), pause(), resume(), resize(),
@@ -734,12 +734,12 @@ export function createCosmos(canvas, opts = {}) {
     },
     setInvert(v) { api.invert = v ? 1 : 0; api.wake(); },
     /** Оттенок дыма по имени из SMOKE ('neutral' | 'cold' | 'moon' | 'warm' | 'violet' | 'ember'). */
-    setSmoke(name) { const s = SMOKE[name]; api.setAccent(s ? s.hex : null, s ? s.amt : 0); },
+    setSmoke(name, k = 1) { const s = SMOKE[name]; api.setAccent(s ? s.hex : null, s ? s.amt * k : 0); },
     /** Ореол: 'calm' | 'chaotic' — плавно за ~0,9 с. */
     setHalo(mode) { api.chaosT = mode === 'chaotic' ? 1 : 0; api.wake(); },
     /** Лучи RTX вкл/выкл — плавно за ~0,9 с. */
     setRays(on) { api.godT = on ? 1 : 0; api.wake(); },
-    chaos: opts.halo === 'chaotic' ? 1 : 0, chaosT: opts.halo === 'chaotic' ? 1 : 0,
+    chaos: opts.halo === 'calm' ? 0 : 1, chaosT: opts.halo === 'calm' ? 0 : 1,
     god: opts.rays ? 1 : 0, godT: opts.rays ? 1 : 0,
     /** Указатель −1..1 → только параллакс планов (линзы у курсора нет); при reduced не двигает ничего. */
     setPointer(x, y) { if (reduced) return; api._pt = [x, y]; api.wake(); },
@@ -979,6 +979,11 @@ export function createCosmos(canvas, opts = {}) {
   measure();
   api.readTokens();
   api.wake();
+  // свечение есть всегда: по умолчанию едва заметный оттенок дыма (SMOKE_DEFAULT); opts.smoke: имя | null, opts.smokeK — сила 0..1
+  if (opts.smoke !== null) {
+    api.setSmoke(opts.smoke || SMOKE_DEFAULT.name, opts.smokeK ?? SMOKE_DEFAULT.k);
+    api.tint = api.tintT.slice(); api.tintAmt = api.tintAmtT;   // с первого кадра, без проявления
+  }
   return api;
 }
 
@@ -986,6 +991,8 @@ export function createCosmos(canvas, opts = {}) {
     под платформу: setAccent(hex, 1). Шейдер не менялся; видимость даёт насыщенный источник (см. замер ΔE в CHANGELOG).
     Оттенки — на оси излучения (violet → ice → white → gold → ember). Обод и ядро остаются белыми, небо и звёзды нейтральны.
     Применение: api.setSmoke('cold') или setAccent(SMOKE.cold.hex, 1); null — нейтральный. */
+/** Оттенок по умолчанию: лунный на ~45 % силы палитры — едва заметный, но есть всегда (правило SKILL «Свечение»). */
+export const SMOKE_DEFAULT = { name: 'moon', k: 0.45 };
 export const SMOKE = {
   neutral: null,
   // сила — 65 % от первой версии палитры (решение пользователя); насыщенность и яркость — как у цветов платформ «выдры» (#ff3b3b, #25f4ee): пастель шейдер не показывает (ΔE < 3),

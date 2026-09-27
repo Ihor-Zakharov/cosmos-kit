@@ -181,11 +181,10 @@
             <button class="card" data-glow><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p class="card-title">Карточка с виньеткой</p><p class="card-sub">фон сцены + виньетка · data-glow</p></button>
             <div class="card static"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Дефолтная карточка</p><p class="card-sub">тихий подъём · .card.static</p></div>
           </div>
-          <div class="demo-grid" style="grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); max-width: 840px; margin-top: 12px">
-            <button class="card mark-gold"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p class="card-title">Золото</p><p class="card-sub">.mark-gold</p></button>
-            <button class="card mark-gold strong"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-move"/></svg></span><p class="card-title">Золото ярче</p><p class="card-sub">.mark-gold.strong</p></button>
-            <button class="card mark-silver"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p class="card-title">Серебро</p><p class="card-sub">.mark-silver</p></button>
-            <button class="card mark-silver strong"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-move"/></svg></span><p class="card-title">Серебро ярче</p><p class="card-sub">.mark-silver.strong</p></button>
+          <div class="demo-grid" style="margin-top: 12px">
+            <button class="card silver"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Серебро</p><p class="card-sub">фон сцены при наведении · .silver</p></button>
+            <button class="card silver" data-glow><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p class="card-title">Серебро с виньеткой</p><p class="card-sub">фон сцены + виньетка · data-glow</p></button>
+            <div class="card silver static"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Серебро дефолтная</p><p class="card-sub">тихий подъём · .card.static</p></div>
           </div>
           <div class="demo-row" style="align-items:flex-start; gap:32px;">
             <nav class="tree-nav" style="width:200px;">
@@ -597,17 +596,24 @@
     </div>
   </dialog>
 
-  <!-- панель «Фон»: все настройки сцены на первом экране, где сцена живая -->
-  <details class="scene-dock" id="scene-dock" open>
-    <summary class="btn small">Фон</summary>
+  <!-- панель «Фон»: настройки сцены поверх живой сцены на первом экране; открывается кнопкой, закрывается ×, Esc и кликом мимо -->
+  <button class="btn small glass scene-dock-btn" id="scene-dock-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="scene-dock">
+    <svg><use href="../src/icons/sprite.svg#i-sliders"/></svg>Фон</button>
+  <div class="scene-dock" id="scene-dock" role="dialog" aria-modal="false" aria-labelledby="scene-dock-title" hidden>
+    <header class="dock-head">
+      <div><p class="drawer-kicker"><svg><use href="../src/icons/sprite.svg#i-sliders"/></svg>Сцена</p><h3 id="scene-dock-title">Фон</h3></div>
+      <button class="icon-btn" id="scene-dock-close" type="button" aria-label="Закрыть"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button>
+    </header>
     <div class="scene-dock-body">
+      <div class="dock-group"><p class="dock-label">Текстура</p>
       <div class="demo-row">
         <div class="pills glass" role="radiogroup" id="plate-pills" aria-label="Текстура">
           <button type="button" role="radio" data-plate="hd" aria-checked="true">ESRGAN испр.</button>
           <button type="button" role="radio" data-plate="old" aria-checked="false">Старый</button>
           <span class="pill-ink" aria-hidden="true"></span>
         </div>
-      </div>
+      </div></div>
+      <div class="dock-group"><p class="dock-label">Композиция</p>
       <div class="demo-row">
         <div class="pills glass" role="radiogroup" id="comp-pills" aria-label="Композиция">
           <button type="button" role="radio" data-comp="right" aria-checked="true">Витрина — справа</button>
@@ -615,27 +621,29 @@
           <button type="button" role="radio" data-comp="far" aria-checked="false">Далеко</button>
           <span class="pill-ink" aria-hidden="true"></span>
         </div>
-      </div>
+      </div></div>
+      <div class="dock-group"><p class="dock-label">Ореол и лучи</p>
       <div class="demo-row">
         <div class="pills glass" role="radiogroup" id="halo-pills" aria-label="Ореол">
-          <button type="button" role="radio" data-halo="calm" aria-checked="true">Ореол: спокойный</button>
-          <button type="button" role="radio" data-halo="chaotic" aria-checked="false">Ореол: хаотичный</button>
+          <button type="button" role="radio" data-halo="calm" aria-checked="false">спокойный</button>
+          <button type="button" role="radio" data-halo="chaotic" aria-checked="true">хаотичный</button>
           <span class="pill-ink" aria-hidden="true"></span>
         </div>
         <label class="switch"><input type="checkbox" id="rays-switch"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Лучи RTX</span></label>
-      </div>
+      </div></div>
+      <div class="dock-group"><p class="dock-label">Движение</p>
       <div class="demo-row">
         <button class="btn" id="toggle-asleep" type="button">Сцена: усыпить</button>
         <button class="btn" id="spin-btn" type="button"><span class="btn-label">Крутить</span></button>
         <button class="btn" id="pulse-go" type="button">pulse('go')</button>
         <button class="btn" id="energy-up" type="button">energy → 1</button>
         <button class="btn" id="energy-down" type="button">energy → 0</button>
-      </div>
+      </div></div>
+      <div class="dock-group"><p class="dock-label">Дым — оттенок свечения</p>
       <div class="demo-row" id="smoke-row" aria-label="Дым">
-        <span class="demo-note">Дым:</span>
-        <button class="btn small" data-smoke="neutral" aria-pressed="true" type="button">нейтральный</button>
+        <button class="btn small" data-smoke="neutral" aria-pressed="false" type="button">нейтральный</button>
         <button class="btn small" data-smoke="cold" type="button">холодный</button>
-        <button class="btn small" data-smoke="moon" type="button">лунный</button>
+        <button class="btn small" data-smoke="moon" aria-pressed="true" type="button">лунный</button>
         <button class="btn small" data-smoke="warm" type="button">тёплый</button>
         <button class="btn small" data-smoke="violet" type="button">дымчато-фиолетовый</button>
         <button class="btn small" data-smoke="ember" type="button">угольный</button>
@@ -645,14 +653,15 @@
         <button class="btn small" data-smoke="instagram" type="button">instagram</button>
         <button class="btn small" data-smoke="other" type="button">other</button>
       </div>
+      </div>
     </div>
-  </details>
+  </div>
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
 
   <script type="module">
     import { boot, shell, wireSegmented, wireTree } from './demo.js';
-    import { buttonState, countTo, odometer } from '../src/js/motion.js';
+    import { buttonState, countTo, odometer, enter, exit } from '../src/js/motion.js';
     import { pulse, hudRing, hudType } from '../src/js/kosmos.js';
     shell('index');
     import('../src/js/motion.js').then(({ countTo }) => document.querySelectorAll('.hero-stats .count').forEach((el, i) => setTimeout(() => countTo(el, +el.dataset.to, { response: 1.4 }), 600 + i * 120)));
@@ -712,7 +721,21 @@
     wireSegmented(document.getElementById('plate-pills'), 'aria-checked', (it) => {
       const u = new URL(location.href); if (it.dataset.plate === 'old') u.searchParams.set('plate', 'old'); else u.searchParams.delete('plate'); location.replace(u);
     });
-    if (innerWidth < 700) document.getElementById('scene-dock').removeAttribute('open');
+    // панель «Фон»: открыть/закрыть с пружиной, Esc и клик мимо закрывают, фокус возвращается на кнопку
+    const dock = document.getElementById('scene-dock'), dockBtn = document.getElementById('scene-dock-btn');
+    const openDock = () => { if (closing) return; dock.hidden = false; dockBtn.setAttribute('aria-expanded', 'true'); if (!reducedQuery.matches) enter(dock, { dy: 16, scale: 0.97, blur: 6, response: 0.42, damping: 0.82 }); dock.querySelector('button').focus({ preventScroll: true }); };
+    let closing = false;
+    const closeDock = async () => {
+      if (dock.hidden || closing) return; closing = true; dockBtn.setAttribute('aria-expanded', 'false');
+      if (!reducedQuery.matches) await Promise.race([exit(dock, { dy: 12, scale: 0.98 }), new Promise((r) => setTimeout(r, 320))]);   // уход не дольше 320 мс
+      dock.hidden = true; closing = false; dockBtn.focus({ preventScroll: true });
+    };
+    dockBtn.addEventListener('click', () => (dock.hidden ? openDock() : closeDock()));
+    document.getElementById('scene-dock-close').addEventListener('click', closeDock);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !dock.hidden) closeDock(); });
+    document.addEventListener('pointerdown', (e) => { if (!dock.hidden && !dock.contains(e.target) && !dockBtn.contains(e.target)) closeDock(); });
+    // по умолчанию: хаотичный ореол (умолчание кита), лунный дым едва заметно (умолчание кита), сцена крутится
+    requestAnimationFrame(() => document.getElementById('spin-btn').click());
     // оттенки дыма
     document.querySelectorAll('#smoke-row [data-smoke]').forEach((b) => b.addEventListener('click', () => {
       document.querySelectorAll('#smoke-row [data-smoke]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
