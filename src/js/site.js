@@ -108,5 +108,8 @@ export function wireSegmented(root, onChange) {
   let ready = false;
   requestAnimationFrame(() => { setActive(items.find((it) => it.getAttribute(attr) === 'true') || items[0], true); ready = true; });
   // контейнер меняет ширину, когда активный пункт становится жирным — перецеливаем плашку без снапа
-  new ResizeObserver(() => { if (ready) setActive(items.find((it) => it.getAttribute(attr) === 'true'), false); }).observe(root);
+  // если группа только что появилась из скрытого (ширина была 0) — ставим плашку сразу, без анимации
+  let lastW = root.offsetWidth;
+  new ResizeObserver(() => { const w = root.offsetWidth, appeared = !lastW && w; lastW = w;
+    if (ready && w) setActive(items.find((it) => it.getAttribute(attr) === 'true'), appeared); }).observe(root);
 }
