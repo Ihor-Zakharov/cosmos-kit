@@ -330,8 +330,13 @@ void main(){
   float fromPlane = xpool * exp(-abs(p.y - yPl) / 0.9) * mix(0.35, 1.0, smoothstep(yPl - 0.3, yPl + 0.1, p.y)) * 0.45;
   float fogL = dens * (0.028 + 1.05 * lit + fromPlane) * uFog * breath;
   vec3 ice = vec3(0.90, 0.95, 1.0);
-  float tintK = clamp(uTintAmt * (0.35 + 0.65 * min(lit * 1.5, 1.0)), 0.0, 0.85);
-  vec3 fogCol = fogL * mix(ice, uTint * 1.25, tintK);
+  // дым: оттенок нормирован по яркости (цвет, а не затемнение), гуще там, где туман освещён кольцом и плоскостью;
+  // окрашенный туман чуть плотнее — атмосфера читается; обод и ядро остаются белыми (они считаются не здесь).
+  // Путь «выдры» (uTint·1.25 при tintAmt 0.55) на этой композиции давал ΔE 3–4 даже с #ff3b3b — ниже порога заметности
+  vec3 tintN = uTint / max(dot(uTint, vec3(0.2126, 0.7152, 0.0722)), 0.25);
+  float tintK = uTintAmt * (0.55 + 0.45 * min(lit * 1.5, 1.0));
+  vec3 smokeCol = mix(ice, tintN, clamp(tintK, 0.0, 1.0));
+  vec3 fogCol = fogL * (1.0 + 0.5 * uTintAmt) * smokeCol;
 
   // ---------- средний план: туман на горизонте — между дырой и «океаном», стелется и дрейфует ----------
   float mistL = 0.0, mistA = 0.0;
@@ -378,14 +383,14 @@ void main(){
   float godN = fbm(vec2(ang * 5.0 + t * 0.012 + uSeed * 9.0, 3.0 + e * 0.35), 3);
   float godK = mix(1.0, 0.28 + 2.55 * smoothstep(0.34, 0.72, godN) * (0.6 + 0.4 * chN), uGod * smoothstep(band * 0.8, band * 2.5, e));
   sca *= godK;
-  vec3 scaCol = mix(ice, uTint * 1.2, uTintAmt * 0.38);
+  vec3 scaCol = mix(ice, tintN, uTintAmt * 0.8);                 // рассеяние ореола — это и есть дымка вокруг дыры
   vec3 halo = ((hal * tex + rng + wisp) + sca * mix(1.0, tex, 0.4) * scaCol) * beC * breath * uHalo * absorb;
 
   // радужная кайма на внешнем краю пояса — только на дуге, обращённой к форме (сверху-слева)
   float xw = (e - band * 1.05) / (0.030 + band * 0.12);
   float bandCA = exp(-xw * xw * 1.3);
   vec3 spec = mix(vec3(1.0), hue2rgb(clamp(0.02 + (0.5 - 0.5 * xw) * 0.72, 0.0, 0.78)), 0.85);
-  spec = mix(spec, uTint * 1.3, uTintAmt * 0.45);
+  spec = mix(spec, tintN, uTintAmt * 0.45);
   float caMask = mix(smoothstep(-0.2, 0.9, cos(ang - 2.25)), smoothstep(-0.9, 0.7, cos(ang - 2.25 + 0.7 * sin(t * 0.17))), uChaos);
   vec3 kayma = spec * bandCA * caMask * caK * 0.8 * beC * (1.0 + 0.35 * uSwell);
 
@@ -411,9 +416,11 @@ void main(){
               * uFlare * (0.85 + 0.15 * sin(t * 0.37));
 
   // ---------- сборка (HDR) ----------
-  col = vec3(L) + SP + fogCol + halo + kayma + vec3(pr) + vec3(planeL + mistL) * ice + vec3(flare) * vec3(0.92, 0.96, 1.0);
-  // широкая диффузия: всё рядом с кольцом чуть приподнято (свет рассеивается в воздухе)
-  col += vec3(0.020 / (1.0 + (e / 0.8) * (e / 0.8))) * be * breath * ice;
+  // плоскость — лёгкий оттенок в отражении, туман на горизонте — почти как дым, блик — наполовину; небо и звёзды (L, SP) — нейтральны
+  col = vec3(L) + SP + fogCol + halo + kayma + vec3(pr) + vec3(planeL) * mix(ice, tintN, uTintAmt * 0.3) + vec3(mistL) * mix(ice, tintN, uTintAmt * 0.7)
+      + vec3(flare) * mix(vec3(0.92, 0.96, 1.0), tintN, uTintAmt * 0.5);
+  // широкая диффузия: всё рядом с кольцом чуть приподнято (свет рассеивается в воздухе) — в цвете дыма
+  col += vec3(0.020 / (1.0 + (e / 0.8) * (e / 0.8))) * be * breath * mix(ice, tintN, uTintAmt * 0.7);
 
   vec2 vc = (fc / uRes - 0.5) * vec2(uRes.x / uRes.y, 1.0);
   col *= 1.0 - 0.22 * dot(vc, vc);
@@ -717,11 +724,12 @@ export function createCosmos(canvas, opts = {}) {
     tint: [1, 1, 1], tintT: [1, 1, 1], tintAmt: 0, tintAmtT: 0,
     energy: 0, energyT: 0,
     swell: 0, _attack: 0, _peak: 1, lastPulse: -10,
-    /** Оттенок тумана и каймы по цвету источника; null — нейтральный белый. amt 1 — как в «выдре» под платформу,
-        для лёгкого дыма — 0.2–0.45 (см. SMOKE). */
+    /** Оттенок дыма: цвет тумана, рассеяния ореола, дымки на горизонте и (слабее) отражения на плоскости; null —
+        нейтральный. amt 0..1 — сила (шейдер нормирует цвет по яркости, поэтому и пастель, и насыщенный источник дают
+        цвет, а не затемнение; обод, ядро, небо и звёзды остаются белыми при любом amt). Смена плавная, ≈ 1 с. */
     setAccent(hex, amt = 1) {
       if (hex) api.tintT = hexToRgb(hex);
-      api.tintAmtT = hex ? 0.55 * amt : 0;
+      api.tintAmtT = hex ? Math.max(0, Math.min(1, amt)) : 0;
       api.wake();
     },
     setInvert(v) { api.invert = v ? 1 : 0; api.wake(); },
@@ -949,8 +957,8 @@ export function createCosmos(canvas, opts = {}) {
     api._far = still ? hasFar : Math.min(hasFar, api._far + dt / 0.5);
     // параллакс: указатель сглажен τ 0,6 с — сцена «догоняет» мышь лениво, без рывков
     if (!reduced) { api._ptS[0] = ease(api._ptS[0], api._pt[0], dt, 0.6); api._ptS[1] = ease(api._ptS[1], api._pt[1], dt, 0.6); }
-    for (let i = 0; i < 3; i++) api.tint[i] = reduced ? api.tintT[i] : ease(api.tint[i], api.tintT[i], dt, 0.5);
-    api.tintAmt = reduced ? api.tintAmtT : ease(api.tintAmt, api.tintAmtT, dt, 0.5);
+    for (let i = 0; i < 3; i++) api.tint[i] = reduced ? api.tintT[i] : ease(api.tint[i], api.tintT[i], dt, 0.35);   // смена дыма ≈ 1 с (90 % за 0,8 с)
+    api.tintAmt = reduced ? api.tintAmtT : ease(api.tintAmt, api.tintAmtT, dt, 0.35);
     api.energy = reduced ? api.energyT : ease(api.energy, api.energyT, dt, 1.2);
     api.chaos = reduced ? api.chaosT : ease(api.chaos, api.chaosT, dt, 0.4);
     api.god = reduced ? api.godT : ease(api.god, api.godT, dt, 0.4);
@@ -974,18 +982,22 @@ export function createCosmos(canvas, opts = {}) {
   return api;
 }
 
-/** Оттенки дыма — лёгкая подкраска тумана, рассеяния и радужной каймы (setAccent(hex, amt): amt 1 = полная
-    подкраска «выдры» под платформу, здесь 0.2–0.45 — едва заметный тон). Оттенки лежат на оси излучения
-    (violet → ice → white → gold → ember), но сильно разбавлены: дым не спорит с белым кольцом.
-    Применение: api.setSmoke('cold') или setAccent(SMOKE.cold.hex, SMOKE.cold.amt); null — нейтральный. */
+/** Оттенки дыма — подкраска тумана, рассеяния ореола и радужной каймы ровно тем же путём, что «выдра» красит сцену
+    под платформу: setAccent(hex, 1). Шейдер не менялся; видимость даёт насыщенный источник (см. замер ΔE в CHANGELOG).
+    Оттенки — на оси излучения (violet → ice → white → gold → ember). Обод и ядро остаются белыми, небо и звёзды нейтральны.
+    Применение: api.setSmoke('cold') или setAccent(SMOKE.cold.hex, 1); null — нейтральный. */
 export const SMOKE = {
   neutral: null,
-  // сила как у подкраски выдры под платформу (setAccent(цвет, 1) при вставке ссылки) — дым заметен, но цвет остаётся в свете, не в поверхностях
-  cold:   { hex: '#8fb8ff', amt: 1.0,  name: 'холодный' },        // лёд: голубая дымка
-  moon:   { hex: '#c9ccf2', amt: 1.0,  name: 'лунный' },          // почти белый с лавандовой тенью
-  warm:   { hex: '#ffb347', amt: 0.9,  name: 'тёплый' },          // золото: как свет свечи в тумане
-  violet: { hex: '#9d7dff', amt: 0.95, name: 'дымчато-фиолетовый' },
-  ember:  { hex: '#ff7a3c', amt: 0.85, name: 'угольный' },        // оранжевый: чуть слабее, иначе становится грязным
+  // насыщенность и яркость — как у цветов платформ «выдры» (#ff3b3b, #25f4ee): пастель шейдер не показывает (ΔE < 3),
+  // насыщенный источник даёт заметный дым при той же силе amt 1; оттенки — на оси излучения
+  cold:   { hex: '#3aa0ff', amt: 1, name: 'холодный' },          // лёд: синий, как tiktok-бирюза по силе
+  moon:   { hex: '#9d8cff', amt: 1, name: 'лунный' },            // лавандовый, светлее фиолетового
+  warm:   { hex: '#ffb020', amt: 1, name: 'тёплый' },            // золото
+  violet: { hex: '#8a4dff', amt: 0.8, name: 'дымчато-фиолетовый' },   // самый насыщенный источник — чуть тише, чтобы не был неоном
+  ember:  { hex: '#ff5a1f', amt: 0.9, name: 'угольный' },        // угли: оранжево-красный, как youtube по силе
+  // эталон — цвета платформ «выдры» (app.js: setAccent(цвет, 1) при вставке ссылки)
+  youtube: { hex: '#ff3b3b', amt: 1, name: 'youtube' }, tiktok: { hex: '#25f4ee', amt: 1, name: 'tiktok' },
+  instagram: { hex: '#f36f9a', amt: 1, name: 'instagram' }, other: { hex: '#3ee0a1', amt: 1, name: 'other' },
 };
 
 /** Алиас с именем, требуемым API-контрактом кита: init(canvas, opts) === createCosmos(canvas, opts). */
