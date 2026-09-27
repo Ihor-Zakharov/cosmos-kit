@@ -1,0 +1,15 @@
+Copyright (c) 2026 Ihor Zakharov. Все права защищены. All rights reserved.
+
+Этот репозиторий (код, стили, шейдеры, изображения, демо, заготовка сайта и документация — далее «кит»)
+опубликован только для просмотра. Открытой лицензии нет.
+
+Без письменного разрешения автора запрещено использовать кит в своих проектах, копировать, изменять,
+распространять, продавать и создавать на его основе производные работы, целиком или частично.
+Разрешение на использование выдаёт автор лично; оно действует только для указанного в нём человека и проекта.
+
+Исключение — сторонние шрифты в src/fonts/ (Geologica, Onest, Unbounded, JetBrains Mono): они распространяются
+на условиях SIL Open Font License 1.1 их авторов, и эти условия сохраняются.
+
+This repository is published for viewing only. No license is granted to use, copy, modify, distribute,
+sell or create derivative works, in whole or in part, without the author's prior written permission.
+Third-party fonts in src/fonts/ remain under the SIL Open Font License 1.1.
