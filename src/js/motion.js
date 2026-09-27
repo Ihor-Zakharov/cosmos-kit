@@ -351,7 +351,7 @@ export function attachDisclosures(root = document, selector = '.disclosure') {
 
 /** Карточки: наклон к курсору (rotateX/Y до 4°, response .35) и подъём 1.015 — только мышь; свет по поверхности
     (--mx/--my) ставит attachPointerGlow, если в его селекторе есть .card. На сенсоре и при reduced — ничего. */
-export function attachCards(root = document, selector = '.card:not(.static)', { tilt = 4 } = {}) {
+export function attachCards(root = document, selector = '.card:not(.static)', { tilt = 0 } = {}) {   // без 3D по умолчанию; наклон — { tilt: 4 }
   if (!FINE.matches || REDUCED) return;
   let cur = null, raf = 0, ev = null;
   root.addEventListener('pointerover', (e) => {
