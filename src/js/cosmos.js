@@ -215,8 +215,10 @@ void main(){
 
   float be = 1.0 + uBeamAmt * cos(ang - uBeam);                    // яркая сторона
   // «хаос»: неровная яркость по окружности (среднее ≈ 1) и дрожь радиуса кромки (±1 % R), оба живут во времени
-  float chN = fbm(vec2(ang * 1.6 + t * 0.05, 7.0 + uSeed * 4.0), 3);
-  float chJ = fbm(vec2(ang * 2.4 - t * 0.09, 19.0), 3);
+  // шум берётся на окружности (dir = (cos, sin)), а не от угла: у atan разрыв ±π слева — там был шов.
+  // Радиус окружности подобран под прежнюю частоту (ang·1.6 → r 1.6, ang·2.4 → r 2.4); время сдвигает по кругу
+  float chN = fbm(rot(t * 0.05 / 1.6) * dir * 1.6 + vec2(7.0 + uSeed * 4.0, 3.0), 3);
+  float chJ = fbm(rot(-t * 0.09 / 2.4) * dir * 2.4 + vec2(19.0, 11.0), 3);
   float beC = be * mix(1.0, 0.72 + 0.56 * chN, uChaos);
   float jit = (chJ - 0.5) * 0.024 * uChaos;
   float breath = 1.0 + 0.03 * sin(t * TAU / 7.0) + 0.05 * uEnergy + 0.10 * uSwell;
