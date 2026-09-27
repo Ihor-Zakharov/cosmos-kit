@@ -1,7 +1,7 @@
 # cosmos-kit
 
 > **Сделать сайт в этом стиле через ИИ-агента** — дай агенту ссылку на этот репозиторий и скажи, о чём сайт.
-> Агенту: инструкция в [`AGENT.md`](AGENT.md). Вручную — одна команда:
+> Человеку: пошаговый гайд для Antigravity — [`GUIDE.md`](GUIDE.md). Агенту: инструкция в [`AGENT.md`](AGENT.md). Вручную — одна команда:
 > `curl -fsSL https://raw.githubusercontent.com/Ihor-Zakharov/cosmos-kit/main/create-site.sh | sh -s -- my-site`
 > (Windows — `create-site.ps1`, см. `AGENT.md`).
 

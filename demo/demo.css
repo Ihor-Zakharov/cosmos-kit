@@ -25,7 +25,9 @@
 .sample-stage { display: grid; place-items: center; gap: 12px; min-height: 120px; padding: 20px 12px; border-radius: var(--r-m); background: var(--bg); border: 1px solid var(--line-1); }
 .sample-stage.rows { grid-auto-flow: row; justify-items: center; }
 /* список (раскрытия): обычный поток без зазоров, поля сверху и снизу равны */
-.sample-stage.list { display: block; min-height: 0; padding: 12px; align-self: start; height: auto; }
+.sample-stage.list { display: block; min-height: 0; padding: 0; overflow: hidden; align-self: start; height: auto; }   /* строки на всю ширину, углы обрезает рамка */
+.sample-stage.list .disclosure:first-child { border-top: 0; }
+.sample-stage.list .disclosure:last-child { border-bottom: 0; }
 .sample-spec { margin: 0; display: block; font: 500 11.5px/1.55 var(--font-mono); letter-spacing: .02em; color: var(--ink-3); }
 .sample-spec b { color: var(--ink-2); font-weight: 500; }
 .sample-spec code { font-size: 11px; padding: .05em .35em; }

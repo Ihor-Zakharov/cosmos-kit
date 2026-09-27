@@ -282,7 +282,7 @@
 .disclosure:last-child { border-bottom: 1px solid var(--line-1); }
 /* заголовок на одной сетке с контейнером: одинаковые поля слева и справа (14px), равные поля над и под текстом;
    hover — плашка той же ширины, что разделители; по клику мышью ничего не рисуется — кольцо только для клавиатуры */
-.disclosure-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 14px 14px; border-radius: var(--r-m); text-align: left; font: 600 15.5px/1.3 var(--font-text); color: var(--ink); cursor: pointer; outline: none; transition: color var(--t-fast), background-color var(--t-fast); }
+.disclosure-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 14px 14px; border-radius: 0; text-align: left; font: 600 15.5px/1.3 var(--font-text); color: var(--ink); cursor: pointer; outline: none; transition: color var(--t-fast), background-color var(--t-fast); }
 @media (hover: hover) { .disclosure-head:hover { background: var(--surface); } }
 .disclosure-head:focus:not(:focus-visible) { outline: none; box-shadow: none; }
 .disclosure-head:focus-visible { outline: 2px solid var(--el-a); outline-offset: -2px; box-shadow: none; }
