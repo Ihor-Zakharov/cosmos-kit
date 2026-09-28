@@ -21,7 +21,9 @@
 //     шире; pulse('go') на старте, pulse('done') на финише (см. SKILL.md «Сцена и процесс»). setSmoke(name, k) — оттенок дыма (k — доля силы); по умолчанию включён едва заметный SMOKE_DEFAULT, opts.smoke: null — без оттенка.
 //   ringBrightness — яркость первого ореола (раскалённый пояс у кромки тени + фотонное кольцо); по умолчанию 0.88,
 //   1.0 = пиксель в пиксель как в v0.1.0. Внешнее гало, диск, отражение и звёзды не трогает. Переопределяется CSS-токеном --bh-ring.
-//   { ok, setAccent(hex, amt), setPointer(x, y), setScroll(v), setEnergy(v), pulse('go' | 'done'), pause(), resume(), resize(),
+//   Кручение — маховик: фазы вращения копятся по кадрам (spinRates), поэтому смена энергии разгоняет и тормозит диск плавно,
+//     без рывка угла; spin(k) — толчок: разгон ≈ 0,2 с, выбег ≈ 4 с (см. SKILL.md «Сцена и процесс»).
+//   { ok, setAccent(hex, amt), setPointer(x, y), setScroll(v), setEnergy(v), spin(k), pulse('go' | 'done'), pause(), resume(), resize(),
 //     readTokens(), destroy() } (+ setInvert для светлой темы — заготовка, см. DESIGN-TODO.md).
 //
 // Разметка-минимум (см. demo/index.html):
@@ -82,6 +84,10 @@ uniform float uExpoRing;   // появление фотонного кольца
 uniform float uRing;       // яркость первого ореола: раскалённый пояс у кромки тени + фотонное кольцо, экранные значения (1.0 = как в v0.1.0)
 uniform float uChaos;      // ореол «хаотичный» 0..1: неровная яркость по окружности, дрожь радиуса, шире радужная кайма, живее нити (средняя яркость та же)
 uniform float uGod;        // лучи RTX 0..1: рассеяние кольца в дымке перераспределяется в тонкие радиальные лучи (среднее не меняется)
+// кручение: фазы вращения накапливаются в JS по кадрам (скорость зависит от энергии, хаоса и толчка spin()), а не считаются
+// как t × скорость — иначе при смене скорости угол прыгает на t·Δω и нити «проворачиваются» тем сильнее, чем дольше открыта страница
+uniform vec4  uSpin;       // x — нити ореола у кольца, y — вихрь тумана, z — частицы на орбитах, w — пятна «хаоса» по окружности, рад
+uniform float uDrift;      // накопленный дрейф мелкого тумана (в единицах времени сцены)
 
 #define PI 3.14159265
 #define TAU 6.2831853
@@ -217,7 +223,7 @@ void main(){
   // «хаос»: неровная яркость по окружности (среднее ≈ 1) и дрожь радиуса кромки (±1 % R), оба живут во времени
   // шум берётся на окружности (dir = (cos, sin)), а не от угла: у atan разрыв ±π слева — там был шов.
   // Радиус окружности подобран под прежнюю частоту (ang·1.6 → r 1.6, ang·2.4 → r 2.4); время сдвигает по кругу
-  float chN = fbm(rot(t * 0.05 / 1.6) * dir * 1.6 + vec2(7.0 + uSeed * 4.0, 3.0), 3);
+  float chN = fbm(rot(uSpin.w / 1.6) * dir * 1.6 + vec2(7.0 + uSeed * 4.0, 3.0), 3);
   float chJ = fbm(rot(-t * 0.09 / 2.4) * dir * 2.4 + vec2(19.0, 11.0), 3);
   float beC = be * mix(1.0, 0.72 + 0.56 * chN, uChaos);
   float jit = (chJ - 0.5) * 0.024 * uChaos;
@@ -298,12 +304,12 @@ void main(){
 
   // ---------- туман: спиральный вихрь вокруг дыры, два слоя ----------
   float rq = length(qs) / kRH;                                     // линзированный радиус, доли R
-  float twist = 0.85 * log(max(rq, 0.6)) - t * 0.02 * (1.0 + uEnergy);
+  float twist = 0.85 * log(max(rq, 0.6)) - uSpin.y;
   vec2 fq = rot(twist) * qs;
   float n1 = fbm(fq * 2.3 + par * 1.6 + uSeed * 3.0, 4);
   float k1 = fbm(fq * 0.75 + 4.2, 3);
   float dens1 = smoothstep(0.36, 0.92, n1) * smoothstep(0.20, 0.72, k1);
-  vec2 f2 = rot(-0.35) * (qs * 5.2 + par * 4.7) - vec2(0.010, 0.004) * t * (1.0 + 1.5 * uEnergy) + 11.0;
+  vec2 f2 = rot(-0.35) * (qs * 5.2 + par * 4.7) - vec2(0.010, 0.004) * uDrift + 11.0;
   float dens2 = smoothstep(0.50, 1.02, fbm(f2, 3));
   float dens = (dens1 * 0.85 + dens2 * 0.32) * mix(0.5, 1.0, exp(-abs(p.y) * 0.45));
 
@@ -319,7 +325,7 @@ void main(){
       float bk = 1.08 + (b - 1.08) * fk;
       vec2 qk = dir * bk * kRH;
       float rk = bk;
-      vec2 fk2 = rot(0.85 * log(max(rk, 0.6)) - t * 0.02 * (1.0 + uEnergy)) * qk;
+      vec2 fk2 = rot(0.85 * log(max(rk, 0.6)) - uSpin.y) * qk;
       acc += smoothstep(0.36, 0.92, fbm(fk2 * 2.3 + par * 1.6 + uSeed * 3.0, 2));
     }
     T = exp(-acc / 6.0 * min(e, 1.6) * 2.4 * uRays);
@@ -355,8 +361,8 @@ void main(){
   // пояс неровный по углу: внешний край «дышит» прядями, а не ровный бублик
   float nb = fbm(dir * 1.8 + vec2(t * 0.006, uSeed * 3.0), 3);
   float band = uBand * (0.72 + 0.62 * nb) * mix(1.0, 0.78 + 0.44 * chJ, uChaos);   // хаос: пояс дышит сильнее
-  float w = (0.045 + 0.05 * uEnergy) / pow(max(b, 1.0), 1.5) * mix(1.0, 1.7, uChaos);   // у кольца: 2,6°/с, при загрузке 5,5°/с; хаос — живее
-  float th = atan(p.y, -p.x) + t * w + 1.5 * log(max(b, 1.0));      // спираль: пряди закручиваются наружу
+  // вращение по Кеплеру: у кольца быстрее, наружу медленнее (÷ b^1,5); скорость у кольца — в JS (spinRates): 2,6°/с, при загрузке 5,5°/с
+  float th = atan(p.y, -p.x) + uSpin.x / pow(max(b, 1.0), 1.5) + 1.5 * log(max(b, 1.0));      // спираль: пряди закручиваются наружу
   float rr = b * 12.0 + uSeed * 5.0;
   float fA = fbm(vec2(th * 3.2, rr), 4);
   float fB = fbm(vec2((th - TAU * sign(th)) * 3.2, rr), 4);
@@ -395,8 +401,7 @@ void main(){
   vec3 kayma = spec * bandCA * caMask * caK * 0.8 * beC * (1.0 + 0.35 * uSwell);
 
   // частицы на орбитах
-  float om = (0.035 + 0.04 * uEnergy) / pow(max(b, 1.0), 1.5);
-  float pr = stars(rot(t * om) * p * kRH + 5.0, 0.018, 0.22, 0.6, upp, 0.9, 5.0);
+  float pr = stars(rot(uSpin.z / pow(max(b, 1.0), 1.5)) * p * kRH + 5.0, 0.018, 0.22, 0.6, upp, 0.9, 5.0);
   pr *= smoothstep(0.0, 0.02, e) * (1.0 - smoothstep(0.15, 0.6, e));
 
   // ---------- плоскость-горизонт: пятно света под дырой, отражение кольца ----------
@@ -511,7 +516,21 @@ const PAIR = [
 const OPEN = 1.8;          // появление сцены, с: кольцо — за первые 40 %, всё остальное — плавно к концу (§4.2)
 const POSTER_T = 14.0;     // «время постера»: нити уже закручены, кадр без движения выглядит собранным (§4.5)
 const PACE = 1.15;         // темп сцены: волны, нити, кольцо — на 15 % живее эталона (просьба пользователя); кадр постера не меняется
-const SLOW_FRAME = 0.020;  // кадр дольше 20 ms три раза подряд — без ближнего плана и пыли (§5.4)
+const SLOW_FRAME = 0.020;
+// Кручение (маховик). Фазы вращения копятся по кадрам: скорость меняется плавно, угол — непрерывно, поэтому смена энергии,
+// хаоса или толчок spin() разгоняют и тормозят диск, а не проворачивают его рывком. Скорости — рад на единицу времени сцены
+// (единица ≈ 1/PACE с в покое): energy — процесс 0..1, chaos — хаотичный ореол 0..1, kick — скорость толчка (выбег τ 1,4 с).
+// Толчок 1 у кольца ≈ +75°/с к покою (с хаосом), за выбег диск доворачивается ещё на ≈ 110°. Энергия 1 — те же 5,5°/с, что раньше.
+const SPIN_GAIN = 0.7;
+export function spinRates(energy = 0, chaos = 1, kick = 0) {
+  return [
+    (0.045 + 0.05 * energy + SPIN_GAIN * kick) * (1 + 0.7 * chaos),   // нити ореола у кольца: 2,6°/с, при загрузке 5,5°/с; хаос — живее
+    0.02 * (1 + energy) + 0.3 * kick,                                  // вихрь тумана — отстаёт от нитей, диск «слоится»
+    0.035 + 0.04 * energy + 0.6 * kick,                                // частицы на орбитах
+    0.05 + 0.03 * energy + 0.6 * kick,                                 // пятна «хаоса» по окружности
+    1 + 1.5 * energy + 2 * kick,                                       // дрейф мелкого тумана
+  ];
+}  // кадр дольше 20 ms три раза подряд — без ближнего плана и пыли (§5.4)
 
 // положение и размер дыры «как в baseline» (решение пользователя, §5.1), CSS px холста
 export function baseLayout(vw, vh) {
@@ -745,6 +764,14 @@ export function createCosmos(canvas, opts = {}) {
     setPointer(x, y) { if (reduced) return; api._pt = [x, y]; api.wake(); },
     setScroll(v) { if (v === api._scroll) return; api._scroll = v; api.wake(); },
     setEnergy(v) { const e = Math.max(0, Math.min(1, v)); if (e === api.energyT) return; api.energyT = e; api.wake(); },
+    /** Толчок-кручение: диск разгоняется за ≈ 0,2 с и выбегает ≈ 4 с (τ 1,4 с), как маховик. k — сила (1 — обычный толчок,
+        толчки складываются, потолок 2,5). Для событий (сохранили, отправили), не для наведения и не по таймеру;
+        на паузе и при reduced motion не делает ничего. */
+    spin(k = 1) {
+      if (reduced || api._paused || !(k > 0)) return;
+      api._kick = Math.min(2.5, api._kick + k);
+      api.wake();
+    },
     /** Мягкий вдох кольца: 'go' — старт загрузки, 'done' — готово (слабее). Не чаще 3 раз в секунду;
         повтор во время вдоха продлевает его, а не начинает заново — яркость не скачет. */
     pulse(kind = 'go') {
@@ -767,6 +794,9 @@ export function createCosmos(canvas, opts = {}) {
     _pt: [0, 0], _ptS: [0, 0], _scroll: 0, _paused: false, _raf: 0, _last: 0,
     _t: POSTER_T, _age: 0, _expo: reduced ? 1 : 0, _expoRing: reduced ? 1 : 0, _far: 0,
     _odd: false, _slow: 0, _lite: false,
+    _kick: 0, _spin: 0,
+    // фазы кручения (см. spinRates): в кадре постера — те же углы, что давало прежнее «t × скорость»
+    _ph: spinRates(0, opts.halo === 'calm' ? 0 : 1, 0).map((r) => r * POSTER_T),
   };
   if (!gl) return api;
   const compile = (type, src) => {
@@ -794,7 +824,7 @@ export function createCosmos(canvas, opts = {}) {
   for (const n of ['uRes', 'uH', 'uTime', 'uPar', 'uParAmt', 'uScroll', 'uC', 'uR', 'uHalo', 'uBand', 'uCA', 'uBeam', 'uBeamAmt', 'uLensE',
     'uTint', 'uTintAmt', 'uSwell', 'uEnergy', 'uFog', 'uRays', 'uPlane', 'uPlaneY', 'uFar', 'uStars', 'uFlare',
     'uInner', 'uFib', 'uPersp', 'uWaves', 'uMist', 'uNear', 'uDust', 'uSpecks', 'uPairA', 'uPairS', 'uInvert', 'uSeed', 'uFarTex', 'uFarMap', 'uFarAnchor', 'uHasFar',
-    'uExpo', 'uExpoRing', 'uRing', 'uChaos', 'uGod']) U[n] = gl.getUniformLocation(prog, n);
+    'uExpo', 'uExpoRing', 'uRing', 'uChaos', 'uGod', 'uSpin', 'uDrift']) U[n] = gl.getUniformLocation(prog, n);
   const seed = opts.seed ?? 0.37;
   const ringDefault = opts.ringBrightness ?? 0.88;   // 1.0 = как в v0.1.0
   api.ok = true;
@@ -930,6 +960,8 @@ export function createCosmos(canvas, opts = {}) {
     gl.uniform1f(U.uRing, tok.ring ?? ringDefault);
     gl.uniform1f(U.uChaos, api.chaos);
     gl.uniform1f(U.uGod, api.god);
+    gl.uniform4f(U.uSpin, api._ph[0], api._ph[1], api._ph[2], api._ph[3]);
+    gl.uniform1f(U.uDrift, api._ph[4]);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     if (hi) hi.end({ comp, s, sx, sy, ax, ay, scroll: api._scroll, lens: tok.lens, planeY: tok.planeY, far: tok.far, hasFar: api._far, par: reduced ? [0, 0] : api._ptS, parAmt: 0.01 * tok.par, expo: api._expo, invert: api.invert });
   };
@@ -941,8 +973,9 @@ export function createCosmos(canvas, opts = {}) {
     const raw = api._last ? (now - api._last) / 1000 : 0.016;
     const dt = Math.min(0.05, raw);
     api._last = now;
+    const dT = reduced ? 0 : dt * PACE * (1 + 0.3 * api.energy);   // при загрузке время сцены ×1,3
     if (!reduced) {
-      api._t += dt * PACE * (1 + 0.3 * api.energy);                  // при загрузке время сцены ×1,3
+      api._t += dT;
       // слабая машина: три долгих кадра подряд — сцена остаётся эталонной, без ближнего плана и пыли
       api._slow = raw > SLOW_FRAME && raw < 0.1 ? api._slow + 1 : 0;           // разовый долгий кадр (>100 ms) — не видеокарта
       if (api._slow >= 3) api._lite = true;
@@ -962,6 +995,15 @@ export function createCosmos(canvas, opts = {}) {
     api.energy = reduced ? api.energyT : ease(api.energy, api.energyT, dt, 1.2);
     api.chaos = reduced ? api.chaosT : ease(api.chaos, api.chaosT, dt, 0.4);
     api.god = reduced ? api.godT : ease(api.god, api.godT, dt, 0.4);
+    // маховик: толчок входит в скорость за ≈ 0,2 с, скорость выбегает τ 1,4 с; фазы копятся с тем же шагом, что время сцены
+    if (!reduced) {
+      const dk = api._kick * Math.min(1, dt / 0.18);
+      api._kick = api._kick - dk < 1e-4 ? 0 : api._kick - dk;
+      api._spin = api._spin * Math.exp(-dt / 1.4) + dk * 1.3;
+      if (api._spin < 1e-3 && !api._kick) api._spin = 0;
+      const r = spinRates(api.energy, api.chaos, api._spin);
+      for (let i = 0; i < 5; i++) api._ph[i] += r[i] * dT;
+    }
     // вдох кольца: пока идёт атака — к пику τ 0,2 с, потом выдох τ 0,7 с (виден ≈ 1,5 с, пик ореола +9 %)
     if (api._attack > 0) { api._attack -= dt; api.swell = ease(api.swell, api._peak, dt, 0.2); }
     else api.swell = api.swell < 0.002 ? 0 : ease(api.swell, 0, dt, 0.7);
@@ -969,7 +1011,7 @@ export function createCosmos(canvas, opts = {}) {
     const busy = api._expo < 1 || api._far < hasFar || api.swell > 0 || api._attack > 0
       || !near(api._ptS[0], api._pt[0], 0.001) || !near(api._ptS[1], api._pt[1], 0.001)
       || !near(api.tintAmt, api.tintAmtT, 0.002) || !near(api.energy, api.energyT, 0.002)
-      || !near(api.chaos, api.chaosT, 0.002) || !near(api.god, api.godT, 0.002);
+      || !near(api.chaos, api.chaosT, 0.002) || !near(api.god, api.godT, 0.002) || api._spin > 0 || api._kick > 0;
     api._odd = !api._odd;
     if (busy || api._odd || reduced || api._paused) draw();
     if (reduced) { api._last = 0; return; }                          // перерисовка — только по событию

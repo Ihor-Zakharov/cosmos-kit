@@ -635,6 +635,7 @@
       <div class="demo-row">
         <button class="btn" id="toggle-asleep" type="button">Сцена: усыпить</button>
         <button class="btn" id="spin-btn" type="button"><span class="btn-label">Крутить</span></button>
+        <button class="btn" id="spin-kick" type="button">spin(1) — толчок</button>
         <button class="btn" id="pulse-go" type="button">pulse('go')</button>
         <button class="btn" id="energy-up" type="button">energy → 1</button>
         <button class="btn" id="energy-down" type="button">energy → 0</button>
@@ -706,6 +707,8 @@
     document.getElementById('fire-toast-ok').addEventListener('click', () => toast('ok', 'Готово'));
     document.getElementById('fire-toast-err').addEventListener('click', () => toast('err', 'Не получилось'));
     document.getElementById('pulse-go').addEventListener('click', () => cosmosApi.pulse('go'));
+    // толчок-маховик: разгон ≈ 0,2 с, выбег ≈ 4 с; как «сохранили» или «отправили» — событие, не процесс
+    document.getElementById('spin-kick').addEventListener('click', () => { cosmosApi.spin(1); cosmosApi.pulse('done'); });
     // «Крутить»: энергия 0 ↔ 1 с пульсом на старте и финише — как загрузка в «выдре»
     let spinning = false;
     document.getElementById('spin-btn').addEventListener('click', (e) => {
