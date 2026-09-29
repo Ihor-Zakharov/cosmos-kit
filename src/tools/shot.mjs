@@ -7,6 +7,7 @@
  *   node kit/tools/shot.mjs index.html --w 390   одна страница, одна ширина
  *   node kit/tools/shot.mjs --base http://127.0.0.1:8790/ --pages /      уже запущенное приложение
  *   node kit/tools/shot.mjs --full               ещё и снимок всей страницы (<страница>-<ширина>-full.png)
+ *   node kit/tools/shot.mjs --skip B4,B5         не проверять эти коды (витрины с несколькими образцами)
  * Страницы отдаёт сам (встроенный статический сервер) или командой из cosmos.json "serve" ("… --port {port}").
  * Снимки — .cosmos/shots/<страница>-<ширина>.png (только первый экран: дёшево смотреть модели).
  * Выход: 0 — ошибок нет, 1 — есть, 3 — браузер не найден (проверка пропущена).
@@ -174,7 +175,8 @@ const AUDIT = `(() => {
 
 // ---------------- запуск ----------------
 const items = [];
-const add = (lvl, where, code, msg, fix = '') => items.push({ lvl, where, code, msg, fix });
+const SKIP = (opt('--skip') || '').split(',').filter(Boolean);        // витрины кита: несколько образцов на экране — B4/B5 ожидаемы
+const add = (lvl, where, code, msg, fix = '') => { if (!SKIP.includes(code)) items.push({ lvl, where, code, msg, fix }); };
 const b = await launch();
 if (!b) { console.log('· B0  браузер не найден (Chrome/Chromium/Edge; путь можно дать в COSMOS_CHROME) — браузерная проверка пропущена'); process.exit(3); }
 if (argv.includes('--probe')) {                                        // cosmos.py setup: есть ли рабочий браузер

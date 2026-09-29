@@ -104,7 +104,7 @@ export function wireTree(tree) {
 
 /** шапка + меню витрины: одна страница, все разделы — якоря */
 export function shell() {
-  const nav = [['#language', 'Язык'], ['#accents', 'Акценты'], ['#components', 'Компоненты'], ['#scene', 'Сцена'], ['#motion', 'Движение'], ['#kosmos', 'KOCMOC']];
+  const nav = [['#language', 'Язык'], ['#accents', 'Акценты'], ['#components', 'Компоненты'], ['#app', 'Приложение'], ['blocks.html', 'Блоки'], ['#scene', 'Сцена'], ['#motion', 'Движение'], ['#kosmos', 'KOCMOC']];
   const links = nav.map(([h, t], i) => `<a href="${h}"${i === 0 ? ' aria-current="page"' : ''}>${t}</a>`).join('');
   document.getElementById('topbar').innerHTML = `
     <a class="brand" href="#top"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>cosmos</a>

@@ -240,6 +240,87 @@
       </div>
     </section>
 
+    <!-- приложение и формы: живое мини-приложение в рамке (components.css, блок «Приложение и формы»; разметка — src/blocks) -->
+    <section class="section" id="app">
+      <div class="section-head">
+        <p class="kicker">приложение и формы</p>
+        <h2>Экран данных — из тех же деталей</h2>
+        <p>Каркас с рейкой, поля с подписью, панели, числа, строки списка и таблица. Рейка переключает экраны — плашка едет пружиной. Готовая разметка каждого куска — на странице <a href="blocks.html">блоков</a>.</p>
+      </div>
+      <div class="demo-app">
+        <div class="app">
+          <aside class="rail">
+            <a class="brand" href="#app"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>книги</a>
+            <nav class="rail-nav" id="demo-rail" aria-label="Экраны примера">
+              <button type="button" data-view="va-home" aria-current="page"><svg><use href="../src/icons/sprite.svg#i-home"/></svg><span class="l">Обзор</span></button>
+              <button type="button" data-view="va-table"><svg><use href="../src/icons/sprite.svg#i-list"/></svg><span class="l">Таблица</span><small>128</small></button>
+              <button type="button" data-view="va-form"><svg><use href="../src/icons/sprite.svg#i-sliders"/></svg><span class="l">Настройки</span></button>
+            </nav>
+            <div class="rail-foot"><button class="btn" type="button" data-open="#demo-modal">Экспорт…</button></div>
+          </aside>
+          <main class="app-main">
+            <section class="view" id="va-home">
+              <header class="view-head"><div><h2>Обзор</h2><p>Что прочитано и что дальше.</p></div><button class="btn primary" type="button">Добавить книгу</button></header>
+              <div class="kpis">
+                <div class="kpi"><b>128</b><span>книг в библиотеке</span></div>
+                <div class="kpi"><b>41</b><span>прочитано за год</span></div>
+                <div class="kpi"><b>7,8</b><span>средняя оценка</span></div>
+              </div>
+              <div class="cols">
+                <div class="panel">
+                  <h3>Недавние отзывы</h3>
+                  <div class="list">
+                    <a class="item" href="#app"><div class="score">9<i style="--p:.9"></i></div><div class="item-body"><div class="item-title">Пикник на обочине</div><div class="item-meta">Стругацкие · 7,2 ч · вчера</div><div class="item-text">Зона как зеркало: каждый находит там то, что принёс с собой.</div></div></a>
+                    <div class="item"><div class="score none">·</div><div class="item-body"><div class="item-title">Солярис</div><div class="item-meta">Лем · в очереди</div></div><button class="chip-btn" type="button"><svg><use href="../src/icons/sprite.svg#i-play"/></svg>Слушать</button></div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <h3>Очередь пуста</h3>
+                  <div class="empty"><span class="empty-mark"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p>Здесь пока пусто</p><small>Добавьте книгу из библиотеки — она встанет в очередь.</small><button class="btn" type="button">Открыть библиотеку</button></div>
+                </div>
+              </div>
+            </section>
+            <section class="view" id="va-table" hidden>
+              <header class="view-head"><div><h2>Таблица</h2><p>Числа справа, шапка липкая, строка светится при наведении.</p></div></header>
+              <div class="table-wrap">
+                <table class="data">
+                  <thead><tr><th>Название</th><th>Автор</th><th>Статус</th><th class="num">Часов</th><th class="num">Оценка</th></tr></thead>
+                  <tbody>
+                    <tr><td class="strong">Пикник на обочине</td><td>Стругацкие</td><td>прочитано</td><td class="num">7,2</td><td class="num">9</td></tr>
+                    <tr><td class="strong">Мастер и Маргарита</td><td>Булгаков</td><td>прочитано</td><td class="num">17,5</td><td class="num">10</td></tr>
+                    <tr><td class="strong">Солярис</td><td>Лем</td><td>в очереди</td><td class="num">8,9</td><td class="num">—</td></tr>
+                    <tr><td class="strong">1984</td><td>Оруэлл</td><td>брошено</td><td class="num">11,3</td><td class="num">6</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+            <section class="view" id="va-form" hidden>
+              <header class="view-head"><div><h2>Настройки</h2><p>Подпись над полем, одно главное действие, ответ — тостом.</p></div></header>
+              <form class="panel" id="demo-app-form">
+                <div class="form-grid">
+                  <label>Имя в отзывах *<input class="in" name="name" value="Игорь" required></label>
+                  <label>Формат выгрузки<select class="in" name="fmt"><option>Markdown</option><option>CSV</option><option>JSON</option><option>HTML</option><option>PDF</option></select></label>
+                  <label class="wide">Заметка для ИИ <small>необязательно</small><textarea class="in" name="note" rows="3" placeholder="Например: люблю короткие книги с медленным темпом"></textarea></label>
+                  <div class="wide lbl">Что учитывать
+                    <div class="choices" role="group" aria-label="Что учитывать" id="demo-choices">
+                      <button class="choice" type="button" aria-pressed="true">Оценку</button>
+                      <button class="choice" type="button" aria-pressed="true">Теги</button>
+                      <button class="choice" type="button" aria-pressed="false">Чтеца</button>
+                      <button class="choice" type="button" aria-pressed="false">Длину</button>
+                    </div>
+                  </div>
+                </div>
+                <label class="switch"><input type="checkbox" checked><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Копия на диск D:</span></label>
+                <p class="notice warn">Диск D: сейчас недоступен — копия сохранится, когда он появится.</p>
+                <div class="form-actions"><button class="btn primary" type="submit">Сохранить</button><button class="btn" type="reset">Отменить</button></div>
+              </form>
+            </section>
+          </main>
+        </div>
+      </div>
+      <div class="demo-row"><p class="demo-note">В приложении сцена спит (<code>bootSite({ page: 'app' })</code>), на телефоне рейка становится верхней полосой. Целая страница — <code>starter/app.html</code>.</p></div>
+    </section>
+
     <!-- сцена: композиции и состояния -->
     <section class="section" id="scene">
       <div class="section-head">
@@ -670,6 +751,11 @@
     const { api: cosmosApi, wrap, toast } = boot({ hero });
     const reducedQuery = matchMedia('(prefers-reduced-motion: reduce)');
 
+    // мини-приложение: рейка показывает свой экран, чипы переключаются, форма отвечает тостом
+    import('../src/js/site.js').then(({ wireRail }) => wireRail(document.getElementById('demo-rail'), (el) =>
+      document.querySelectorAll('.demo-app .view').forEach((v) => { v.hidden = v.id !== el.dataset.view; })));
+    document.querySelectorAll('#demo-choices .choice').forEach((b) => b.addEventListener('click', () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'))));
+    document.getElementById('demo-app-form').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Сохранено'); });
     wireSegmented(document.getElementById('demo-tabs'), 'aria-selected');
     wireSegmented(document.getElementById('demo-pills'), 'aria-checked');
     wireSegmented(document.getElementById('demo-island').querySelector('.tabs'), 'aria-selected');

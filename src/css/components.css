@@ -245,6 +245,8 @@
 @media (prefers-reduced-motion: reduce) { .card.static:hover { translate: none; } }
 .card-glyph + .card-title { margin-top: 18px; }
 .card-text { margin: 8px 0 0; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
+.card > .kicker { margin: 0 0 12px; }                     /* кикер в карточке (тариф, шаг) — не вплотную к заголовку */
+.card > .btn-row { margin-top: 18px; }
 
 /* карточка-«блок» с заголовком-иконкой (например настройки, диагностика) */
 .card-block { display: grid; gap: 12px; padding: 16px; border-radius: var(--r-l); background: var(--s1); border: 1px solid var(--line-1); }
@@ -719,7 +721,7 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 .app-main { min-width: 0; padding: 32px clamp(20px, 3.4vw, 56px) 112px; position: relative; }
 .view { display: flex; flex-direction: column; gap: 20px; max-width: 1120px; width: 100%; margin-inline: auto; }
 .view-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.view-head h1 { margin: 0; font: 700 clamp(26px, 2.6vw, 34px)/1.1 var(--font-display); letter-spacing: -.03em; color: var(--ink); }
+.view-head h1, .view-head h2 { margin: 0; font: 700 clamp(26px, 2.6vw, 34px)/1.1 var(--font-display); letter-spacing: -.03em; color: var(--ink); }
 .view-head p { margin: 6px 0 0; color: var(--ink-2); }
 @media (max-width: 760px) {
   .app { grid-template-columns: minmax(0, 1fr); }

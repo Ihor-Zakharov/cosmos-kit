@@ -63,3 +63,11 @@
 .scene-dock-body .pills { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
 @media (max-width: 680px) { .scene-dock { left: 8px; right: 8px; width: auto; bottom: 60px; max-height: 64vh; } }
 .dock-break { flex-basis: 100%; margin-top: 6px; }
+
+/* мини-приложение в рамке (#app): каркас .app живёт в окне витрины, а не на весь экран */
+.demo-app { width: 100%; max-width: 1120px; text-align: left; border: 1px solid var(--line-2); border-radius: var(--r-xl); overflow: hidden; background: var(--bg); }
+.demo-app .app { min-height: 0; height: 640px; }
+.demo-app .rail { position: relative; height: 100%; }
+.demo-app .app-main { overflow-y: auto; padding-top: 24px; padding-bottom: 32px; }
+@media (max-width: 760px) { .demo-app .app { height: auto; } .demo-app .rail { height: auto; } }
+

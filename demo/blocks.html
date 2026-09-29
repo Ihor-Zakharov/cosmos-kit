@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>cosmos-kit — блоки</title>
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../src/icons/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../src/fonts/fonts.css">
+<link rel="stylesheet" href="../src/css/tokens.css">
+<link rel="stylesheet" href="../src/css/components.css">
+<link rel="stylesheet" href="demo.css">
+<style>
+  /* витрина блоков: каждый блок живёт в своей рамке — каркасы (шапка, герой, приложение) не расползаются на страницу */
+  .blk-intro { padding-top: calc(var(--topbar-h) + 72px); }
+  .blk-list { padding: 0 var(--datum) 96px; }
+  .blk { padding: 56px 0; }
+  .blk + .blk { border-top: 1px solid var(--line-1); }
+  .blk-head { display: grid; gap: 8px; max-width: 760px; margin: 0 auto 24px; }
+  .blk-head h2 { margin: 0; font: 700 26px/1.15 var(--font-display); letter-spacing: -.02em; color: var(--ink); }
+  .blk-head p { margin: 0; color: var(--ink-2); line-height: 1.55; white-space: pre-line; }
+  .blk-stage { position: relative; border: 1px solid var(--line-2); border-radius: var(--r-xl); overflow: hidden; background: var(--bg); padding: 8px 24px; }
+  .blk-stage .section { padding: 48px 0; }
+  .blk-stage .hero { min-height: 0; padding: 72px 24px 56px; }
+  .blk-stage .topbar { position: relative; }
+  .blk-stage .site-footer { margin-top: 0; }
+  .blk-stage.app-like { padding: 0; }
+  .blk-stage .app { min-height: 0; height: 560px; }
+  .blk-stage .rail { position: relative; height: 100%; }
+  .blk-stage .app-main { overflow-y: auto; }
+  .blk-stage.plain { padding: 24px; }
+  .blk-code { max-width: 1120px; margin: 16px auto 0; }
+  .blk-code summary { cursor: pointer; color: var(--ink-2); font: 500 14px/1 var(--font-text); padding: 8px 0; }
+  .blk-code pre { margin: 8px 0 0; max-height: 420px; overflow: auto; padding: 16px; border-radius: var(--r-l); background: var(--s1); border: 1px solid var(--line-1);
+    font: 12.5px/1.55 var(--font-mono); color: var(--ink-2); white-space: pre; }
+  .blk-toc { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 900px; margin: 0 auto; }
+  @media (max-width: 760px) { .blk-stage { padding: 4px 12px; } .blk-stage .app { height: auto; } .blk-stage .rail { height: auto; } }
+</style>
+</head>
+<body>
+  <div class="cosmos-wrap asleep" id="cosmos-wrap" aria-hidden="true">
+    <canvas class="cosmos" id="cosmos"></canvas>
+    <div class="cosmos-fallback"></div>
+    <div class="grain"></div>
+  </div>
+
+  <header class="topbar solid" id="topbar">
+    <a class="brand" href="index.html"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>cosmos</a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="index.html">Витрина</a>
+      <a href="#site" aria-current="page">Сайт</a>
+      <a href="#app">Приложение</a>
+    </nav>
+  </header>
+
+  <div class="site" id="top">
+    <section class="section blk-intro">
+      <div class="section-head">
+        <p class="kicker">блоки · src/blocks</p>
+        <h1 class="display">Страница собирается из готового</h1>
+        <p>Каждый блок — файл в <code>src/blocks/</code>, как его берёт агент: шапка «когда и какие правила», живой образец и разметка.
+          Каталог для агента — <code>src/blocks/INDEX.md</code>. Страница читает файлы блоков напрямую, поэтому всегда совпадает с китом.</p>
+      </div>
+      <nav class="blk-toc" id="toc" aria-label="Блоки"></nav>
+    </section>
+    <div class="container blk-list" id="blocks"></div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script type="module">
+    import { bootSite } from '../src/js/site.js';
+    // порядок и группы — как в src/blocks/INDEX.md
+    const GROUPS = [
+      ['site', 'Сайт', ['topbar', 'hero', 'features', 'steps', 'text', 'stats', 'pricing', 'faq', 'cta', 'contact', 'footer']],
+      ['app', 'Приложение', ['app-shell', 'list', 'table', 'form', 'wizard', 'tabs', 'empty', 'dialog-confirm']],
+    ];
+    const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const box = document.getElementById('blocks'), toc = document.getElementById('toc');
+    for (const [gid, gname, names] of GROUPS) {
+      const g = document.createElement('div'); g.id = gid; box.append(g);
+      for (const name of names) {
+        const src = await (await fetch(`../src/blocks/${name}.html`)).text();
+        const m = src.match(/^<!--\s*БЛОК\s+([\s\S]*?)-->/);
+        const about = m ? m[1].trim().replace(/\n\s+/g, '\n') : '';
+        const [title, ...rest] = about.split('·');
+        // пути кита из проекта (kit/…) → из витрины (../src/…); id шапки/шторки — свои, чтобы не спорить со страницей
+        const live = src.replace(/<!--[\s\S]*?-->/g, '').replace(/(href|src)="kit\//g, '$1="../src/')
+          .replace(/id="topbar"/g, '').replace(/menu-drawer/g, `menu-drawer-${name}`).replace(/id="confirm-delete/g, `id="confirm-delete-${name}`)
+          .replace(/data-open="#confirm-delete"/g, `data-open="#confirm-delete-${name}"`);
+        const kind = name === 'app-shell' ? 'app-like' : /^(list|table|form|wizard|tabs|empty|dialog-confirm)$/.test(name) ? 'plain' : '';
+        const s = document.createElement('section'); s.className = 'blk'; s.id = 'b-' + name;
+        s.innerHTML = `<div class="blk-head"><p class="kicker">${gname.toLowerCase()} · ${name}.html</p><h2>${esc(name)}</h2><p>${esc(rest.join('·').trim() || title.trim())}</p></div>
+          <div class="blk-stage ${kind}">${live}</div>
+          <details class="blk-code"><summary>Разметка блока</summary><pre><code>${esc(src)}</code></pre></details>`;
+        g.append(s);
+        const a = document.createElement('a'); a.className = 'chip'; a.href = '#b-' + name; a.textContent = name; toc.append(a);
+      }
+    }
+    const site = bootSite({ page: 'inner' });
+    // живые мелочи блоков: чипы-переключатели и формы отвечают тостом
+    document.querySelectorAll('.blk .choice').forEach((b) => b.addEventListener('click', () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'))));
+    document.querySelectorAll('.blk form').forEach((f) => f.addEventListener('submit', (e) => { e.preventDefault(); site.toast('ok', 'Отправлено (пример)'); }));
+    if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
+  </script>
+</body>
+</html>

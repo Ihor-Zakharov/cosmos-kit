@@ -15,4 +15,6 @@ for d in site app; do
   [ -z "$out" ] || { echo "✗ заготовка $d:"; echo "$out"; exit 1; }
   if [ "${1:-}" != "--no-browser" ]; then (cd "$T/$d" && node kit/tools/shot.mjs | tail -1); fi
 done
+# витрины кита: все блоки (грузятся из src/blocks) и главная демо — без ошибок консоли, 404 и прокрутки
+if [ "${1:-}" != "--no-browser" ]; then node src/tools/shot.mjs demo/blocks.html demo/index.html --skip B4,B5,B6,B7 | tail -1; fi
 echo "selftest: OK"
