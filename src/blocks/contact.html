@@ -1,0 +1,23 @@
+<!-- БЛОК contact · форма заявки.
+     Правила: подпись над полем (не плейсхолдер); обязательное — звёздочка, необязательное — «необязательно»; одна .btn.primary;
+     ответ — тост, а не alert. JS ниже — в свой <script type="module"> (site = bootSite()). -->
+<section class="section" id="contact">
+  <div class="section-head">
+    <p class="kicker">ЗАМЕНИТЬ контакты</p>
+    <h2>ЗАМЕНИТЬ как с нами связаться</h2>
+    <p>ЗАМЕНИТЬ ответим за один рабочий день.</p>
+  </div>
+  <form class="panel centered" id="contact-form">
+    <div class="form-grid">
+      <label>Имя *<input class="in" name="name" required autocomplete="name"></label>
+      <label>Почта *<input class="in" name="email" type="email" required autocomplete="email"></label>
+      <label class="wide">Сообщение <small>необязательно</small><textarea class="in" name="message" rows="4"></textarea></label>
+    </div>
+    <div class="form-actions"><button class="btn primary" type="submit">ЗАМЕНИТЬ отправить</button></div>
+  </form>
+</section>
+<!-- JS:
+  document.getElementById('contact-form').addEventListener('submit', (e) => {
+    e.preventDefault(); e.target.reset(); site.toast('ok', 'Отправлено — ответим за день');
+  });
+-->

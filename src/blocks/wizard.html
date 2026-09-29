@@ -1,0 +1,19 @@
+<!-- БЛОК wizard · мастер/анкета по шагам.
+     Правила: ≤ 7 шагов, у каждого номер и короткая подпись; одна тема на шаг; вопросы — открытыми группами .group (не раскрытиями);
+     варианты ≤ 16 — все сразу (.choices); внизу — только «Далее» (.btn.primary) и «Назад» (.btn); автосохранение с видимым статусом. -->
+<div class="panel">
+  <nav class="steps" aria-label="Шаги">
+    <button class="step done" type="button"><span class="n">1</span><span class="l">ЗАМЕНИТЬ</span></button><span class="step-sep"></span>
+    <button class="step on" type="button" aria-current="step"><span class="n">2</span><span class="l">ЗАМЕНИТЬ</span></button><span class="step-sep"></span>
+    <button class="step" type="button"><span class="n">3</span><span class="l">ЗАМЕНИТЬ</span></button>
+  </nav>
+  <div class="group">
+    <h3>ЗАМЕНИТЬ вопрос группы</h3>
+    <div class="choices" role="group" aria-label="ЗАМЕНИТЬ">
+      <button class="choice" type="button" aria-pressed="false">ЗАМЕНИТЬ</button>
+      <button class="choice" type="button" aria-pressed="true">ЗАМЕНИТЬ</button>
+      <button class="choice" type="button" aria-pressed="false">ЗАМЕНИТЬ</button>
+    </div>
+  </div>
+  <div class="form-actions"><button class="btn primary" type="button">Далее</button><button class="btn" type="button">Назад</button><span class="item-meta">✓ сохранено</span></div>
+</div>

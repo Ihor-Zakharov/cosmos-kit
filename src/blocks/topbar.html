@@ -1,0 +1,31 @@
+<!-- БЛОК topbar · шапка сайта «линия» + меню-шторка для телефона (шторку — в конец <body>).
+     Правила: бренд слева, 3–5 ссылок-якорей, одна кнопка .btn.small (не primary); активный пункт — aria-current (дальше ведёт кит).
+     Ссылки меню в шторке = ссылки шапки. Для приложения вместо шапки — блок app-shell. -->
+<header class="topbar" id="topbar">
+  <a class="brand" href="#top"><svg><use href="kit/icons/sprite.svg#i-mark"/></svg>ЗАМЕНИТЬ бренд</a>
+  <nav class="nav" aria-label="Разделы">
+    <a href="#about" aria-current="page">ЗАМЕНИТЬ О нас</a>
+    <a href="#features">ЗАМЕНИТЬ Возможности</a>
+    <a href="#contact">ЗАМЕНИТЬ Контакты</a>
+  </nav>
+  <div class="topbar-actions">
+    <a class="btn small" href="#contact">ЗАМЕНИТЬ действие</a>
+    <button class="icon-btn menu-btn" type="button" data-open="#menu-drawer" aria-label="Меню"><svg><use href="kit/icons/sprite.svg#i-menu"/></svg></button>
+  </div>
+</header>
+
+<!-- меню на телефоне -->
+<dialog class="drawer" id="menu-drawer">
+  <div class="drawer-box" tabindex="-1">
+    <div class="grab" aria-hidden="true"></div>
+    <header class="drawer-head">
+      <div><p class="drawer-kicker"><svg><use href="kit/icons/sprite.svg#i-mark"/></svg>ЗАМЕНИТЬ бренд</p><h3>Разделы</h3></div>
+      <button class="icon-btn" data-close type="button" aria-label="Закрыть"><svg><use href="kit/icons/sprite.svg#i-x"/></svg></button>
+    </header>
+    <div class="drawer-scroll">
+      <nav class="drawer-links">
+        <a href="#about" data-close>ЗАМЕНИТЬ О нас</a><a href="#features" data-close>ЗАМЕНИТЬ Возможности</a><a href="#contact" data-close>ЗАМЕНИТЬ Контакты</a>
+      </nav>
+    </div>
+  </div>
+</dialog>

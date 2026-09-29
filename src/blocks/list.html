@@ -1,0 +1,18 @@
+<!-- БЛОК list · список записей (заказы, книги, задачи).
+     Правила: строка .item: слева .score (число + шкала, --p от 0 до 1) или .card-glyph, тело, справа ОДНО действие (.btn/.chip-btn);
+     монохром — цвет не несёт смысла; кликабельная строка — <a class="item"> или <button class="item">. Пусто — блок empty. -->
+<div class="list">
+  <a class="item" href="#">
+    <div class="score">8<i style="--p:.8"></i></div>
+    <div class="item-body">
+      <div class="item-title">ЗАМЕНИТЬ название</div>
+      <div class="item-meta">ЗАМЕНИТЬ мета · дата · статус</div>
+      <div class="item-text">ЗАМЕНИТЬ одна-две строки описания.</div>
+    </div>
+  </a>
+  <div class="item">
+    <div class="score none">·</div>
+    <div class="item-body"><div class="item-title">ЗАМЕНИТЬ название</div><div class="item-meta">ЗАМЕНИТЬ мета</div></div>
+    <button class="chip-btn" type="button"><svg><use href="kit/icons/sprite.svg#i-download"/></svg>ЗАМЕНИТЬ</button>
+  </div>
+</div>

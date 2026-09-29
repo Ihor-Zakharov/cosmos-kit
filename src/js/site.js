@@ -6,6 +6,7 @@
  *   import { bootSite } from './kit/js/site.js';
  *   const site = bootSite();                        // главная: живая сцена, гаснет за героем
  *   bootSite({ page: 'inner' });                    // внутренняя страница: сцена спит с первого кадра
+ *   bootSite({ page: 'app' });                      // приложение (.app + .rail): сцена спит, плашка .rail-ink едет за пунктом
  *   bootSite({ accent: 'gold' });                   // ступень излучения: violet | ice | gold | ember (по умолчанию белая)
  *   bootSite({ plateUrl: 'img/my-plate.webp' });    // свой фон сцены (те же пропорции и точки привязки, что у plate.webp);
  *                                                   // без него на больших экранах высокой чёткости берётся plate-hd.webp
@@ -34,7 +35,7 @@ export function bootSite({ page = 'home', accent = null, plateUrl = null, stars 
     new ResizeObserver(() => cosmos.resize()).observe(wrap);
     if (accent && accent !== 'white') cosmos.setAccent(getComputedStyle(document.documentElement).getPropertyValue('--el-a').trim());
     const hero = $('hero');
-    if (page !== 'inner' && hero) {
+    if (page === 'home' && hero) {
       addEventListener('pointermove', (e) => {
         if (e.pointerType && e.pointerType !== 'mouse') return;
         cosmos.setPointer((e.clientX / innerWidth - 0.5) * 2, (e.clientY / innerHeight - 0.5) * -2);
@@ -73,6 +74,9 @@ export function bootSite({ page = 'home', accent = null, plateUrl = null, stars 
     links.forEach((a, i) => a.addEventListener('click', () => { if (targets[i]) setCurrent(i, false); }));
   }
 
+  // боковая навигация приложения: <nav class="rail-nav"> с пунктами <a|button>, активный — [aria-current]
+  for (const rn of document.querySelectorAll('.rail-nav')) wireRail(rn);
+
   // сегментированные переключатели: <div class="tabs|pills" data-segmented> с [aria-selected] или [aria-checked]
   for (const root of document.querySelectorAll('[data-segmented]')) wireSegmented(root);
 
@@ -94,6 +98,28 @@ export function bootSite({ page = 'home', accent = null, plateUrl = null, stars 
 
   const toast = (tone, text) => { const box = $('toasts'); return box ? pushToast(box, { tone, text }) : null; };
   return { cosmos, wrap, toast };
+}
+
+/** Боковая навигация .rail-nav: общая плашка .rail-ink едет «каплей» по вертикали к пункту с [aria-current].
+    Клик по пункту-кнопке делает его текущим; ссылки на другие страницы просто уходят. onChange(el) — показать свой экран. */
+export function wireRail(nav, onChange) {
+  const items = [...nav.querySelectorAll(':scope > a, :scope > button')];
+  let ink = nav.querySelector('.rail-ink');
+  if (!ink) { ink = document.createElement('span'); ink.className = 'rail-ink'; ink.setAttribute('aria-hidden', 'true'); nav.prepend(ink); }
+  nav.classList.add('has-ink');
+  const place = (el, immediate) => { if (el && el.offsetParent) moveInk(nav, el, ink, { immediate, axis: 'y' }); ink.style.opacity = el ? '' : '0'; };
+  const setCurrent = (el, immediate) => {
+    items.forEach((it) => (it === el ? it.setAttribute('aria-current', 'page') : it.removeAttribute('aria-current')));
+    place(el, immediate);
+  };
+  items.forEach((it) => it.addEventListener('click', () => {
+    const h = it.getAttribute('href');
+    if (it.tagName === 'A' && h && !h.startsWith('#')) return;
+    setCurrent(it, false); onChange?.(it);
+  }));
+  requestAnimationFrame(() => place(items.find((it) => it.hasAttribute('aria-current')), true));
+  addEventListener('resize', () => place(items.find((it) => it.hasAttribute('aria-current')), true));
+  return { setCurrent: (el) => setCurrent(el, false) };
 }
 
 /** Сегментированный переключатель: клик переключает aria-*, плашка (.pill-ink / .tab-ink) едет «каплей». */

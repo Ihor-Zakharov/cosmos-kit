@@ -1,0 +1,24 @@
+<!-- БЛОК app-shell · каркас приложения: слева рейка с разделами, справа экран. Целая страница — starter/app.html.
+     Правила: bootSite({ page: 'app' }); один <h1> — заголовок экрана в .view-head; одна .btn.primary на экран;
+     разделов 3–8 (больше — группы с .rail-kicker); активный — [aria-current], плашку двигает кит.
+     Экраны-разделы: <section class="view" id="v-…" hidden> и переключение через wireRail(nav, el => …) из kit/js/site.js. -->
+<div class="app">
+  <aside class="rail">
+    <a class="brand" href="#"><svg><use href="kit/icons/sprite.svg#i-mark"/></svg>ЗАМЕНИТЬ</a>
+    <nav class="rail-nav" aria-label="Разделы">
+      <button type="button" aria-current="page"><svg><use href="kit/icons/sprite.svg#i-home"/></svg><span class="l">ЗАМЕНИТЬ обзор</span></button>
+      <button type="button"><svg><use href="kit/icons/sprite.svg#i-list"/></svg><span class="l">ЗАМЕНИТЬ список</span><small>12</small></button>
+      <button type="button"><svg><use href="kit/icons/sprite.svg#i-sliders"/></svg><span class="l">ЗАМЕНИТЬ настройки</span></button>
+    </nav>
+    <div class="rail-foot"><button class="btn" type="button">ЗАМЕНИТЬ действие</button></div>
+  </aside>
+  <main class="app-main">
+    <section class="view">
+      <header class="view-head">
+        <div><h1>ЗАМЕНИТЬ экран</h1><p>ЗАМЕНИТЬ одна строка о том, что здесь.</p></div>
+        <button class="btn primary" type="button">ЗАМЕНИТЬ главное действие</button>
+      </header>
+      <!-- сюда: блоки list / table / form / empty -->
+    </section>
+  </main>
+</div>

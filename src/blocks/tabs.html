@@ -1,0 +1,13 @@
+<!-- БЛОК tabs · вкладки (разделы одного экрана) и пилюли (выбор режима).
+     Правила: 2–5 пунктов; data-segmented — плашка поедет сама (bootSite); активный один: aria-selected / aria-checked="true". -->
+<div class="tabs" role="tablist" data-segmented>
+  <button class="tab" role="tab" type="button" aria-selected="true">ЗАМЕНИТЬ</button>
+  <button class="tab" role="tab" type="button" aria-selected="false">ЗАМЕНИТЬ</button>
+  <button class="tab" role="tab" type="button" aria-selected="false">ЗАМЕНИТЬ</button>
+  <span class="tab-ink" aria-hidden="true"></span>
+</div>
+<div class="pills" role="radiogroup" aria-label="ЗАМЕНИТЬ режим" data-segmented>
+  <button type="button" role="radio" aria-checked="true">ЗАМЕНИТЬ</button>
+  <button type="button" role="radio" aria-checked="false">ЗАМЕНИТЬ</button>
+  <span class="pill-ink" aria-hidden="true"></span>
+</div>

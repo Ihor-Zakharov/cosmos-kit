@@ -8,3 +8,7 @@ build/
 
 # личные переопределения агентов — не коммитятся
 .claude/settings.local.json
+
+# служебное воркфлоу и кэш Python
+.cosmos/
+__pycache__/

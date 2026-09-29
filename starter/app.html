@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- ЗАМЕНИТЬ: название приложения -->
+<title>Название сайта</title>
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="kit/icons/mark.svg" type="image/svg+xml">
+<!-- порядок важен: шрифты → токены → компоненты кита → свои стили -->
+<link rel="stylesheet" href="kit/fonts/fonts.css">
+<link rel="stylesheet" href="kit/css/tokens.css">
+<link rel="stylesheet" href="kit/css/components.css">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <!-- приложение: сцена спит под рейкой (bootSite({ page: 'app' })), живой может быть только главный экран сайта -->
+  <div class="cosmos-wrap asleep" id="cosmos-wrap" aria-hidden="true">
+    <canvas class="cosmos" id="cosmos"></canvas>
+    <div class="cosmos-fallback"></div>
+    <div class="grain"></div>
+  </div>
+
+  <div class="app">
+    <aside class="rail">
+      <a class="brand" href="#"><svg><use href="kit/icons/sprite.svg#i-mark"/></svg>ЗАМЕНИТЬ</a>
+      <nav class="rail-nav" aria-label="Разделы">
+        <button type="button" aria-current="page"><svg><use href="kit/icons/sprite.svg#i-home"/></svg><span class="l">ЗАМЕНИТЬ обзор</span></button>
+        <button type="button"><svg><use href="kit/icons/sprite.svg#i-list"/></svg><span class="l">ЗАМЕНИТЬ список</span><small>12</small></button>
+        <button type="button"><svg><use href="kit/icons/sprite.svg#i-sliders"/></svg><span class="l">ЗАМЕНИТЬ настройки</span></button>
+      </nav>
+      <div class="rail-foot"><button class="btn" type="button">ЗАМЕНИТЬ действие</button></div>
+    </aside>
+    <main class="app-main">
+      <section class="view">
+        <header class="view-head">
+          <div><h1>ЗАМЕНИТЬ экран</h1><p>ЗАМЕНИТЬ одна строка о том, что здесь.</p></div>
+          <button class="btn primary" type="button">ЗАМЕНИТЬ главное действие</button>
+        </header>
+        <div class="kpis">
+          <div class="kpi"><b>24</b><span>ЗАМЕНИТЬ подпись</span></div>
+          <div class="kpi"><b>7</b><span>ЗАМЕНИТЬ подпись</span></div>
+          <div class="kpi"><b>92%</b><span>ЗАМЕНИТЬ подпись</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel">
+            <h2>ЗАМЕНИТЬ недавнее</h2>
+            <div class="list">
+              <a class="item" href="#">
+                <div class="score">8<i style="--p:.8"></i></div>
+                <div class="item-body">
+                  <div class="item-title">ЗАМЕНИТЬ название</div>
+                  <div class="item-meta">ЗАМЕНИТЬ мета · дата · статус</div>
+                  <div class="item-text">ЗАМЕНИТЬ одна-две строки описания.</div>
+                </div>
+              </a>
+              <div class="item">
+                <div class="score none">·</div>
+                <div class="item-body"><div class="item-title">ЗАМЕНИТЬ название</div><div class="item-meta">ЗАМЕНИТЬ мета</div></div>
+                <button class="chip-btn" type="button"><svg><use href="kit/icons/sprite.svg#i-download"/></svg>ЗАМЕНИТЬ</button>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <h2>ЗАМЕНИТЬ пусто</h2>
+            <div class="empty">
+              <span class="empty-mark"><svg><use href="kit/icons/sprite.svg#i-folder-open"/></svg></span>
+              <p>ЗАМЕНИТЬ здесь пока пусто</p>
+              <small>ЗАМЕНИТЬ что сделать, чтобы появилось.</small>
+              <button class="btn" type="button">ЗАМЕНИТЬ действие</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script type="module">
+    import { bootSite, wireRail } from './kit/js/site.js';
+    const site = bootSite({ page: 'app' });
+    // экраны-разделы: <section class="view" id="v-…" hidden>; переключение — по пункту рейки
+    // wireRail(document.querySelector('.rail-nav'), (el) => { /* показать нужный .view */ });
+  </script>
+</body>
+</html>

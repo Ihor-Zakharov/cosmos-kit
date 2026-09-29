@@ -1,0 +1,20 @@
+<!-- БЛОК form · настройки/анкета в приложении.
+     Правила: подпись над полем обычным текстом; вариантов ≤ 4 — .choices (кнопки), 5–10 — <select class="in">, больше — поиск;
+     вкл/выкл — .switch; действия — последний ряд .form-actions (одна .btn.primary); сохранение с видимым статусом (тост). -->
+<form class="panel" id="settings-form">
+  <h2>ЗАМЕНИТЬ группа настроек</h2>
+  <div class="form-grid">
+    <label>ЗАМЕНИТЬ имя *<input class="in" name="name" required></label>
+    <label>ЗАМЕНИТЬ город<select class="in" name="city"><option>ЗАМЕНИТЬ</option><option>ЗАМЕНИТЬ</option><option>ЗАМЕНИТЬ</option><option>ЗАМЕНИТЬ</option><option>ЗАМЕНИТЬ</option></select></label>
+    <div class="wide lbl">ЗАМЕНИТЬ формат
+      <div class="choices" role="group" aria-label="ЗАМЕНИТЬ формат">
+        <button class="choice" type="button" aria-pressed="true">ЗАМЕНИТЬ</button>
+        <button class="choice" type="button" aria-pressed="false">ЗАМЕНИТЬ</button>
+        <button class="choice" type="button" aria-pressed="false">ЗАМЕНИТЬ</button>
+      </div>
+    </div>
+  </div>
+  <label class="switch"><input type="checkbox" checked><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">ЗАМЕНИТЬ уведомления</span></label>
+  <div class="form-actions"><button class="btn primary" type="submit">Сохранить</button><button class="btn" type="reset">Отменить</button></div>
+</form>
+<!-- JS: .choice — переключать aria-pressed по клику; submit → e.preventDefault(); site.toast('ok', 'Сохранено') -->

@@ -106,7 +106,7 @@
 .pills.small button { padding: 6px 11px; font-size: 13.5px; }
 
 /* плашка активного пункта — общая для .tabs и .pills */
-.pill-ink, .tab-ink { position: absolute; left: 0; width: var(--w, 0); transform: translateX(var(--x, 0)); will-change: transform; top: 3px; bottom: 3px; border-radius: 7px; background: rgba(255, 255, 255, .11); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14); }
+.pill-ink, .tab-ink { position: absolute; left: 0; width: var(--w, 0); transform: translateX(var(--x, 0)); will-change: transform; top: 3px; bottom: 3px; border-radius: 7px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-2); }
 :root[data-theme="light"] .tab-ink, :root[data-theme="light"] .pill-ink { background: #fff; box-shadow: inset 0 0 0 1px var(--line-1), 0 2px 8px rgba(20, 20, 30, .12); }
 
 /* переключатель (switch): дорожка 34×20 r7, ползунок 14×14 r5 */
@@ -477,6 +477,13 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
        с текстом. Никакого блюра: блюр на скролле дорог и делает остаток мутным пятном;
      · «спит»        (.asleep) — внутренние страницы и экраны данных: размыта и погашена с первого кадра,
        без анимации появления. Так «выдра» вела себя на экранах очереди и библиотеки.
+   Приём для приложения (abook, 28.09 — DESIGN-TODO п. 17, SKILL «Сцена в приложении»): живой только главный экран —
+   «витрина» с настройками кита по умолчанию (как в демо), экспозиция −14 % (слой .shade, opacity .14). Остальные экраны
+   получают «за горизонтом» не от скролла, а от состояния: дыра переезжает в «ось» (центр) и одновременно
+   api.setScroll(1) гасит кадр до ~8 % и ставит рендер на паузу. Это единственное движение сцены, одна пружина в духе Apple
+   (response 1,2 с, damping 0,85), и свет и путь разведены: уходя с главного, дыра сначала заметно едет (0–40 % пути), потом гаснет;
+   возвращаясь — сначала светлеет (первые 55 %), потом едет вправо. Всплывающий поиск — только плоское затемнение
+   CSS (.shade .42), без движения и пульса; открывается сверху в колонке своей страницы, чтобы не закрывать дыру.
    Сцена одна на сайт, position: fixed, под всем содержимым (.site — над ней). Не кладите вторую сцену
    в подвал или в секцию — дыра не орнамент, а ориентир.
    ============================================================ */
@@ -522,7 +529,7 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
   color: var(--ink); background: transparent; border-bottom: 1px solid transparent;
   transition: background-color var(--t-slow) var(--ease-out), border-color var(--t-slow) var(--ease-out), backdrop-filter var(--t-slow) var(--ease-out); }
 .topbar.solid { background: var(--plate); border-bottom-color: var(--line-1); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 500 15px/1 var(--font-brand); letter-spacing: .02em; }
+.brand { display: inline-flex; align-items: center; gap: 10px; min-height: 32px; color: var(--ink); text-decoration: none; font: 500 15px/1 var(--font-brand); letter-spacing: .02em; }   /* min-height — цель нажатия ≥ 24px (UX.md §10) */
 .brand svg { width: 22px; height: 22px; color: var(--ink); }
 .nav { display: flex; align-items: center; gap: 2px; margin-left: auto; }
 .nav a { position: relative; display: inline-flex; align-items: center; height: 36px; padding: 0 12px; border-radius: var(--r-s); color: var(--ink-2); font-size: 14px; font-weight: 500; text-decoration: none;
@@ -581,7 +588,7 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 .hero-stats { display: flex; flex-wrap: wrap; gap: 12px 36px; margin-top: 18px; padding-top: 22px; border-top: 1px solid var(--line-1); }
 .stat { display: grid; gap: 6px; }
 .stat b { font: 600 24px/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
-.stat span { font: 500 11px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.stat span { font: 500 12.5px/1.3 var(--font-text); color: var(--ink-2); }   /* подпись, которую читают: не мелкий капс (UX.md §9) */
 
 /* Правило композиции: всё по центру, кроме героя. Голова секции — центрированная колонка 640px с центрированным
    текстом; исключения (длинный текст .prose, таблицы, формы, дерево/крошки — всё, что читается слева направо)
@@ -608,6 +615,7 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 .site-footer { padding: 56px var(--datum) 32px; border-top: 1px solid var(--line-1); display: grid; gap: 40px; justify-items: center; text-align: center; }
 .footer-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px 64px; }
 .footer-about { display: grid; gap: 14px; justify-items: center; align-content: start; max-width: 360px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.footer-about p { margin: 0; }
 .footer-col { display: grid; gap: 2px; align-content: start; min-width: 120px; }
 .footer-col h5 { margin: 0 0 8px; font: 500 11px/1 var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-3); }
 .footer-col a { display: block; padding: 5px 0; color: var(--ink-2); font-size: 14px; text-decoration: none; transition: color var(--t-fast); }
@@ -638,3 +646,143 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 .drawer-links { display: grid; gap: 2px; }
 .drawer-links a { display: block; padding: 11px 12px; border-radius: var(--r-m); color: var(--ink-2); font-size: 16px; font-weight: 500; text-decoration: none; transition: background-color var(--t-fast), color var(--t-fast); }
 .drawer-links a:hover, .drawer-links a[aria-current="page"] { color: var(--ink); background: var(--surface-2); }
+
+/* ============================================================
+   UX-компоненты (09.2026, UX.md; DESIGN-TODO п. 16), вынесены из abook:
+     · .choice — чип-переключатель (кнопка): невыбранный — контур на плите, выбранный — светлее плита + ярче кайма + полные
+       чернила (два признака, без цвета); размер не меняется. Группа .choices показывает всё, что есть, если вариантов
+       ≤ 16; длиннее — первые 10 (и всё выбранное) + .choice.more «ещё N»;
+     · .steps / .step / .step-sep — строка шагов мастера от края до края: номер + короткая подпись, между шагами волосяные
+       линии забирают свободное место, поэтому промежутки ровные; .done — заполненный номер, .on — текущий;
+     · .group — группа вопросов внутри шага: волосяная линия и заголовок, всегда открыта (прятать то, что помещается, нельзя).
+   Кастомный выпадающий список (.dd в abook) пока не переносился — см. DESIGN-TODO п. 16.
+   ============================================================ */
+
+.choices { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.choice { height: 34px; padding: 0 13px; border: 0; border-radius: var(--r-s); background: transparent; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--ink-2);
+  font: 500 13.5px/1 var(--font-text); cursor: pointer; transition: background-color var(--t-base), color var(--t-base), box-shadow var(--t-base); }
+@media (hover: hover) { .choice:hover { background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-3); } }
+.choice[aria-pressed="true"], .choice.on { background: color-mix(in oklab, var(--ink) 13%, transparent); color: var(--ink); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 46%, transparent); }
+.choice.more { box-shadow: inset 0 0 0 1px var(--line-1); color: var(--ink-3); }
+
+.steps { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.step-sep { flex: 1 1 12px; min-width: 8px; height: 1px; background: var(--line-2); }
+.step { flex: none; display: flex; align-items: center; gap: 9px; height: 38px; padding: 0 12px 0 8px; border-radius: 999px; border: 1px solid transparent; color: var(--ink-2);
+  font-size: 14px; cursor: pointer; transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base); }
+.step .n { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font: 600 12px/1 var(--font-mono); box-shadow: inset 0 0 0 1px var(--line-3); color: var(--ink-2); }
+.step .l { white-space: nowrap; }
+@media (hover: hover) { .step:hover { color: var(--ink); background: var(--surface); } }
+.step.done .n { background: var(--ink); color: var(--bg); box-shadow: none; }
+.step.on, .step[aria-current="step"] { color: var(--ink); background: var(--surface-2); border-color: var(--line-2); }
+.step.on .n, .step[aria-current="step"] .n { box-shadow: inset 0 0 0 1.5px var(--ink); color: var(--ink); }
+.step.on.done .n { box-shadow: none; }
+@media (max-width: 1100px) { .step:not(.on):not([aria-current="step"]) .l { display: none; } .step:not(.on):not([aria-current="step"]) { padding: 0 7px; } }
+@media (max-width: 760px) { .steps { gap: 4px; } .step-sep { min-width: 4px; } .step:not(.on):not([aria-current="step"]) { padding: 0; border-width: 0; } .step { height: 34px; } }
+
+.group { border-top: 1px solid var(--line-1); padding-top: 18px; }
+.group > h3, .group > h4 { margin: 0 0 14px; font: 700 17px/1.3 var(--font-display); letter-spacing: -.015em; color: var(--ink); }
+
+/* ============================================================
+   Приложение и формы (09.2026, вынесено из abook — экраны проверены пользователем; DESIGN-TODO п. 18)
+     · .app — каркас приложения: слева .rail (бренд, .rail-nav с плашкой .rail-ink, внизу — действия), справа .app-main
+       с колонкой .view. Сцена в приложении спит (bootSite({ page: 'app' })), живой может быть только главный экран.
+       На телефоне (≤ 760px) рейка становится верхней полосой, пункты — строкой с прокруткой.
+     · .in — обычное поле (input / select / textarea) там, где полей много: формы, фильтры, настройки. Поле-«портал»
+       (.field) — одно главное поле экрана. Подпись — над полем, обычным текстом (UX.md §3): .form-grid label / .lbl.
+     · .panel — тихая плита раздела; .cols — колонки панелей; .kpis — ряд чисел с подписями (одна плита, волосяные швы).
+     · .list + .item — строка списка: слева .score (число + сегментная шкала, монохром), тело (.item-title, .item-meta,
+       .item-text), справа одно действие. Монохром: на экране много строк — цвет не несёт смысла.
+     · table.data в .table-wrap — таблица: липкая шапка, числа справа (.num), строка подсвечивается при наведении.
+     · .notice — строка-предупреждение в потоке (не плавает поверх): .notice.err / .notice.warn — кайма семантики.
+   ============================================================ */
+
+.app { position: relative; z-index: 1; display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); min-height: 100dvh; }
+.rail { position: sticky; top: 0; height: 100dvh; display: flex; flex-direction: column; gap: 16px; padding: 18px 14px 14px; background: var(--plate);
+  border-right: 1px solid var(--line-1); overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; z-index: 5; }
+.rail .brand { padding: 4px 8px 2px; }
+.rail-kicker { margin: 8px 0 6px; padding: 0 10px; font: 500 12px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+.rail-nav { position: relative; display: grid; gap: 2px; }
+.rail-nav > a, .rail-nav > button { position: relative; z-index: 1; display: flex; align-items: center; gap: 11px; height: 38px; padding: 0 10px; border: 0; border-radius: var(--r-m);
+  background: transparent; color: var(--ink-2); font: 500 14px/1 var(--font-text); text-align: left; text-decoration: none; cursor: pointer;
+  transition: color var(--t-fast), background-color var(--t-fast); }
+.rail-nav svg { width: 17px; height: 17px; flex: none; color: var(--ink-3); transition: color var(--t-fast); }
+.rail-nav .l { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rail-nav small { font: 500 11.5px/1 var(--font-mono); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+@media (hover: hover) { .rail-nav > a:hover, .rail-nav > button:hover { color: var(--ink); background: var(--surface); } }
+.rail-nav [aria-current], .rail-nav [aria-current] svg { color: var(--ink); }
+/* плашка активного пункта: без JS — у самого пункта; с JS (bootSite) — общая .rail-ink едет пружиной по вертикали */
+.rail-nav [aria-current] { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-1); }
+.rail-nav.has-ink [aria-current] { background: transparent; box-shadow: none; }
+.rail-ink { position: absolute; left: 0; right: 0; top: 0; height: var(--h, 0px); transform: translateY(var(--y, 0)); border-radius: var(--r-m); background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line-1); pointer-events: none; will-change: transform; }
+.rail-foot { margin-top: auto; display: grid; gap: 8px; }
+.app-main { min-width: 0; padding: 32px clamp(20px, 3.4vw, 56px) 112px; position: relative; }
+.view { display: flex; flex-direction: column; gap: 20px; max-width: 1120px; width: 100%; margin-inline: auto; }
+.view-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.view-head h1 { margin: 0; font: 700 clamp(26px, 2.6vw, 34px)/1.1 var(--font-display); letter-spacing: -.03em; color: var(--ink); }
+.view-head p { margin: 6px 0 0; color: var(--ink-2); }
+@media (max-width: 760px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .rail { position: sticky; height: auto; flex-direction: row; align-items: center; gap: 10px; padding: 10px 16px; border-right: 0; border-bottom: 1px solid var(--line-1); overflow-x: auto; }
+  .rail-nav { display: flex; gap: 2px; }
+  .rail-nav .l { overflow: visible; }
+  .rail-kicker, .rail-foot, .rail-ink { display: none; }
+  .rail-nav.has-ink [aria-current] { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-1); }
+  .app-main { padding: 20px 16px 80px; }
+}
+
+.in { height: 40px; width: 100%; min-width: 0; padding: 0 12px; background: var(--s1); border: 1px solid var(--line-2); border-radius: var(--r-m); outline: none;
+  color: var(--ink); font: 400 14px/1.3 var(--font-text); transition: border-color var(--t-fast), box-shadow var(--t-base) var(--ease-out); }
+.in::placeholder { color: var(--ink-3); }
+@media (hover: hover) { .in:hover { border-color: var(--line-3); } }
+.in:focus, .in:focus-visible { border-color: color-mix(in oklab, var(--el-a) 60%, transparent); box-shadow: var(--focus-ring); outline: none; }
+.in.sm { height: 34px; font-size: 13.5px; }
+select.in { padding-right: 32px; appearance: none; cursor: pointer;
+  background: var(--s1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23bab4ab' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 9px center / 16px; }
+select.in option { background: var(--s-raised); color: var(--ink); }
+textarea.in { height: auto; min-height: 130px; padding: 10px 12px; resize: vertical; line-height: 1.55; font-size: 14.5px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 16px 14px; }
+.form-grid label, .lbl { display: flex; flex-direction: column; gap: 7px; font: 500 14px/1.35 var(--font-text); color: var(--ink); }
+.form-grid label.wide { grid-column: 1 / -1; }
+.form-grid label small, .lbl small { font: 400 13px/1.4 var(--font-text); color: var(--ink-3); }
+.form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-top: 18px; border-top: 1px solid var(--line-1); }
+
+.panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 18px 20px; background: var(--plate); border: 1px solid var(--line-1); border-radius: var(--r-l); }
+.panel > h2, .panel > h3 { margin: 0; font: 600 16px/1.25 var(--font-display); letter-spacing: -.015em; color: var(--ink); }
+.panel > p { margin: 0; color: var(--ink-2); font-size: 14.5px; line-height: 1.55; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 14px; }
+.kpis { display: flex; flex-wrap: wrap; gap: 1px; overflow: hidden; background: var(--line-1); border: 1px solid var(--line-1); border-radius: var(--r-l); }
+.kpi { flex: 1 1 160px; display: grid; gap: 8px; align-content: start; min-width: 0; padding: 16px 18px; background: var(--plate); }
+.kpi b { font: 600 26px/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.kpi span { font: 500 13px/1.3 var(--font-text); color: var(--ink-2); }
+
+.list { display: flex; flex-direction: column; gap: 8px; }
+.item { display: flex; gap: 16px; align-items: flex-start; padding: 14px 16px; background: var(--plate); border: 1px solid var(--line-1); border-radius: var(--r-l); color: inherit; text-decoration: none;
+  transition: border-color var(--t-fast), background-color var(--t-fast); }
+a.item, button.item, .item[tabindex] { cursor: pointer; }
+@media (hover: hover) { a.item:hover, button.item:hover, .item[tabindex]:hover { border-color: var(--line-2); background: var(--surface-2); } }
+.panel .item { background: var(--s1); }
+.item-body { flex: 1; min-width: 0; }
+.item-title { font-weight: 500; font-size: 15px; color: var(--ink); }
+.item-meta { margin-top: 3px; color: var(--ink-3); font: 500 12px/1.5 var(--font-mono); }
+.item-text { margin-top: 6px; color: var(--ink-2); font-size: 14px; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.item > .btn, .item > .chip-btn, .item > .icon-btn { flex: none; margin-top: 5px; }   /* по центру плитки .score (46px) */
+.score { flex: none; width: 46px; height: 46px; display: grid; place-items: center; align-content: center; gap: 5px; border-radius: var(--r-m); background: var(--s1);
+  box-shadow: inset 0 0 0 1px var(--line-1); font: 600 17px/1 var(--font-display); color: var(--ink); font-variant-numeric: tabular-nums; }
+.score i { display: block; width: 28px; height: 3px; background: repeating-linear-gradient(90deg, var(--line-2) 0 2px, transparent 2px 3px); }
+.score i::before { content: ""; display: block; height: 100%; width: calc(var(--p, 0) * 100%); background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 3px); }
+.score.none { color: var(--ink-3); }
+
+.table-wrap { overflow-x: auto; background: var(--plate); border: 1px solid var(--line-1); border-radius: var(--r-l); }
+table.data { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.data th { position: sticky; top: 0; z-index: 1; padding: 12px 12px; background: var(--s-raised); border-bottom: 1px solid var(--line-2); text-align: left; white-space: nowrap;
+  font: 500 13px/1 var(--font-text); color: var(--ink-2); }
+table.data td { padding: 10px 12px; border-bottom: 1px solid var(--line-1); vertical-align: middle; color: var(--ink-2); }
+table.data tr:last-child td { border-bottom: 0; }
+@media (hover: hover) { table.data tbody tr:hover td { background: var(--surface); } }
+table.data .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+table.data .strong { color: var(--ink); }
+
+.notice { padding: 10px 14px; background: var(--s1); border: 1px solid var(--line-2); border-radius: var(--r-m); color: var(--ink); font-size: 14px; line-height: 1.5; }
+.notice.err { border-color: color-mix(in oklab, var(--err) 45%, transparent); }
+.notice.warn { border-color: color-mix(in oklab, var(--warn) 45%, transparent); }

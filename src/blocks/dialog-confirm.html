@@ -1,0 +1,19 @@
+<!-- БЛОК dialog-confirm · подтверждение НЕОБРАТИМОГО действия (удалить навсегда).
+     Правила: в интерфейсе — обычная .btn с честным текстом «Удалить…» (data-open), красная .btn.solid.danger — только здесь;
+     фокус на «Отмене»; обратимое действие не подтверждают — делают и дают «Отменить» в тосте. Никогда confirm()/alert(). -->
+<button class="btn" type="button" data-open="#confirm-delete">ЗАМЕНИТЬ Удалить…</button>
+<dialog class="modal" id="confirm-delete" aria-labelledby="confirm-delete-title">
+  <div class="modal-box" tabindex="-1">
+    <header class="drawer-head">
+      <div><p class="drawer-kicker"><svg><use href="kit/icons/sprite.svg#i-warn"/></svg>Необратимо</p><h3 id="confirm-delete-title">ЗАМЕНИТЬ Удалить «…»?</h3></div>
+      <button class="icon-btn" data-close type="button" aria-label="Закрыть"><svg><use href="kit/icons/sprite.svg#i-x"/></svg></button>
+    </header>
+    <p class="modal-text">ЗАМЕНИТЬ что именно пропадёт и что восстановить не получится.</p>
+    <div class="btn-row modal-actions"><button class="btn" data-close type="button" autofocus>Отмена</button><button class="btn solid danger" type="button" id="confirm-delete-yes">ЗАМЕНИТЬ Удалить навсегда</button></div>
+  </div>
+</dialog>
+<!-- JS (import { closeDialog } from './kit/js/motion.js'):
+  document.getElementById('confirm-delete-yes').onclick = async () => {
+    await doDelete(); closeDialog(document.getElementById('confirm-delete')); site.toast('ok', 'Удалено');
+  };
+-->

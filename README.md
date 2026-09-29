@@ -1,9 +1,33 @@
 # cosmos-kit
 
-> **Сделать сайт в этом стиле через ИИ-агента** — дай агенту ссылку на этот репозиторий и скажи, о чём сайт.
-> Человеку: пошаговый гайд для Antigravity — [`GUIDE.md`](GUIDE.md). Агенту: инструкция в [`AGENT.md`](AGENT.md). Вручную — одна команда:
-> `curl -fsSL https://raw.githubusercontent.com/Ihor-Zakharov/cosmos-kit/main/create-site.sh | sh -s -- my-site`
-> (Windows — `create-site.ps1`, см. `AGENT.md`).
+> **ИИ-агенту:** выполни [`AGENT.md`](AGENT.md) — `curl -fsSL https://raw.githubusercontent.com/Ihor-Zakharov/cosmos-kit/main/install.sh | sh`,
+> затем в проекте `python3 ~/.cosmos-kit/src/tools/cosmos.py init` и навык `.agents/skills/cosmos-site/SKILL.md`.
+> **Человеку:** дай агенту ссылку на этот репозиторий и скажи «примени UI» (к своему проекту) или «сделай сайт/приложение о …».
+> После установки фраза «примени UI» / «сделай с UI» работает в любом проекте (глобальный навык `cosmos-ui`).
+> Гайд для Antigravity — [`GUIDE.md`](GUIDE.md).
+
+## Как кит держит качество с любой моделью
+
+Стиль держится не на прозе, а на механике — поэтому одинаково работает и у Haiku на low effort, и у сильных моделей:
+
+- **блоки** (`src/blocks/`, каталог — `INDEX.md`): страница собирается из готовой разметки, а не рисуется;
+- **линтер** `src/tools/check.py`: правила языка кодами (цвет только токенами, одна главная кнопка, только существующие
+  классы и иконки, без `alert`, кит не правится…), вывод — «файл:строка КОД что → как исправить»;
+- **браузер** `src/tools/shot.mjs` (Node ≥ 22 + любой Chrome, без зависимостей): консоль, 404, горизонтальная прокрутка
+  на 1440/390, одна главная кнопка на экран, снимки для просмотра;
+- **хуки Claude Code** (`cosmos.py hook`): кит нельзя править, большие файлы кита нельзя читать целиком, после каждой
+  записи — линтер, закончить работу нельзя, пока проверка не зелёная;
+- **навык** `cosmos-site`: короткий цикл из 6 шагов + справочники для сильных моделей и агенты-проверяющие
+  (`cosmos-eyes` — слепой тест снимка, `cosmos-critic` — разбор по правилам).
+
+## Инструменты (зависимости)
+
+- **Обязательно:** Python ≥ 3.8 (линтер, `cosmos.py`), Node ≥ 22 (браузерная проверка), любой Chrome/Chromium/Edge
+  (из WSL подходит Windows Chrome). Проверка — `python3 ~/.cosmos-kit/src/tools/cosmos.py setup`.
+- **Для разработки** — `cosmos.py setup --tools` ставит без sudo: prettier, typescript, vite, svgo, playwright (+ Chromium),
+  lighthouse, eslint, stylelint, html-validate, ruff; для Linux печатает одну команду `sudo apt-get install …` —
+  библиотеки headless-Chromium и CLI (sqlite3, imagemagick, webp, pngquant, shellcheck, fd, tree, zip, bat, fzf).
+- Сам кит от них не зависит: сайт — статика без сборки.
 
 Дизайн-кит визуального языка «чёрная дыра» (тёмная тема, монохромные поверхности, цвет только
 в излучении). Вынесен и обобщён из фронтенда проекта «выдра»
