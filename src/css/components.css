@@ -653,7 +653,7 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
    UX-компоненты (09.2026, UX.md; DESIGN-TODO п. 16), вынесены из abook:
      · .choice — чип-переключатель (кнопка): невыбранный — контур на плите, выбранный — светлее плита + ярче кайма + полные
        чернила (два признака, без цвета); размер не меняется. Группа .choices показывает всё, что есть, если вариантов
-       ≤ 16; длиннее — первые 10 (и всё выбранное) + .choice.more «ещё N»;
+       ≤ 24 на широком экране (≤ 16 на узком); длиннее — первые 10 (и всё выбранное) + .choice.more «ещё N» (UX.md §1);
      · .steps / .step / .step-sep — строка шагов мастера от края до края: номер + короткая подпись, между шагами волосяные
        линии забирают свободное место, поэтому промежутки ровные; .done — заполненный номер, .on — текущий;
      · .group — группа вопросов внутри шага: волосяная линия и заголовок, всегда открыта (прятать то, что помещается, нельзя).
@@ -740,7 +740,7 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 .in:focus, .in:focus-visible { border-color: color-mix(in oklab, var(--el-a) 60%, transparent); box-shadow: var(--focus-ring); outline: none; }
 .in.sm { height: 34px; font-size: 13.5px; }
 select.in { padding-right: 32px; appearance: none; cursor: pointer;
-  background: var(--s1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23bab4ab' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 9px center / 16px; }
+  background: var(--s1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b4b5bd' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 9px center / 16px; }
 select.in option { background: var(--s-raised); color: var(--ink); }
 textarea.in { height: auto; min-height: 130px; padding: 10px 12px; resize: vertical; line-height: 1.55; font-size: 14.5px; }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 16px 14px; }
@@ -788,3 +788,163 @@ table.data .strong { color: var(--ink); }
 .notice { padding: 10px 14px; background: var(--s1); border: 1px solid var(--line-2); border-radius: var(--r-m); color: var(--ink); font-size: 14px; line-height: 1.5; }
 .notice.err { border-color: color-mix(in oklab, var(--err) 45%, transparent); }
 .notice.warn { border-color: color-mix(in oklab, var(--warn) 45%, transparent); }
+
+/* ============================================================
+   Чат и советы (01.10, вынесено из abook — экран «Чат» проверен пользователем; DESIGN-TODO п. 19)
+   Чат — как в браузерном Claude, отдельным экраном во всю высоту (внутри .app-main — .view без полей):
+     · .chat — сетка: слева .chat-side (кнопка «новый», .chat-list — разговоры группами по датам .chat-group, строка
+       .chat-row с подписью <small> и крестиком .x, подвал .chat-side-foot), справа .chat-main;
+     · .chat-main — колонка: .chat-head (заголовок, .sub, распорка, переключатель), .chat-scroll (прокручивается только он)
+       с колонкой .chat-col ≤ 880px, последним рядом — .composer. .chat-main.blank — пустое состояние .chat-empty с полем
+       по центру; .chat-main.incognito — поле пунктиром (ничего не запоминается);
+     · .msg.user — пузырь .bubble у правого края с метой <small>; .msg.ai — ответ без пузыря, Markdown в .md;
+       .caret — каретка потока (дышит механикой кита, без своих кадров); .msg-run — фаза и таймер, пока ответ пишется;
+       .msg-acts — действия сообщения, видны при наведении / фокусе / у последнего (.last);
+     · .composer-box — поле: textarea растёт по тексту, под ним ряд .composer-bar (подписи .composer-lbl, сегменты .pills,
+       распорка, одно .btn.primary); .composer-keys — подсказка клавиш одной строкой;
+     · .advice / .advice-row — строка-совет: текст слева (.advice-title, .advice-chain, .advice-why, .advice-meta), справа
+       .advice-side: ряд действий (.btn.small) и реакции .reacts; .advice-row.gone — отклонённый совет гаснет;
+     · .reacts / .react — 👍 👎 «Уже читал»: иконки из спрайта, .on / aria-pressed — отмеченная (кайма, полные чернила);
+     · .fetch-acts — группа «нескачанное»: Ссылка · Скачать · в Telegram — три .btn.small, встаёт в любой ряд действий;
+       одно действие ведёт до результата (скачать → проверить → отправить), даже если файла ещё нет (UX.md §13);
+     · .pills button.spark — крайний «✦» вариант шкалы-сегмента (самое смелое: «удиви»), знак рисует CSS;
+     · .text-btn.small — тихая мелкая кнопка (действия сообщения, «⚑ пожаловаться»);
+     · жалоба на элемент — <dialog class="modal"> с вопросом-заголовком, причинами .choices (radiogroup), необязательным
+       полем и переключателем; действие — .btn.primary, не красное: отметка обратима и действует сразу (блок dialog-report).
+   ============================================================ */
+
+.chat { display: grid; grid-template-columns: 268px minmax(0, 1fr); height: 100dvh; min-height: 520px; }
+.chat-side { display: flex; flex-direction: column; gap: 8px; min-height: 0; padding: 18px 12px 14px; border-right: 1px solid var(--line-1); }
+.chat-side > .btn { justify-content: center; }
+.chat-list { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 2px; margin: 4px -4px 0; padding: 0 4px; scrollbar-width: thin; }
+.chat-group { padding: 12px 10px 4px; font: 500 11.5px/1.4 var(--font-mono); color: var(--ink-3); }
+.chat-row { display: flex; align-items: center; gap: 4px; border-radius: var(--r-m); color: var(--ink-2); transition: background-color var(--t-fast), color var(--t-fast); }
+.chat-row > button:first-child, .chat-row > a:first-child { flex: 1; min-width: 0; padding: 8px 10px; text-align: left; font-size: 13.5px; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: inherit; text-decoration: none; }
+.chat-row small { display: block; font: 500 11.5px/1.4 var(--font-mono); color: var(--ink-3); }
+@media (hover: hover) { .chat-row:hover { background: var(--s1); color: var(--ink); } }
+.chat-row.on, .chat-row[aria-current] { background: var(--s3); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-2); }
+.chat-row .x { flex: none; width: 24px; height: 24px; margin-right: 4px; border-radius: var(--r-s); display: grid; place-items: center; color: var(--ink-3); opacity: 0; transition: opacity var(--t-fast), color var(--t-fast), background-color var(--t-fast); }
+.chat-row .x svg { width: 13px; height: 13px; }
+.chat-row:hover .x, .chat-row:focus-within .x, .chat-row.on .x, .chat-row[aria-current] .x { opacity: 1; }
+.chat-row .x:hover { color: var(--ink); background: var(--s2); }
+.chat-side-foot { padding: 10px 6px 0; border-top: 1px solid var(--line-1); font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
+.chat-side-foot button, .chat-side-foot a { color: var(--ink-2); text-decoration: none; }
+.chat-side-foot button:hover, .chat-side-foot a:hover { color: var(--ink); }
+
+.chat-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+/* шапка, колонка сообщений и поле — одна колонка ≤ 880px: на широком окне ничего не уезжает к дальнему краю */
+.chat-head { display: flex; align-items: center; gap: 12px; width: min(880px, 100%); min-height: 60px; margin: 0 auto; padding: 14px 24px; }
+.chat-head h1, .chat-head h2 { margin: 0; min-width: 0; font: 600 16px/1.3 var(--font-text); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-head .sub { margin: 0; font-size: 12.5px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-head .spacer, .composer-bar .spacer { flex: 1; min-width: 8px; }
+.chat-scroll { flex: 1; min-height: 0; overflow: auto; scroll-behavior: smooth; scrollbar-width: thin; }
+.chat-col { display: flex; flex-direction: column; gap: 22px; width: min(880px, 100%); margin: 0 auto; padding: 12px 24px 24px; }
+.chat-empty { display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; padding-top: clamp(40px, 18vh, 200px); }
+.chat-empty h2, .chat-empty h3 { margin: 0; font: 600 30px/1.2 var(--font-display); letter-spacing: -.02em; color: var(--ink); }
+.chat-empty p { margin: 0; max-width: 560px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+.chat-empty .choices, .msg .choices { justify-content: center; }
+.msg.ai .choices { justify-content: flex-start; }
+/* пустое состояние: поле ввода поднимается к центру, подсказки — прямо над ним */
+.chat-main.blank .chat-scroll { display: flex; align-items: flex-end; }
+.chat-main.blank .chat-empty { padding: 0 0 18px; }
+.chat-main.blank .composer { padding-bottom: 24vh; }
+.chat-main.incognito .composer-box { border-style: dashed; }
+
+.msg { display: flex; flex-direction: column; gap: 12px; max-width: 100%; }
+.msg.user { align-self: flex-end; max-width: 85%; }
+.bubble { padding: 10px 16px; border-radius: var(--r-l); background: var(--s3); border: 1px solid var(--line-1); color: var(--ink); font-size: 15.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bubble small { display: block; margin-top: 4px; font: 500 11.5px/1.4 var(--font-mono); color: var(--ink-3); text-align: right; white-space: normal; }
+.bubble.edit { padding: 6px; width: min(640px, 100%); }
+.bubble.edit textarea { width: 100%; min-height: 64px; padding: 6px 8px; background: transparent; border: 0; outline: none; resize: vertical; color: var(--ink); font: inherit; }
+.bubble.edit .btn-row { justify-content: flex-end; }
+.md { font-size: 16px; line-height: 1.75; color: var(--ink-2); }
+.md p { margin: 0 0 12px; }
+.md > :last-child { margin-bottom: 0; }
+.md h3, .md h4 { margin: 14px 0 6px; font: 600 16px/1.4 var(--font-text); color: var(--ink); }
+.md strong { color: var(--ink); font-weight: 600; }
+.md ul, .md ol { margin: 0 0 12px; padding-left: 22px; }
+.md li { margin: 4px 0; }
+.md code { font: 500 13px/1 var(--font-mono); padding: 2px 5px; }
+.md a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-3); text-underline-offset: 3px; }
+/* каретка потока — дышит той же механикой, что .live-dot; прямоугольник в строке, пока текст пишется */
+.caret { display: inline-block; width: 8px; height: 1.05em; margin-left: 3px; vertical-align: -2px; border-radius: 1px; background: var(--ink-2); animation: breathe 1.1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .caret { animation: none; } }
+.msg-run { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink-3); }
+.msg-run b { font: 500 12px/1 var(--font-mono); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.msg-acts { display: flex; align-items: center; gap: 2px; opacity: 0; transition: opacity var(--t-fast); }
+.msg:hover .msg-acts, .msg:focus-within .msg-acts, .msg.last .msg-acts { opacity: 1; }
+.msg.user .msg-acts { justify-content: flex-end; margin-top: -8px; }
+.msg-acts .meta { margin-left: auto; font-size: 12.5px; color: var(--ink-3); }
+.text-btn.small { height: 28px; padding: 0 9px; border-radius: var(--r-s); font-size: 12.5px; font-weight: 500; color: var(--ink-3); }
+.text-btn.small:hover { color: var(--ink); background: var(--s2); }
+.text-btn.small svg { width: 14px; height: 14px; }
+
+.composer { width: min(880px, 100%); margin: 0 auto; padding: 6px 24px 18px; }
+.composer-box { display: flex; flex-direction: column; gap: 8px; padding: 12px 12px 10px 16px; background: var(--s2); border: 1px solid var(--line-2); border-radius: var(--r-xl); transition: border-color var(--t-fast); }
+.composer-box:focus-within { border-color: var(--line-3); }
+.composer-box textarea { width: 100%; min-height: 28px; max-height: 240px; padding: 4px 0; background: transparent; border: 0; outline: none; resize: none; color: var(--ink); font: 400 16px/1.55 var(--font-text); }
+.composer-box textarea::placeholder { color: var(--ink-3); }
+.composer-box textarea:focus-visible { outline: none; box-shadow: none; }
+.composer-bar { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; min-width: 0; }
+.composer-bar .pills, .composer-bar .btn { flex: none; }
+.composer-bar .btn { height: 36px; }
+.composer-lbl { flex: none; font: 500 13px/1 var(--font-text); color: var(--ink-3); }
+.composer-keys { margin: 8px 0 0; font: 400 12.5px/1.4 var(--font-text); color: var(--ink-3); text-align: center; }
+/* крайний «✦» вариант шкалы: самое смелое, знак рисует CSS (эмодзи в кнопках нет — H6) */
+.pills button.spark::before { content: "✦ "; }
+
+.advice { display: flex; flex-direction: column; gap: 8px; }
+.advice-row { display: flex; gap: 18px; align-items: flex-start; min-width: 0; padding: 14px 16px; background: var(--plate); border: 1px solid var(--line-1); border-radius: var(--r-l); transition: opacity var(--t-base); }
+.advice-row.gone { opacity: .45; }
+.advice-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+.advice-side { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; max-width: 50%; }
+.advice-side .btn-row { justify-content: flex-end; gap: 6px; }
+.advice-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.advice-title { font: 600 15px/1.4 var(--font-text); color: var(--ink); overflow-wrap: anywhere; }
+.advice-title.link, button.advice-title { cursor: pointer; text-align: left; }
+.advice-title.link:hover, button.advice-title:hover { text-decoration: underline; text-decoration-color: var(--line-3); text-underline-offset: 3px; }
+.advice-chain { padding: 7px 10px; background: var(--s1); border: 1px solid var(--line-1); border-radius: var(--r-m); font: 500 12.5px/1.55 var(--font-mono); color: var(--ink); overflow-wrap: anywhere; }
+.advice-chain i { font-style: normal; color: var(--ink-3); }
+.advice-why { font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
+.advice-meta { font: 500 12px/1.5 var(--font-mono); color: var(--ink-3); min-height: 18px; }
+.btn.small.on { background: var(--s4); border-color: var(--line-3); }
+
+.reacts { display: flex; align-items: center; justify-content: flex-end; gap: 2px; }
+.react { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 9px; border-radius: var(--r-s); font: 500 12.5px/1 var(--font-text); color: var(--ink-3);
+  transition: color var(--t-fast), background-color var(--t-fast), box-shadow var(--t-fast); }
+.react svg { width: 15px; height: 15px; }
+.react:hover { color: var(--ink); background: var(--s2); }
+.react.on, .react[aria-pressed="true"] { color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-3); }
+.fetch-acts { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+@media (max-width: 760px) {
+  .chat { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); height: calc(100dvh - 160px); }
+  .chat-side { padding: 10px; border-right: 0; border-bottom: 1px solid var(--line-1); }
+  .chat-list { max-height: 110px; }
+  .chat-head .sub, .composer-keys, .chat-side-foot { display: none; }
+  .chat-col, .composer, .chat-head { padding-left: 12px; padding-right: 12px; }
+  .composer-bar { flex-wrap: wrap; }
+  .composer-bar .pills { max-width: 100%; }
+  .msg.user { max-width: 100%; }
+  .advice-row { flex-direction: column; }
+  .advice-side { max-width: none; align-items: flex-start; }
+  .advice-side .btn-row, .reacts { justify-content: flex-start; }
+}
+
+/* ---------- быстрая оценка и «две дороги» (01.10, abook; DESIGN-TODO п. 19) ----------
+   · .scale — оценка 1–10 одним кликом: десять равных плит в ряд (в диалоге «Уже читал»: шкала + «Просто отметить» + «Полный отзыв →»;
+     цифры с клавиатуры, 0 = 10). Любая отметка снимается повторным нажатием — правило кита (UX.md §13);
+   · .ways — «две дороги в форму»: сегмент .pills по центру над мастером («По шагам» / «Рассказать своими словами»);
+     вторая дорога — одно большое поле .field.area и одно действие: ИИ раскладывает рассказ по полям, заполненное руками
+     не перетирает, проверка — на шаге «Итог». */
+.scale { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; }
+.scale button { height: 44px; border-radius: var(--r-m); background: var(--s2); border: 1px solid var(--line-1); color: var(--ink-2); font: 600 16px/1 var(--font-display); font-variant-numeric: tabular-nums;
+  transition: background-color var(--t-fast), color var(--t-fast), border-color var(--t-fast); }
+.scale button:hover, .scale button:focus-visible { background: var(--s3); color: var(--ink); border-color: var(--line-3); }
+.scale button.on, .scale button[aria-pressed="true"] { background: var(--s4); color: var(--ink); border-color: var(--line-3); }
+.modal-box > .scale { margin: 6px 0 2px; }
+.modal-box > .choices, .modal-box > .lbl, .modal-box > .switch { margin-top: 14px; }
+.modal-actions .spacer { flex: 1; }
+.ways { display: flex; justify-content: center; margin-bottom: 18px; }
+.field.area .field-body { align-items: stretch; padding: 12px 14px; }
+.field.area textarea { min-height: 220px; padding: 2px 0; font-size: 16px; line-height: 1.55; resize: vertical; }

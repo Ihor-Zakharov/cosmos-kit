@@ -29,6 +29,8 @@
   .blk-stage .rail { position: relative; height: 100%; }
   .blk-stage .app-main { overflow-y: auto; }
   .blk-stage.plain { padding: 24px; }
+  .blk-stage.chat-like { padding: 0; }
+  .blk-stage .chat { height: 640px; }
   .blk-code { max-width: 1120px; margin: 16px auto 0; }
   .blk-code summary { cursor: pointer; color: var(--ink-2); font: 500 14px/1 var(--font-text); padding: 8px 0; }
   .blk-code pre { margin: 8px 0 0; max-height: 420px; overflow: auto; padding: 16px; border-radius: var(--r-l); background: var(--s1); border: 1px solid var(--line-1);
@@ -73,7 +75,7 @@
     // порядок и группы — как в src/blocks/INDEX.md
     const GROUPS = [
       ['site', 'Сайт', ['topbar', 'hero', 'features', 'steps', 'text', 'stats', 'pricing', 'faq', 'cta', 'contact', 'footer']],
-      ['app', 'Приложение', ['app-shell', 'list', 'table', 'form', 'wizard', 'tabs', 'empty', 'dialog-confirm']],
+      ['app', 'Приложение', ['app-shell', 'list', 'table', 'form', 'wizard', 'wizard-text', 'tabs', 'empty', 'dialog-confirm', 'dialog-rate', 'dialog-report', 'chat', 'advice']],
     ];
     const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const box = document.getElementById('blocks'), toc = document.getElementById('toc');
@@ -87,8 +89,10 @@
         // пути кита из проекта (kit/…) → из витрины (../src/…); id шапки/шторки — свои, чтобы не спорить со страницей
         const live = src.replace(/<!--[\s\S]*?-->/g, '').replace(/(href|src)="kit\//g, '$1="../src/')
           .replace(/id="topbar"/g, '').replace(/menu-drawer/g, `menu-drawer-${name}`).replace(/id="confirm-delete/g, `id="confirm-delete-${name}`)
-          .replace(/data-open="#confirm-delete"/g, `data-open="#confirm-delete-${name}"`);
-        const kind = name === 'app-shell' ? 'app-like' : /^(list|table|form|wizard|tabs|empty|dialog-confirm)$/.test(name) ? 'plain' : '';
+          .replace(/data-open="#confirm-delete"/g, `data-open="#confirm-delete-${name}"`)
+          .replace(/id="report"/g, `id="report-${name}"`).replace(/data-open="#report"/g, `data-open="#report-${name}"`)
+          .replace(/id="rate"/g, `id="rate-${name}"`).replace(/data-open="#rate"/g, `data-open="#rate-${name}"`);
+        const kind = name === 'app-shell' ? 'app-like' : name === 'chat' ? 'chat-like' : /^(list|table|form|wizard|wizard-text|tabs|empty|dialog-confirm|dialog-rate|dialog-report|advice)$/.test(name) ? 'plain' : '';
         const s = document.createElement('section'); s.className = 'blk'; s.id = 'b-' + name;
         s.innerHTML = `<div class="blk-head"><p class="kicker">${gname.toLowerCase()} · ${name}.html</p><h2>${esc(name)}</h2><p>${esc(rest.join('·').trim() || title.trim())}</p></div>
           <div class="blk-stage ${kind}">${live}</div>

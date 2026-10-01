@@ -1,0 +1,17 @@
+<!-- БЛОК dialog-rate · быстрая оценка с выходом в подробное («Уже читал», «уже пробовал»).
+     Правила: шкала .scale 1–10 — одним кликом (цифры с клавиатуры, 0 = 10), рядом «Просто отметить» (.btn) и «Полный отзыв →» (.btn.primary);
+     отметка действует сразу и снимается повторным нажатием на ту же кнопку («✓ Читал» → снять); открывать — data-open="#id". -->
+<button class="react" type="button" data-open="#rate" aria-pressed="false">Уже читал</button>
+<dialog class="modal" id="rate" aria-labelledby="rate-title">
+  <div class="modal-box" tabindex="-1">
+    <header class="drawer-head"><h3 id="rate-title">«ЗАМЕНИТЬ название» — уже читали</h3></header>
+    <p class="modal-text">Оцените одним нажатием — это сразу уточнит подбор.</p>
+    <div class="scale" role="group" aria-label="Оценка от 1 до 10">
+      <button type="button" aria-label="Оценка 1" data-close>1</button><button type="button" aria-label="Оценка 2" data-close>2</button><button type="button" aria-label="Оценка 3" data-close>3</button>
+      <button type="button" aria-label="Оценка 4" data-close>4</button><button type="button" aria-label="Оценка 5" data-close>5</button><button type="button" aria-label="Оценка 6" data-close>6</button>
+      <button type="button" aria-label="Оценка 7" data-close>7</button><button type="button" aria-label="Оценка 8" data-close>8</button><button type="button" aria-label="Оценка 9" data-close>9</button>
+      <button type="button" aria-label="Оценка 10" data-close>10</button>
+    </div>
+    <div class="btn-row modal-actions"><button class="btn" type="button" data-close>Отмена</button><span class="spacer"></span><button class="btn" type="button" data-close>Просто отметить</button><button class="btn primary" type="button" data-close>Полный отзыв →</button></div>
+  </div>
+</dialog>

@@ -1,0 +1,60 @@
+<!-- БЛОК chat · чат с консультантом, как в браузерном Claude: отдельный экран во всю высоту.
+     Правила: слева разговоры группами по датам, справа колонка сообщений ≤ 880px и поле ввода последним рядом (ничего не плавает);
+     вопрос — пузырь справа, ответ — без пузыря, Markdown в .md; действия сообщения видны при наведении; поток — .caret;
+     пустой чат — .chat-main.blank с полем по центру и подсказками; инкогнито — .chat-main.incognito (поле пунктиром);
+     одно .btn.primary — «Отправить» (во время ответа та же кнопка становится «Остановить», обычной). Внутри .app-main — .view без полей. -->
+<div class="chat">
+  <aside class="chat-side">
+    <button class="btn small" type="button">+ Новый чат</button>
+    <div class="chat-list">
+      <div class="chat-group">Сегодня</div>
+      <div class="chat-row on"><button type="button">ЗАМЕНИТЬ тема разговора<small>19:42 · 1 вопрос</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="kit/icons/sprite.svg#i-x"/></svg></button></div>
+      <div class="chat-row"><button type="button">ЗАМЕНИТЬ тема разговора<small>18:11 · 3 вопроса</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="kit/icons/sprite.svg#i-x"/></svg></button></div>
+      <div class="chat-group">Вчера</div>
+      <div class="chat-row"><button type="button">ЗАМЕНИТЬ тема разговора<small>10:22 · 2 вопроса · инкогнито</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="kit/icons/sprite.svg#i-x"/></svg></button></div>
+    </div>
+    <div class="chat-side-foot"><button type="button">Память: 2 факта</button></div>
+  </aside>
+  <div class="chat-main">
+    <header class="chat-head">
+      <h2>ЗАМЕНИТЬ тема разговора</h2><p class="sub">помнит ваш вкус</p><span class="spacer"></span>
+      <label class="switch"><input type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">инкогнито</span></label>
+    </header>
+    <div class="chat-scroll" aria-live="polite">
+      <div class="chat-col">
+        <div class="msg user">
+          <div class="bubble">ЗАМЕНИТЬ вопрос пользователя<small>19:42 · рядом · авто</small></div>
+          <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button">Изменить</button></div>
+        </div>
+        <div class="msg ai last">
+          <div class="md"><p>ЗАМЕНИТЬ ответ: абзацы, <strong>жирное</strong>, списки, <code>код</code> и ссылки — узкий Markdown.</p>
+            <ul><li>ЗАМЕНИТЬ пункт</li><li>ЗАМЕНИТЬ пункт</li></ul></div>
+          <div class="choices"><button class="choice" type="button">ЗАМЕНИТЬ уточняющий вопрос</button><button class="choice" type="button">ЗАМЕНИТЬ ещё один</button></div>
+          <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button"><svg><use href="kit/icons/sprite.svg#i-refresh"/></svg>Другой ответ</button><span class="meta">00:19</span></div>
+        </div>
+        <div class="msg ai">
+          <div class="md"><p>ЗАМЕНИТЬ ответ, который ещё пишется<span class="caret" aria-hidden="true"></span></p></div>
+          <div class="msg-run"><i class="live-dot"></i><span>ЗАМЕНИТЬ фаза процесса</span><b>00:07</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="composer">
+      <div class="composer-box">
+        <textarea rows="1" maxlength="2000" aria-label="Сообщение" placeholder="ЗАМЕНИТЬ пример вопроса"></textarea>
+        <div class="composer-bar">
+          <span class="composer-lbl">ЗАМЕНИТЬ шкала</span>
+          <div class="pills small" role="radiogroup" aria-label="ЗАМЕНИТЬ шкала" data-segmented>
+            <button type="button" role="radio" aria-checked="false">Близко</button>
+            <button type="button" role="radio" aria-checked="true">Рядом</button>
+            <button type="button" role="radio" aria-checked="false">Далеко</button>
+            <button type="button" role="radio" aria-checked="false" class="spark">Удиви</button>
+            <span class="pill-ink" aria-hidden="true"></span>
+          </div>
+          <span class="spacer"></span>
+          <button class="btn primary" type="button">Отправить</button>
+        </div>
+      </div>
+      <p class="composer-keys">Enter — отправить · Shift+Enter — новая строка · ↑ — изменить последнее · Esc — остановить</p>
+    </div>
+  </div>
+</div>

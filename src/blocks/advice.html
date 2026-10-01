@@ -1,0 +1,44 @@
+<!-- БЛОК advice · строки-советы (рекомендации, результаты подбора) с реакциями.
+     Правила: одна строка на вариант, все строки одной структуры: текст слева (.advice-title, цепочка .advice-chain, .advice-why, .advice-meta),
+     действия и реакции справа (.advice-side); одно действие ведёт до результата — для нескачанного группа .fetch-acts
+     (Ссылка · Скачать · отправить) делает всё сама; реакции .reacts — иконки из спрайта, отмеченная — .on; отклонённое — .advice-row.gone.
+     На широком экране показывать до 24 строк без «ещё». Пусто — не рисовать блок вовсе, пока нет первого результата. -->
+<div class="advice">
+  <div class="advice-row">
+    <div class="advice-body">
+      <div class="advice-tags"><span class="tag">рядом</span><span class="tag">ЗАМЕНИТЬ жанр</span></div>
+      <div class="advice-title">ЗАМЕНИТЬ автор — «Название»</div>
+      <div class="advice-why">ЗАМЕНИТЬ почему это подходит — одна-две строки.</div>
+      <div class="advice-meta">ЗАМЕНИТЬ мета · 5 ч · на диске</div>
+    </div>
+    <div class="advice-side">
+      <div class="btn-row"><button class="btn small" type="button">+ в очередь</button><button class="btn small" type="button"><svg><use href="kit/icons/sprite.svg#i-external"/></svg>ЗАМЕНИТЬ отправить</button></div>
+      <div class="reacts">
+        <button class="react" type="button" aria-pressed="false" aria-label="Нравится — больше такого"><svg><use href="kit/icons/sprite.svg#i-thumb-up"/></svg></button>
+        <button class="react" type="button" aria-pressed="false" aria-label="Не моё — меньше такого"><svg><use href="kit/icons/sprite.svg#i-thumb-down"/></svg></button>
+        <button class="react" type="button" aria-pressed="false">Уже читал</button>
+      </div>
+    </div>
+  </div>
+  <div class="advice-row">
+    <div class="advice-body">
+      <div class="advice-tags"><span class="tag accent">мост</span><span class="tag">ЗАМЕНИТЬ жанр</span></div>
+      <div class="advice-title">ЗАМЕНИТЬ автор — «Название»</div>
+      <div class="advice-chain">ЗАМЕНИТЬ откуда <i>→</i> общий признак <i>→</i> куда</div>
+      <div class="advice-meta">нет в библиотеке — найду и скачаю · уверенность 50%</div>
+    </div>
+    <div class="advice-side">
+      <div class="btn-row fetch-acts">
+        <button class="btn small" type="button"><svg><use href="kit/icons/sprite.svg#i-link"/></svg>Ссылка</button>
+        <button class="btn small" type="button"><svg><use href="kit/icons/sprite.svg#i-download"/></svg>Скачать</button>
+        <button class="btn small" type="button"><svg><use href="kit/icons/sprite.svg#i-external"/></svg>ЗАМЕНИТЬ отправить</button>
+        <button class="text-btn small" type="button" aria-label="Пожаловаться на запись"><svg><use href="kit/icons/sprite.svg#i-flag"/></svg></button>
+      </div>
+      <div class="reacts">
+        <button class="react" type="button" aria-pressed="true" aria-label="Нравится — больше такого"><svg><use href="kit/icons/sprite.svg#i-thumb-up"/></svg></button>
+        <button class="react" type="button" aria-pressed="false" aria-label="Не моё — меньше такого"><svg><use href="kit/icons/sprite.svg#i-thumb-down"/></svg></button>
+        <button class="react" type="button" aria-pressed="false">Уже читал</button>
+      </div>
+    </div>
+  </div>
+</div>

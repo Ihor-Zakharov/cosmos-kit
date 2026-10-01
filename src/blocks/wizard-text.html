@@ -1,0 +1,19 @@
+<!-- БЛОК wizard-text · вторая дорога в анкету: «рассказать своими словами».
+     Правила: сегмент .ways над мастером (та же пара, что в блоке wizard); одно большое поле .field.area и одно действие (.btn.primary);
+     подпись рядом говорит, сколько ждать; ИИ раскладывает рассказ по полям, заполненное вручную не перетирает, проверка — на шаге «Итог». -->
+<div class="ways">
+  <div class="pills" role="radiogroup" aria-label="Как заполнить" data-segmented>
+    <button type="button" role="radio" aria-checked="false">По шагам</button>
+    <button type="button" role="radio" aria-checked="true">Рассказать своими словами</button>
+    <span class="pill-ink" aria-hidden="true"></span>
+  </div>
+</div>
+<div class="panel">
+  <h3>ЗАМЕНИТЬ Расскажите, что вам нравится</h3>
+  <p>ЗАМЕНИТЬ что рассказать и что будет дальше: ответ разложится по полям анкеты, заполненное вами не перетрётся, всё проверите в «Итоге».</p>
+  <div class="field area">
+    <div class="field-ring" aria-hidden="true"></div>
+    <div class="field-body"><textarea maxlength="8000" aria-label="ЗАМЕНИТЬ о чём рассказ" placeholder="ЗАМЕНИТЬ пример рассказа своими словами…"></textarea></div>
+  </div>
+  <div class="form-actions"><button class="btn primary" type="button">ЗАМЕНИТЬ Заполнить анкету</button><span class="item-meta">≈ 10–20 с</span></div>
+</div>

@@ -1,6 +1,14 @@
 <!-- БЛОК wizard · мастер/анкета по шагам.
      Правила: ≤ 7 шагов, у каждого номер и короткая подпись; одна тема на шаг; вопросы — открытыми группами .group (не раскрытиями);
-     варианты ≤ 16 — все сразу (.choices); внизу — только «Далее» (.btn.primary) и «Назад» (.btn); автосохранение с видимым статусом. -->
+     варианты — все сразу (.choices: до 24 на широком экране, до 16 на узком); внизу — только «Далее» (.btn.primary) и «Назад» (.btn);
+     автосохранение с видимым статусом. Над мастером — .ways «две дороги»: по шагам или своими словами (вторая — блок wizard-text). -->
+<div class="ways">
+  <div class="pills" role="radiogroup" aria-label="Как заполнить" data-segmented>
+    <button type="button" role="radio" aria-checked="true">По шагам</button>
+    <button type="button" role="radio" aria-checked="false">Рассказать своими словами</button>
+    <span class="pill-ink" aria-hidden="true"></span>
+  </div>
+</div>
 <div class="panel">
   <nav class="steps" aria-label="Шаги">
     <button class="step done" type="button"><span class="n">1</span><span class="l">ЗАМЕНИТЬ</span></button><span class="step-sep"></span>

@@ -1,0 +1,19 @@
+<!-- БЛОК dialog-report · жалоба / обратная связь на элемент («что-то не так с записью»).
+     Правила: у любого внешнего источника одна мелкая кнопка «что-то не так» (.text-btn.small с i-flag) в ряду действий; диалог —
+     вопрос в заголовке, причины чипами .choices (radiogroup, одна), необязательное поле, переключатель следствия; действие —
+     .btn.primary, НЕ красное (отметка обратима и действует сразу, подтверждения не нужно); открывать — data-open="#id". -->
+<button class="text-btn small" type="button" data-open="#report" aria-label="Пожаловаться"><svg><use href="kit/icons/sprite.svg#i-flag"/></svg>Пожаловаться</button>
+<dialog class="modal" id="report" aria-labelledby="report-title">
+  <div class="modal-box" tabindex="-1">
+    <header class="drawer-head"><h3 id="report-title">Что не так с ЗАМЕНИТЬ записью?</h3></header>
+    <p class="modal-text">ЗАМЕНИТЬ название элемента. Отметка сразу убирает его из выдачи и ссылок.</p>
+    <div class="choices" role="radiogroup" aria-label="Причина">
+      <button class="choice" type="button" role="radio" aria-checked="true">ЗАМЕНИТЬ причина</button>
+      <button class="choice" type="button" role="radio" aria-checked="false">ЗАМЕНИТЬ причина</button>
+      <button class="choice" type="button" role="radio" aria-checked="false">ЗАМЕНИТЬ причина</button>
+    </div>
+    <label class="lbl">Подробнее, если хочется<input class="in" maxlength="500" placeholder="ЗАМЕНИТЬ пример: «обрывается на 3-й части»"></label>
+    <label class="switch"><input type="checkbox" checked><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">ЗАМЕНИТЬ следствие: найти другую запись</span></label>
+    <div class="btn-row modal-actions"><button class="btn" type="button" data-close>Отмена</button><button class="btn primary" type="button" data-close>Пожаловаться</button></div>
+  </div>
+</dialog>
