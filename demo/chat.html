@@ -10,11 +10,6 @@
 <link rel="stylesheet" href="../src/css/tokens.css">
 <link rel="stylesheet" href="../src/css/components.css">
 <link rel="stylesheet" href="demo.css">
-<style>
-  /* чат — отдельный экран во всю высоту: .view без полей, колонка на всю ширину экрана приложения */
-  .app-main.chat-screen { padding: 0; }
-  .app-main.chat-screen > .view { max-width: none; }
-</style>
 </head>
 <body>
   <div class="cosmos-wrap asleep" id="cosmos-wrap" aria-hidden="true">
@@ -23,50 +18,54 @@
     <div class="grain"></div>
   </div>
 
-  <div class="app">
+  <!-- чат — экран приложения во всю высоту: рейка свёрнута до иконок (.app.chatmode), .app-main без полей (.chat-screen) -->
+  <div class="app chatmode" id="app">
     <aside class="rail">
-      <a class="brand" href="index.html"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>книги</a>
+      <a class="brand" href="index.html" aria-label="К витрине"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg><span>книги</span></a>
       <nav class="rail-nav" aria-label="Экраны">
-        <a href="index.html#app"><svg><use href="../src/icons/sprite.svg#i-home"/></svg><span class="l">Обзор</span></a>
-        <a href="index.html#app"><svg><use href="../src/icons/sprite.svg#i-list"/></svg><span class="l">Библиотека</span><small>564</small></a>
-        <a href="chat.html" aria-current="page"><svg><use href="../src/icons/sprite.svg#i-wave"/></svg><span class="l">Чат</span></a>
-        <a href="index.html#wizard"><svg><use href="../src/icons/sprite.svg#i-pencil"/></svg><span class="l">Анкета</span></a>
+        <a href="index.html#app" aria-label="Обзор"><svg><use href="../src/icons/sprite.svg#i-home"/></svg><span class="l">Обзор</span></a>
+        <a href="index.html#app" aria-label="Библиотека"><svg><use href="../src/icons/sprite.svg#i-list"/></svg><span class="l">Библиотека</span><small>564</small></a>
+        <a href="chat.html" aria-current="page" aria-label="Чат"><svg><use href="../src/icons/sprite.svg#i-wave"/></svg><span class="l">Чат</span></a>
+        <a href="index.html#wizard" aria-label="Анкета"><svg><use href="../src/icons/sprite.svg#i-pencil"/></svg><span class="l">Анкета</span></a>
       </nav>
-      <div class="rail-foot">
-        <div class="pills small" role="radiogroup" aria-label="Палитра" id="palette-pills" data-segmented>
-          <button type="button" role="radio" data-palette="default" aria-checked="true">обычная</button>
-          <button type="button" role="radio" data-palette="paper" aria-checked="false">бумага-золото</button>
-          <span class="pill-ink" aria-hidden="true"></span>
-        </div>
-        <a class="btn" href="index.html#chat">К витрине</a>
-      </div>
+      <div class="rail-foot"><a class="btn" href="index.html#chat">К витрине</a></div>
     </aside>
     <main class="app-main chat-screen">
       <section class="view">
         <div class="chat" id="chat">
           <aside class="chat-side">
             <button class="btn small" type="button">+ Новый чат</button>
+            <div class="chat-search">
+              <svg><use href="../src/icons/sprite.svg#i-search"/></svg>
+              <input class="in sm" type="search" placeholder="Поиск по разговорам" aria-label="Поиск по разговорам">
+            </div>
             <div class="chat-list">
               <div class="chat-group">Сегодня</div>
               <div class="chat-row on"><button type="button">Хочу что-то мрачное, но короткое<small>19:42 · 1 вопрос</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
               <div class="chat-row"><button type="button">Радиоспектакль на вечер<small>18:11 · 3 вопроса</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
               <div class="chat-group">Вчера</div>
               <div class="chat-row"><button type="button">Что-то похожее на «Убик», 1969<small>10:22 · 2 вопроса · инкогнито</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
+              <div class="chat-row"><button type="button">Притчи без жестокости<small>08:05 · 1 вопрос</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
               <div class="chat-group">На этой неделе</div>
               <div class="chat-row"><button type="button">Документальное про Арктику<small>пн · 4 вопроса</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
+              <div class="chat-row"><button type="button">Что после «Соляриса»<small>вт · 2 вопроса</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
+              <div class="chat-group">Раньше</div>
+              <div class="chat-row"><button type="button">Лекции по истории Рима<small>12 сен · 6 вопросов</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
             </div>
             <div class="chat-side-foot"><button type="button">Память: 2 факта</button></div>
           </aside>
           <div class="chat-main">
             <header class="chat-head">
-              <h1>Хочу что-то мрачное, но короткое</h1><p class="sub">помнит ваш вкус</p><span class="spacer"></span>
+              <h1>Хочу что-то мрачное, но короткое</h1>
+              <button class="icon-btn small" type="button" data-act="rename" aria-label="Переименовать разговор"><svg><use href="../src/icons/sprite.svg#i-pencil"/></svg></button>
+              <p class="sub">помнит ваш вкус</p><span class="spacer"></span>
               <label class="switch" title="Не видит анкету, отзывы и память и ничего не запоминает"><input type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">инкогнито</span></label>
             </header>
             <div class="chat-scroll" aria-live="polite">
               <div class="chat-col">
                 <div class="msg user">
                   <div class="bubble">Хочу что-то мрачное, но короткое<small>19:42 · рядом · авто</small></div>
-                  <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button">Изменить</button></div>
+                  <div class="msg-acts"><button class="text-btn small" type="button" data-act="copy">Копировать</button><button class="text-btn small" type="button" data-act="edit">Изменить</button></div>
                 </div>
                 <div class="msg ai">
                   <div class="md"><p>Раз вам зашли <strong>«Женщина в песках»</strong> и мрачные притчи, вот что предложу:</p>
@@ -77,7 +76,7 @@
                       <div class="advice-body">
                         <div class="advice-tags"><span class="tag">рядом</span><span class="tag">роман</span></div>
                         <div class="advice-title link">Кобо Абэ — «Женщина в песках»</div>
-                        <div class="advice-why">Тест: на диске. Та же клаустрофобия и песок, который не кончается; 5 часов — как раз «короткое».</div>
+                        <div class="advice-why">На диске. Та же клаустрофобия и песок, который не кончается; 5 часов — как раз «короткое».</div>
                         <div class="advice-meta">5 ч · не указан (живой голос) · ✓ на диске · отзыв: прослушано</div>
                       </div>
                       <div class="advice-side">
@@ -135,11 +134,11 @@
                     </div>
                   </div>
                   <div class="choices"><button class="choice" type="button">А покороче?</button><button class="choice" type="button">Что-нибудь светлее</button></div>
-                  <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-refresh"/></svg>Другой ответ</button><span class="meta">00:19</span></div>
+                  <div class="msg-acts"><button class="text-btn small" type="button" data-act="copy">Копировать</button><button class="text-btn small" type="button" data-act="again"><svg><use href="../src/icons/sprite.svg#i-refresh"/></svg>Другой ответ</button><span class="meta">00:19</span></div>
                 </div>
                 <div class="msg user">
                   <div class="bubble">А покороче?<small>19:44 · рядом · 3 книги</small></div>
-                  <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button">Изменить</button></div>
+                  <div class="msg-acts"><button class="text-btn small" type="button" data-act="copy">Копировать</button><button class="text-btn small" type="button" data-act="edit">Изменить</button></div>
                 </div>
                 <div class="msg ai" data-stream="<p>Короче пяти часов и в том же настроении — три записи. Первая уже на диске: <strong>«Превращение»</strong> Кафки в чтении Терновского, 2 ч 10 мин. Вторая — радиоспектакль <strong>«Пикник на обочине»</strong>, 3 ч. Третья — мост в документальное: <strong>«Ночь»</strong> Эли Визеля, 3 ч 40 мин; её найду в сети и скачаю, если скажете.</p>">
                   <div class="md"></div>
@@ -147,6 +146,7 @@
                 </div>
               </div>
             </div>
+            <button class="chat-down" type="button" aria-label="К последнему сообщению"><svg><use href="../src/icons/sprite.svg#i-arrow-down"/></svg></button>
             <div class="composer">
               <div class="composer-box">
                 <textarea rows="1" maxlength="2000" aria-label="Сообщение консультанту" placeholder="Чего хочется послушать?"></textarea>
@@ -172,7 +172,7 @@
                   <button class="btn primary" type="button">Отправить</button>
                 </div>
               </div>
-              <p class="composer-keys">Enter — отправить · Shift+Enter — новая строка · ↑ — изменить последнее · Esc — остановить</p>
+              <p class="composer-keys">Enter — отправить · Shift+Enter — новая строка · ↑ — изменить последнее · Esc — остановить · T — тема</p>
             </div>
           </div>
         </div>
@@ -216,10 +216,10 @@
   <script type="module">
     import { bootSite } from '../src/js/site.js';
     import { closeDialog } from '../src/js/motion.js';
-    import { wirePalette, wireChatDemo, wireRateDialog } from './demo.js';
+    import { wireTheme, wireChatDemo, wireRateDialog } from './demo.js';
     const site = bootSite({ page: 'app' });
-    wirePalette(document.getElementById('palette-pills'), site.cosmos);
-    wireChatDemo(document.getElementById('chat'), site.toast);
+    wireTheme([], site.cosmos);   // тема — та же, что выбрана на витрине (localStorage, ?theme=); клавиша T листает
+    window.chatDemo = wireChatDemo(document.getElementById('chat'), site.toast);
     wireRateDialog(document.getElementById('rate'), site.toast);
     // жалоба: одна причина, действие становится доступным после выбора; отметка — сразу, тостом
     const reasons = document.getElementById('report-reasons'), sendBtn = document.getElementById('report-send');

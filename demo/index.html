@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>cosmos-kit — витрина</title>
 <meta name="color-scheme" content="dark">
+<link rel="icon" href="../src/icons/mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../src/fonts/fonts.css">
 <link rel="stylesheet" href="../src/css/tokens.css">
 <link rel="stylesheet" href="../src/css/components.css">
@@ -29,18 +30,29 @@
         <p class="kicker">дизайн-кит · тёмная тема</p>
         <h1 class="display">Тёмная сцена. Монохром. Цвет&nbsp;— только в&nbsp;<span class="lit">излучении</span>.</h1>
         <p class="lead">Токены, шрифты, иконки, чёрная дыра на WebGL, пружинная физика и набор компонентов, чтобы
-        собирать сайты в одном визуальном языке — без сборки и без копипасты.</p>
+        собирать сайты в одном визуальном языке — без сборки и без копипасты. На этой странице — всё, что есть в ките, вживую.</p>
         <div class="hero-actions">
-          <a class="btn primary" href="#components">Смотреть компоненты</a>
+          <a class="btn primary" href="#toc">Смотреть всё</a>
           <a class="btn" href="#connect">Как подключить</a>
         </div>
         <div class="hero-stats">
           <div class="stat"><b class="count" data-to="4">0</b><span>шрифта · OFL</span></div>
-          <div class="stat"><b class="count" data-to="50">0</b><span>глифов в спрайте</span></div>
+          <div class="stat"><b class="count" data-to="57">0</b><span>глифов в спрайте</span></div>
           <div class="stat"><b class="count" data-to="5">0</b><span>ступеней излучения</span></div>
-          <div class="stat"><b class="count" data-to="0">0</b><span>зависимостей</span></div>
+          <div class="stat"><b class="count" data-to="3">0</b><span>темы · клавиша T</span></div>
         </div>
       </div>
+    </section>
+
+    <!-- оглавление: все разделы и подразделы витрины якорями -->
+    <section class="section" id="toc">
+      <div class="section-head">
+        <p class="kicker">оглавление</p>
+        <h2>Всё, что есть в ките, — на одной странице</h2>
+        <p>Компоненты и их состояния, каждое движение с кнопкой «ещё раз», сцена, приложение, чат, анкета, KOCMOC — и отдельно то,
+        что было и что будет. Снизу страницы — переключатель трёх тем.</p>
+      </div>
+      <nav class="toc" id="toc-nav" aria-label="Оглавление"></nav>
     </section>
 
     <!-- контентная секция: три утверждения языка -->
@@ -72,34 +84,46 @@
       </div>
     </section>
 
-    <!-- ось акцентов -->
+    <!-- темы и ось акцентов -->
     <section class="section" id="accents">
       <div class="section-head">
-        <p class="kicker">акценты</p>
-        <h2>Одна ось — температура</h2>
-        <p>Пять ступеней от ультрафиолета до углей. Один сайт — одна ступень; или ступень как состояние: лёд — покой,
-        белое — норма, золото — внимание, угли — горячо. На экране не больше двух, одна из них — белая.</p>
+        <p class="kicker">темы и акценты</p>
+        <h2>Три палитры и одна ось — температура</h2>
+        <p>Тема меняет чернила и нейтрали, ступень излучения — только то, что светится. Переключатель тем повторён в подвале страницы,
+        клавиша <kbd>T</kbd> листает их по кругу, выбор помнится.</p>
       </div>
-      <div class="swatches" id="swatches">
-        <button class="swatch" data-accent="violet" style="--a:#b49cff;--b:#7d6cf5" aria-pressed="false"><i></i>Ультрафиолет<small>violet · горячий край</small></button>
-        <button class="swatch" data-accent="ice" style="--a:#a9ccff;--b:#e4eeff" aria-pressed="false"><i></i>Лёд<small>ice</small></button>
-        <button class="swatch" data-accent="white" style="--a:#ffffff;--b:#d6d6d6" aria-pressed="true"><i></i>Белое<small>white · по умолчанию</small></button>
-        <button class="swatch" data-accent="gold" style="--a:#ffc76a;--b:#ff9a3c" aria-pressed="false"><i></i>Золото<small>gold</small></button>
-        <button class="swatch" data-accent="ember" style="--a:#ff9448;--b:#ff5a3c" aria-pressed="false"><i></i>Угли<small>ember · холодный край</small></button>
-      </div>
-      <p class="demo-note" style="margin-top:16px">Ступень ставится атрибутом <code>data-accent</code> на <code>&lt;html&gt;</code>; сцена перекрашивает туман и кайму
-      через <code>cosmosApi.setAccent(--el-a)</code>. Поверхности при этом не меняются — только то, что светится.</p>
-      <div class="demo-section" style="margin-top:40px">
-        <h3>Палитра нейтралей — по умолчанию и пример «бумага-золото»</h3>
+      <div class="demo-section">
+        <h3 id="t-themes" data-toc="Три темы">Темы: нейтральная · серая · золотистая</h3>
         <div class="demo-row">
-          <div class="pills glass" role="radiogroup" aria-label="Палитра" id="palette-pills">
-            <button type="button" role="radio" data-palette="default" aria-checked="true">По умолчанию</button>
-            <button type="button" role="radio" data-palette="paper" aria-checked="false">Бумага-золото · пример</button>
+          <div class="pills glass" role="radiogroup" aria-label="Тема" id="theme-pills">
+            <button type="button" role="radio" data-theme="neutral" aria-checked="true">Нейтральная</button>
+            <button type="button" role="radio" data-theme="grey" aria-checked="false">Серая · 0.2.0</button>
+            <button type="button" role="radio" data-theme="gold" aria-checked="false">Золотистая</button>
             <span class="pill-ink" aria-hidden="true"></span>
           </div>
         </div>
-        <p class="demo-note">По умолчанию чернила и поверхности нейтральные, холодно-белые, свет белый — как в выдре. Чернила приглушены до APCA Lc 90 / 78 / 62, чтобы не слепили.
-        «Бумага» — тёплые нейтрали прохода «книжный шарм»: <code>&lt;html data-palette="paper" data-accent="gold"&gt;</code>. Это пресет-пример, не умолчание.</p>
+        <p class="demo-note"><strong>Нейтральная</strong> — умолчание 0.3: холодно-белые поверхности выдры, чернила приглушены до APCA Lc 90 / 78 / 62, свет белый.
+        <strong>Серая</strong> — кит 0.2.0 один-в-один (<code>data-palette="grey"</code>): чернила #f4f4f6 / #b4b6be / #8b8d96 — серые подписи, яркий заголовок, свечение раскалённого сильнее.
+        <strong>Золотистая</strong> — «бумага» с золотым светом (<code>data-palette="paper" data-accent="gold"</code>): тёплые нейтрали прохода «книжный шарм».</p>
+      </div>
+      <div class="demo-section" style="margin-top:40px">
+        <h3 id="t-axis" data-toc="Ось акцентов">Ось излучения: пять ступеней</h3>
+        <div class="swatches" id="swatches">
+          <button class="swatch" data-accent="violet" style="--a:#b49cff;--b:#7d6cf5" aria-pressed="false"><i></i>Ультрафиолет<small>violet · горячий край</small></button>
+          <button class="swatch" data-accent="ice" style="--a:#a9ccff;--b:#e4eeff" aria-pressed="false"><i></i>Лёд<small>ice</small></button>
+          <button class="swatch" data-accent="white" style="--a:#ffffff;--b:#d6d6d6" aria-pressed="true"><i></i>Белое<small>white · по умолчанию</small></button>
+          <button class="swatch" data-accent="gold" style="--a:#ffc76a;--b:#ff9a3c" aria-pressed="false"><i></i>Золото<small>gold</small></button>
+          <button class="swatch" data-accent="ember" style="--a:#ff9448;--b:#ff5a3c" aria-pressed="false"><i></i>Угли<small>ember · холодный край</small></button>
+        </div>
+        <p class="demo-note">Один сайт — одна ступень; или ступень как состояние: лёд — покой, белое — норма, золото — внимание, угли — горячо. На экране не больше двух, одна из них — белая.
+        Ступень ставится атрибутом <code>data-accent</code> на <code>&lt;html&gt;</code>; сцена перекрашивает туман и кайму через <code>cosmosApi.setAccent(--el-a)</code>. Поверхности не меняются.</p>
+      </div>
+      <div class="demo-section" style="margin-top:40px">
+        <h3 id="t-gilt" data-toc="Золочение отметок">Золочение — чернила отметок, не ступень оси</h3>
+        <div class="gilt-row">
+          <span><i></i>--gilt</span><span class="deep"><i></i>--gilt-deep</span><span>--gilt-tint · подкраска</span><span>--gilt-ring · кайма</span>
+        </div>
+        <p class="demo-note">Токены <code>--gilt*</code> живут в любой палитре для точечной отметки — малой и короткой (ответ на оценку, «избранное»). Никогда — заливки, абзацы, кикеры, выбранные чипы: по умолчанию золота нет (DESIGN-TODO п. 15).</p>
       </div>
     </section>
 
@@ -107,14 +131,14 @@
     <section class="section" id="components">
       <div class="section-head">
         <p class="kicker">компоненты</p>
-        <h2>Каталог</h2>
-        <p>Живая витрина всех классов из <code>components.css</code>. Разметку берите отсюда как есть.</p>
+        <h2>Каталог: каждый класс и каждое состояние</h2>
+        <p>Живая витрина всех классов из <code>components.css</code>. Разметку берите отсюда как есть; готовые куски страниц — на странице <a href="blocks.html">блоков</a>.</p>
         <div class="demo-row"><button class="btn small" id="toggle-motion" type="button">Reduced motion: авто</button></div>
       </div>
 
       <div class="catalog">
         <div class="demo-section">
-          <h3>Поле ввода (field) — кайма-горизонт + свет курсора</h3>
+          <h3 id="c-field" data-toc="Поле-портал">Поле ввода (field) — кайма-горизонт + свет курсора</h3>
           <form class="field" id="demo-field">
             <div class="field-ring" aria-hidden="true"></div>
             <div class="field-body glass">
@@ -124,32 +148,51 @@
               <button class="go-btn" type="submit" aria-label="Отправить"><svg><use href="../src/icons/sprite.svg#i-arrow-down"/></svg></button>
             </div>
           </form>
-          <p class="demo-note">Кайма и поверхность подсвечиваются в точке указателя (motion.js: attachPointerGlow). Глиф слева — единственная плита формы, залитая излучением; знак на ней тёмный, как на раскалённой кнопке.</p>
+          <div class="demo-row">
+            <button class="btn small" type="button" data-field="lit">Кайма горит · .lit</button>
+            <button class="btn small" type="button" data-field="busy">Кайма быстрее · .busy</button>
+            <button class="btn small" type="button" data-field="fire">Нырок стрелки · .go-btn.fire</button>
+            <button class="btn small" type="button" data-field="off">Покой</button>
+          </div>
+          <p class="demo-note">Кольцо <code>.field-ring</code> крутится 24 с, при фокусе и <code>.lit</code> — 12 с и ярче, <code>.busy</code> — 6 с. Кайма и поверхность подсвечиваются в точке указателя (motion.js: attachPointerGlow). Глиф слева — единственная плита формы, залитая излучением; знак на ней тёмный, как на раскалённой кнопке. Большое поле той же природы — <code>.field.area</code> в анкете ниже.</p>
         </div>
 
         <div class="demo-section">
-          <h3>Кнопки</h3>
+          <h3 id="c-buttons" data-toc="Кнопки">Кнопки — все виды и состояния</h3>
           <div class="demo-row">
             <button class="btn primary">Основное действие</button>
             <button class="btn">Обычная</button>
             <button class="glass btn">Плита</button>
+            <button class="btn small">Маленькая</button>
+            <button class="btn small on">Маленькая · .on</button>
             <button class="btn" disabled>Недоступна</button>
-            <button class="chip-btn"><svg><use href="../src/icons/sprite.svg#i-download"/></svg>Скачать копию</button>
-            <button class="icon-btn glass" aria-label="Настройки"><svg><use href="../src/icons/sprite.svg#i-sliders"/></svg></button>
-            <button class="text-btn"><svg><use href="../src/icons/sprite.svg#i-keyboard"/></svg>клавиши</button>
+            <button class="btn" data-glow>Со светом курсора · data-glow</button>
+            <button class="btn busy"><svg><use href="../src/icons/sprite.svg#i-refresh"/></svg>Занята · .busy</button>
           </div>
+          <div class="demo-row">
+            <button class="chip-btn"><svg><use href="../src/icons/sprite.svg#i-download"/></svg>Чип-кнопка</button>
+            <button class="chip-btn danger"><svg><use href="../src/icons/sprite.svg#i-trash"/></svg>Чип · .danger (текст)</button>
+            <button class="icon-btn glass" aria-label="Настройки"><svg><use href="../src/icons/sprite.svg#i-sliders"/></svg></button>
+            <button class="icon-btn" aria-label="Ещё"><svg><use href="../src/icons/sprite.svg#i-dots"/></svg></button>
+            <button class="icon-btn small" aria-label="Закрыть"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button>
+            <button class="text-btn"><svg><use href="../src/icons/sprite.svg#i-keyboard"/></svg>текстовая</button>
+            <button class="text-btn small">тихая мелкая · .small</button>
+            <button class="ghost-btn"><svg><use href="../src/icons/sprite.svg#i-clipboard"/></svg>призрак</button>
+          </div>
+          <p class="demo-note">Одна раскалённая на экран. Красная плита есть только внутри подтверждения — ниже. Свет курсора — только по явному <code>data-glow</code>, 1–3 элемента на экран. Состояния busy/done без скачка ширины — в разделе «Движение».</p>
         </div>
 
         <div class="demo-section">
-          <h3>Разрушительное действие</h3>
+          <h3 id="c-danger" data-toc="Необратимое">Разрушительное действие</h3>
           <div class="demo-row">
             <button class="btn" data-open="#danger-modal">Удалить проект…</button>
+            <button class="btn" id="undo-demo" type="button">Удалить разговор (обратимо)</button>
           </div>
-          <p class="demo-note">Красная плита — только внутри подтверждения необратимого действия, никогда в общем ряду. Само действие в интерфейсе — обычная кнопка с честным текстом; опасность передаёт текст и подтверждение.</p>
+          <p class="demo-note">Необратимое — красная плита <code>.btn.solid.danger</code> только внутри подтверждения, никогда в общем ряду. Обратимое делается сразу, а «Отменить» живёт в тосте (UX.md §11, §15).</p>
         </div>
 
         <div class="demo-section">
-          <h3>Навигация «остров» — вторая композиция</h3>
+          <h3 id="c-island" data-toc="Навигация «остров»">Навигация «остров» — вторая композиция</h3>
           <div class="demo-stage">
             <div class="island" id="demo-island">
               <a class="brand" href="#top"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg><span>cosmos</span></a>
@@ -162,32 +205,69 @@
               <button class="btn small" type="button">Подключить</button>
             </div>
           </div>
-          <p class="demo-note">Плавающая пилюля по центру (<code>.island.fixed</code>) для одностраничников и приложений с 3–5 якорями. Первая композиция — «линия» — это шапка этой страницы: прозрачная над героем, плита после прокрутки. На телефоне обе сводятся к линии с кнопкой меню и шторкой.</p>
+          <p class="demo-note">Плавающая пилюля по центру (<code>.island.fixed</code>) для одностраничников и приложений с 3–5 якорями. Первая композиция — «линия» — это шапка этой страницы: прозрачная над героем, плита после прокрутки; полоска активного пункта едет пружиной (<code>.nav-ink</code>). На телефоне обе сводятся к линии с кнопкой меню и шторкой.</p>
         </div>
 
         <div class="demo-section">
-          <h3>Вкладки и сегментированный переключатель</h3>
+          <h3 id="c-tabs" data-toc="Вкладки, сегменты, переключатели">Вкладки, сегментированный переключатель, переключатели</h3>
           <div class="demo-row">
             <div class="tabs glass" role="tablist" id="demo-tabs">
               <button role="tab" class="tab" aria-selected="true" type="button">По ссылке</button>
-              <button role="tab" class="tab" aria-selected="false" type="button">Конвертер</button>
+              <button role="tab" class="tab" aria-selected="false" type="button"><svg><use href="../src/icons/sprite.svg#i-film"/></svg>Конвертер</button>
               <span class="tab-ink" aria-hidden="true"></span>
             </div>
-            <div class="pills glass" role="radiogroup" id="demo-pills">
+            <div class="pills glass" role="radiogroup" id="demo-pills" aria-label="Качество">
               <button type="button" role="radio" aria-checked="true">Макс</button>
               <button type="button" role="radio" aria-checked="false">1080p</button>
               <button type="button" role="radio" aria-checked="false">720p</button>
+              <button type="button" role="radio" aria-checked="false" disabled>4K</button>
+              <span class="pill-ink" aria-hidden="true"></span>
+            </div>
+            <div class="pills small" role="radiogroup" id="demo-pills-small" aria-label="Насколько далеко">
+              <button type="button" role="radio" aria-checked="true">Близко</button>
+              <button type="button" role="radio" aria-checked="false">Далеко</button>
+              <button type="button" role="radio" aria-checked="false" class="spark">Удиви</button>
               <span class="pill-ink" aria-hidden="true"></span>
             </div>
           </div>
           <div class="demo-row">
             <label class="switch"><input type="checkbox" checked><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Переключатель включён</span></label>
             <label class="switch"><input type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Выключен</span></label>
+            <label class="check"><input type="checkbox" checked><span class="check-box"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Чекбокс</span></label>
+            <label class="radio"><input type="radio" name="cq" checked><span class="radio-dot"><i></i></span><span>Радио</span></label>
+            <label class="radio"><input type="radio" name="cq"><span class="radio-dot"><i></i></span><span>Второе</span></label>
           </div>
+          <p class="demo-note">Плашка <code>.tab-ink</code> / <code>.pill-ink</code> перетекает каплей (motion.js: moveInk). <code>.pills.small</code> — для рядов в поле ввода; <code>.spark</code> — крайний «✦» вариант; недоступный пункт зачёркнут.</p>
         </div>
 
         <div class="demo-section">
-          <h3>Карточки, дерево, крошки</h3>
+          <h3 id="c-choices" data-toc="Чипы-переключатели и шаги">Чипы-переключатели, строка шагов, группа</h3>
+          <div class="choices" role="group" aria-label="Жанры" id="demo-choices-cat">
+            <button class="choice" type="button" aria-pressed="true">фантастика</button>
+            <button class="choice" type="button" aria-pressed="false">детектив</button>
+            <button class="choice" type="button" aria-pressed="true">притча</button>
+            <button class="choice" type="button" aria-pressed="false">документальное</button>
+            <button class="choice" type="button" aria-pressed="false">радиоспектакль</button>
+            <button class="choice" type="button" aria-pressed="false">лекции</button>
+            <button class="choice" type="button" aria-pressed="false">хоррор</button>
+            <button class="choice" type="button" aria-pressed="false">классика</button>
+            <button class="choice" type="button" aria-pressed="false">биография</button>
+            <button class="choice" type="button" aria-pressed="false">история</button>
+            <button class="choice more" type="button">ещё 9</button>
+          </div>
+          <div class="panel" style="width:100%;max-width:760px;text-align:left">
+            <nav class="steps" aria-label="Шаги">
+              <button class="step done" type="button"><span class="n">1</span><span class="l">Книги</span></button><span class="step-sep"></span>
+              <button class="step on" type="button" aria-current="step"><span class="n">2</span><span class="l">Кино</span></button><span class="step-sep"></span>
+              <button class="step" type="button"><span class="n">3</span><span class="l">Итог</span></button>
+            </nav>
+            <div class="group"><h3>Открытая группа вопросов</h3><p>Группа <code>.group</code> всегда открыта: прятать то, что помещается, нельзя. Раскрытие — только для длинного.</p></div>
+          </div>
+          <p class="demo-note">Выбранный чип — светлее плита, ярче кайма, полные чернила, без цвета. Всё видно сразу до 24 вариантов на широком экране; <code>.choice.more</code> — только для списков длиннее. Строка шагов от края до края, волосяные линии забирают свободное место.</p>
+        </div>
+
+        <div class="demo-section">
+          <h3 id="c-cards" data-toc="Карточки">Карточки — шесть видов и два состояния</h3>
           <div class="demo-grid">
             <button class="card"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Обычная карточка</p><p class="card-sub">фон сцены при наведении</p></button>
             <button class="card" data-glow><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p class="card-title">Карточка с виньеткой</p><p class="card-sub">фон сцены + виньетка · data-glow</p></button>
@@ -198,56 +278,130 @@
             <button class="card silver" data-glow><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p class="card-title">Серебро с виньеткой</p><p class="card-sub">фон сцены + виньетка · data-glow</p></button>
             <div class="card silver static"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Серебро дефолтная</p><p class="card-sub">тихий подъём · .card.static</p></div>
           </div>
+          <div class="demo-grid" style="margin-top: 12px">
+            <button class="card selected"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-check"/></svg></span><p class="card-title">Выбранная</p><p class="card-sub">.card.selected — светлее плита</p></button>
+            <button class="card drop-target"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-move"/></svg></span><p class="card-title">Цель перетаскивания</p><p class="card-sub">.card.drop-target — ярче кайма</p></button>
+            <div class="card-block"><h4><svg><use href="../src/icons/sprite.svg#i-info"/></svg>Карточка-блок</h4><p class="modal-text">.card-block — заголовок с иконкой, для шторок настроек и диагностики.</p></div>
+          </div>
+          <p class="demo-note">Без 3D-наклона (вернуть — <code>attachCards(document, '.card', { tilt: 4 })</code>). Золото и серебро как отметки карточек 0.2.0 стали <code>.card.silver</code> и токенами <code>--gilt*</code>.</p>
+        </div>
+
+        <div class="demo-section">
+          <h3 id="c-tree" data-toc="Дерево, крошки">Дерево и крошки</h3>
           <div class="demo-row" style="align-items:flex-start; gap:32px;">
-            <nav class="tree-nav" style="width:200px;">
+            <nav class="tree-nav" style="width:220px;" id="c-tree-nav">
               <div class="tnode open"><span class="tw"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></span><svg class="ti"><use href="../src/icons/sprite.svg#i-folder"/></svg><span class="tn">Раздел</span><span class="tc">8</span></div>
               <div class="tkids">
                 <div class="tnode" aria-current="true"><span class="tw leaf"></span><svg class="ti"><use href="../src/icons/sprite.svg#i-file"/></svg><span class="tn">Текущий пункт</span></div>
                 <div class="tnode"><span class="tw leaf"></span><svg class="ti"><use href="../src/icons/sprite.svg#i-file"/></svg><span class="tn">Другой пункт</span></div>
+                <div class="tnode drop-target"><span class="tw leaf"></span><svg class="ti"><use href="../src/icons/sprite.svg#i-file"/></svg><span class="tn">Цель перетаскивания</span></div>
+                <div class="tnode" aria-disabled="true"><span class="tw leaf"></span><svg class="ti"><use href="../src/icons/sprite.svg#i-file"/></svg><span class="tn">Недоступный</span></div>
               </div>
             </nav>
-            <nav class="crumbs"><span class="crumb" aria-current="page"><svg><use href="../src/icons/sprite.svg#i-home"/></svg>Главная</span><span class="crumb-sep"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></span><span class="crumb">Раздел</span><span class="crumb-sep"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></span><span class="crumb">Подраздел</span></nav>
+            <nav class="crumbs"><span class="crumb" aria-current="page"><svg><use href="../src/icons/sprite.svg#i-home"/></svg>Главная</span><span class="crumb-sep"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></span><span class="crumb">Раздел</span><span class="crumb-sep"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></span><span class="crumb drop-target">Подраздел · цель</span></nav>
           </div>
         </div>
 
         <div class="demo-section">
-          <h3>Теги, чипы, прогресс</h3>
+          <h3 id="c-tags" data-toc="Теги, чипы, прогресс, скелетон">Теги, чипы, прогресс, индикаторы, скелетон</h3>
           <div class="demo-row">
             <span class="tag">по умолчанию</span>
-            <span class="tag accent">своя папка</span>
+            <span class="tag accent">своя папка · .accent</span>
             <span class="chip"><svg><use href="../src/icons/sprite.svg#i-film"/></svg>MP4 · 1080p</span>
-            <span class="chip mono accent">14:32</span>
+            <span class="chip mono">14:32 · .mono</span>
+            <span class="chip accent">выбран · .accent</span>
+            <span class="live-dot"></span><span class="demo-note">индикатор активности (дышит)</span>
           </div>
-          <div style="max-width:320px;">
-            <div class="meter"><div class="meter-fill" style="--p:.62"></div><div class="meter-glow" style="--p:.62"></div></div>
+          <div style="display:grid;gap:14px;width:100%;max-width:360px;">
+            <div><p class="demo-note" style="margin-bottom:4px">процент · <code>--p: .62</code></p><div class="meter"><div class="meter-fill" style="--p:.62"></div><div class="meter-glow" style="--p:.62"></div></div></div>
+            <div><p class="demo-note" style="margin-bottom:4px">без процента · <code>.meter.indet</code></p><div class="meter indet"><div class="meter-fill"></div></div></div>
+            <div><p class="demo-note" style="margin-bottom:4px">ждёт · <code>.meter.breathing</code></p><div class="meter breathing"><div class="meter-fill" style="--p:.3"></div><div class="meter-glow" style="--p:.3"></div></div></div>
+            <div><p class="demo-note" style="margin-bottom:4px">скелетон загрузки · <code>.skel</code>, <code>.skel-line</code></p><div style="display:grid;gap:8px"><div class="skel skel-line" style="width:70%"></div><div class="skel skel-line" style="width:92%"></div><div class="skel skel-line" style="width:45%"></div></div></div>
           </div>
-          <div class="demo-row"><span class="live-dot"></span><span class="demo-note">индикатор активности (дышит)</span></div>
         </div>
 
         <div class="demo-section">
-          <h3>Листалка страниц</h3>
+          <h3 id="c-pager" data-toc="Листалка">Листалка страниц</h3>
           <nav class="pager" style="margin-top:0">
             <span class="pager-pos">3 из 12</span>
             <div class="pager-pages">
-              <button class="pager-btn prev"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></button>
+              <button class="pager-btn prev" disabled aria-label="Назад"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></button>
               <button class="pager-btn">1</button>
               <button class="pager-btn" aria-current="page">2</button>
               <button class="pager-btn">3</button>
               <span class="pager-gap">…</span>
               <button class="pager-btn">12</button>
-              <button class="pager-btn"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></button>
+              <button class="pager-btn" aria-label="Вперёд"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></button>
             </div>
           </nav>
         </div>
 
         <div class="demo-section">
-          <h3>Диалоги, тосты</h3>
+          <h3 id="c-forms" data-toc="Поля формы, уведомления">Обычные поля, уведомления в потоке, клавиши</h3>
+          <form class="panel" style="width:100%;max-width:760px;text-align:left" id="c-form">
+            <div class="form-grid">
+              <label>Имя *<input class="in" name="name" placeholder="Например: Игорь" required></label>
+              <label>Формат<select class="in" name="fmt"><option>Markdown</option><option>CSV</option><option>JSON</option></select></label>
+              <label>Мелкое поле<input class="in sm" name="small" placeholder=".in.sm · 34px"></label>
+              <label class="wide">Заметка <small>необязательно</small><textarea class="in" name="note" rows="2" placeholder="textarea.in растёт по тексту"></textarea></label>
+            </div>
+            <div class="btn-row" style="align-items:center">
+              <span class="demo-note">фильтры одним рядом, селекты по содержимому:</span>
+              <select class="in auto" aria-label="Статус"><option>все</option><option>прочитано</option><option>в очереди</option></select>
+              <select class="in auto" aria-label="Период"><option>за год</option><option>за месяц</option></select>
+            </div>
+            <p class="notice">Обычное уведомление в потоке — <code>.notice</code>: ничего не плавает поверх полей.</p>
+            <p class="notice warn">Диск D: сейчас недоступен — копия сохранится, когда он появится. <code>.notice.warn</code></p>
+            <p class="notice err">Не удалось сохранить: нет связи с сервером. Повторите позже. <code>.notice.err</code></p>
+            <p class="demo-note" style="max-width:none"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> — сохранить, <kbd>Esc</kbd> — закрыть; инлайн-код — <code>bootSite()</code>. Выделение текста — цвет излучения.</p>
+            <div class="form-actions"><button class="btn primary" type="submit">Сохранить</button><button class="btn" type="reset">Отменить</button></div>
+          </form>
+        </div>
+
+        <div class="demo-section">
+          <h3 id="c-dropzone" data-toc="Зона перетаскивания">Зона перетаскивания</h3>
+          <label class="dropzone" style="width:100%;max-width:560px">
+            <input type="file" aria-label="Выбрать файл">
+            <span class="dz-orb"><svg><use href="../src/icons/sprite.svg#i-upload"/></svg></span>
+            <span class="dz-title">Перетащите файл сюда или нажмите</span>
+            <span class="dz-sub">MP4, MKV до 2 ГБ · перетаскивание — только дополнение: клик и клавиатура работают всегда</span>
+          </label>
+        </div>
+
+        <div class="demo-section">
+          <h3 id="c-empty" data-toc="Пустое состояние">Пустое состояние</h3>
+          <div class="panel" style="width:100%;max-width:560px">
+            <div class="empty"><span class="empty-mark"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p>Здесь пока пусто</p><small>Добавьте книгу из библиотеки — она встанет в очередь.</small><button class="btn" type="button">Открыть библиотеку</button></div>
+          </div>
+          <p class="demo-note">Пустое состояние говорит, что сделать дальше, и ведёт к действию. Класс <code>.empty</code> занят китом именно под это — для «скрыть» есть <code>[hidden]</code> (линтер H11).</p>
+        </div>
+
+        <div class="demo-section">
+          <h3 id="c-ctx" data-toc="Контекстное меню">Контекстное меню</h3>
+          <div class="demo-stage" style="min-height:0">
+            <div class="ctx" role="menu" aria-label="Пример меню">
+              <button type="button" role="menuitem"><svg><use href="../src/icons/sprite.svg#i-play"/></svg>Слушать<kbd>Enter</kbd></button>
+              <button type="button" role="menuitem"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg>Показать в папке</button>
+              <button type="button" role="menuitem" disabled><svg><use href="../src/icons/sprite.svg#i-external"/></svg>В Telegram</button>
+              <hr>
+              <button type="button" role="menuitem" class="danger"><svg><use href="../src/icons/sprite.svg#i-trash"/></svg>Удалить<kbd>Del</kbd></button>
+            </div>
+          </div>
+          <p class="demo-note"><code>.ctx</code> — всплывающее при правом клике (здесь стоит в потоке, чтобы было видно); в самом ките оно <code>position: fixed</code>. Пункт <code>.danger</code> — красный текст, не плита.</p>
+        </div>
+
+        <div class="demo-section">
+          <h3 id="c-dialogs" data-toc="Диалоги, тосты">Диалоги, шторка, тосты, подсказка клавиш</h3>
           <div class="demo-row">
             <button class="btn" data-open="#demo-modal">Модальное окно</button>
             <button class="btn" data-open="#demo-drawer">Шторка</button>
+            <button class="btn" data-open="#keys-modal">Клавиши · .cheat-list</button>
             <button class="btn" id="fire-toast-ok">Тост: успех</button>
             <button class="btn" id="fire-toast-err">Тост: ошибка</button>
+            <button class="btn" id="fire-toast-warn">Тост: предупреждение</button>
+            <button class="btn" id="fire-toast-plain">Тост: тихий</button>
           </div>
+          <p class="demo-note">Диалоги — <code>&lt;dialog&gt;</code> с <code>.modal-box</code> или <code>.drawer-box</code>; подложка с блюром, Esc и клик по подложке закрывают, шторка на телефоне смахивается. Тосты стоят внизу по центру и не перекрывают фокус; выше них — поле ввода чата.</p>
         </div>
       </div>
     </section>
@@ -257,12 +411,13 @@
       <div class="section-head">
         <p class="kicker">приложение и формы</p>
         <h2>Экран данных — из тех же деталей</h2>
-        <p>Каркас с рейкой, поля с подписью, панели, числа, строки списка и таблица. Рейка переключает экраны — плашка едет пружиной. Готовая разметка каждого куска — на странице <a href="blocks.html">блоков</a>.</p>
+        <p>Каркас с рейкой, поля с подписью, панели, числа, строки списка и таблица. Рейка переключает экраны — плашка едет пружиной, экран входит снизу. Готовая разметка каждого куска — на странице <a href="blocks.html">блоков</a>.</p>
       </div>
       <div class="demo-app">
         <div class="app">
           <aside class="rail">
             <a class="brand" href="#app"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>книги</a>
+            <p class="rail-kicker">экраны</p>
             <nav class="rail-nav" id="demo-rail" aria-label="Экраны примера">
               <button type="button" data-view="va-home" aria-current="page"><svg><use href="../src/icons/sprite.svg#i-home"/></svg><span class="l">Обзор</span></button>
               <button type="button" data-view="va-table"><svg><use href="../src/icons/sprite.svg#i-list"/></svg><span class="l">Таблица</span><small>128</small></button>
@@ -330,16 +485,17 @@
           </main>
         </div>
       </div>
-      <div class="demo-row"><p class="demo-note">В приложении сцена спит (<code>bootSite({ page: 'app' })</code>), на телефоне рейка становится верхней полосой. Целая страница — <code>starter/app.html</code>.</p></div>
+      <div class="demo-row"><p class="demo-note">В приложении сцена спит (<code>bootSite({ page: 'app' })</code>), на телефоне рейка становится верхней полосой. Целая страница — <code>starter/app.html</code>; чат как экран приложения со свёрнутой рейкой — <a href="chat.html">demo/chat.html</a>.</p></div>
     </section>
 
     <!-- чат и советы: отдельный экран во всю высоту (demo/chat.html), здесь — в рамке (components.css, блок «Чат и советы») -->
     <section class="section" id="chat">
       <div class="section-head">
         <p class="kicker">чат и советы</p>
-        <h2>Разговор — как в браузерном Claude</h2>
-        <p>Слева разговоры по датам, в центре колонка сообщений не шире 880px, поле ввода — последним рядом. Вопрос — пузырь, ответ — текст
+        <h2>Разговор во всю высоту</h2>
+        <p>Слева разговоры по датам (поиск появляется, когда их больше шести), в центре колонка сообщений не шире 880px, поле ввода — последним рядом. Вопрос — пузырь, ответ — текст
         без пузыря, советы — строками с реакциями. Отдельным экраном во всю высоту — <a href="chat.html">demo/chat.html</a>.</p>
+        <div class="demo-row"><button class="btn small" type="button" id="chat-replay">Проиграть поток ещё раз</button></div>
       </div>
       <div class="demo-app">
         <div class="chat" id="demo-chat">
@@ -363,7 +519,7 @@
               <div class="chat-col">
                 <div class="msg user">
                   <div class="bubble">Хочу что-то мрачное, но короткое<small>19:42 · рядом · авто</small></div>
-                  <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button">Изменить</button></div>
+                  <div class="msg-acts"><button class="text-btn small" type="button" data-act="copy">Копировать</button><button class="text-btn small" type="button" data-act="edit">Изменить</button></div>
                 </div>
                 <div class="msg ai">
                   <div class="md"><p>Раз вам зашли <strong>«Женщина в песках»</strong> и мрачные притчи, вот что предложу: одну книгу рядом — уже на диске — и один <em>мост</em> в другой жанр.</p></div>
@@ -407,11 +563,11 @@
                     </div>
                   </div>
                   <div class="choices"><button class="choice" type="button">А покороче?</button><button class="choice" type="button">Что-нибудь светлее</button></div>
-                  <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-refresh"/></svg>Другой ответ</button><span class="meta">00:19</span></div>
+                  <div class="msg-acts"><button class="text-btn small" type="button" data-act="copy">Копировать</button><button class="text-btn small" type="button" data-act="again"><svg><use href="../src/icons/sprite.svg#i-refresh"/></svg>Другой ответ</button><span class="meta">00:19</span></div>
                 </div>
                 <div class="msg user">
                   <div class="bubble">А покороче?<small>19:44 · рядом · 3 книги</small></div>
-                  <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button">Изменить</button></div>
+                  <div class="msg-acts"><button class="text-btn small" type="button" data-act="copy">Копировать</button><button class="text-btn small" type="button" data-act="edit">Изменить</button></div>
                 </div>
                 <div class="msg ai" data-stream="<p>Короче пяти часов и в том же настроении: <strong>«Превращение»</strong> Кафки, 2 ч 10 мин, уже на диске; радиоспектакль <strong>«Пикник на обочине»</strong>, 3 ч; и мост в документальное — <strong>«Ночь»</strong> Эли Визеля, найду в сети и скачаю, если скажете.</p>">
                   <div class="md"></div>
@@ -449,9 +605,8 @@
           </div>
         </div>
       </div>
-      <div class="demo-row"><p class="demo-note">Нажмите «+ Новый чат» — пустое состояние с полем по центру; включите «инкогнито» — поле пунктиром. Поток печатается с кареткой <code>.caret</code>
-      (дышит той же механикой, что <code>.live-dot</code>). Реакции и «Скачать» — живые. Шкала «Прыжок»: крайний «✦ Удиви» — <code>.pills button.spark</code>.
-      Флажок у нескачанной записи открывает жалобу — диалог причины, не красная кнопка.</p></div>
+      <div class="demo-row"><p class="demo-note">Всё живое: «+ Новый чат» — пустое состояние с полем по центру; «инкогнито» — поле пунктиром; карандаш у заголовка — переименовать; «Изменить» — пузырь становится полем, ответы ниже уходят;
+      «Другой ответ» пишется заново; реакции снимаются повторным нажатием; «Уже читал» открывает быструю оценку; «в Telegram» у нескачанной записи сам скачивает и отправляет; флажок — жалоба, не красная кнопка. Лента едет вниз сама, только если вы её не отмотали; иначе — кнопка «вниз».</p></div>
     </section>
 
     <!-- анкета по шагам: строка шагов, открытые группы, все варианты сразу, действия последним рядом -->
@@ -478,7 +633,7 @@
         <div class="form-actions"><button class="btn primary" type="submit">Заполнить анкету</button><span class="item-meta">≈ 10–20 с · заполненное руками не перетрётся</span></div>
       </form>
       <form class="panel demo-wizard" id="demo-wizard">
-        <nav class="steps" aria-label="Шаги анкеты">
+        <nav class="steps" aria-label="Шаги анкеты" id="demo-steps">
           <button class="step done" type="button"><span class="n">1</span><span class="l">Любимые книги</span></button><span class="step-sep"></span>
           <button class="step done" type="button"><span class="n">2</span><span class="l">Не зашли</span></button><span class="step-sep"></span>
           <button class="step done" type="button"><span class="n">3</span><span class="l">Как слушаете</span></button><span class="step-sep"></span>
@@ -524,37 +679,80 @@
         </div>
         <div class="form-actions"><button class="btn" type="button">← Назад</button><span class="spacer"></span><span class="item-meta">✓ черновик сохранён · 14:31</span><button class="btn primary" type="submit">К итогу →</button></div>
       </form>
+      <div class="demo-row"><p class="demo-note">Быстрая оценка (<code>.scale</code>, 1–10 одним кликом, цифра с клавиатуры) и жалоба открываются из чата выше: «Уже читал» и флажок. Клик по шагу переносит текущий.</p></div>
     </section>
 
-    <!-- сцена: композиции и состояния -->
+    <!-- сцена: композиции, состояния и все движения — кнопки ниже делают то же, что панель «Фон», и прокручивают к первому экрану -->
     <section class="section" id="scene">
       <div class="section-head">
         <p class="kicker">сцена</p>
         <h2>Одна дыра, три композиции, три состояния</h2>
         <p>Текстура плана одна и привязана к дыре — куда дыра, туда и подсвеченная плоскость. Композиция задаётся
-        токенами <code>--bh-*</code> на обёртке; переключите и прокрутите к началу, чтобы увидеть героя.</p>
+        токенами <code>--bh-*</code> на обёртке. Все настройки — в панели «Фон» (кнопка слева внизу); кнопки ниже делают то же и прокручивают к первому экрану, где сцена живая.</p>
       </div>
-      <p class="demo-note">Все настройки сцены — в панели «Фон» на первом экране, где сцена живая.</p>
-      <p class="demo-note" style="margin-top:16px">Варианты: ореол <code>halo: 'calm' | 'chaotic'</code> (хаос — неровная яркость, дрожь кромки, шире радужная кайма; средняя яркость обода та же) и <code>rays: true</code> (лучи RTX — рассеяние кольца в дымке перераспределяется в тонкие радиальные лучи, общий свет тот же). Сочетаются как угодно.</p>
-      <p class="demo-note" style="margin-top:16px"><strong>Крутить</strong> — как загрузка в «выдре»: <code>pulse('go')</code> на старте, <code>setEnergy(1)</code> на время процесса (вихрь и нити быстрее, время сцены ×1,3, ореол дышит шире), <code>pulse('done')</code> и <code>setEnergy(0)</code> на финише. <strong>Дым</strong> — <code>setSmoke(name)</code>: лёгкие оттенки тумана и каймы на оси излучения, amt 0.2–0.45 (полная подкраска «выдры» — 1).</p>
-      <p class="demo-note" style="margin-top:16px">Состояния: <strong>живая</strong> — герой на экране; <strong>за горизонтом</strong> — герой ушёл вверх, кадр
-      гаснет до 8 % и рендер на паузе (вы сейчас в нём); <strong>спит</strong> — внутренние страницы: размыта и погашена с первого кадра. Из
-      консоли: <code>cosmosApi.pulse('go')</code>, <code>cosmosApi.setEnergy(1)</code>, <code>cosmosApi.setAccent('#ffc76a')</code>.</p>
+      <div class="catalog">
+        <div class="demo-section">
+          <h3 id="s-comp" data-toc="Композиции и переезд">Композиции и переезд</h3>
+          <div class="demo-row">
+            <button class="btn" type="button" data-scene="comp:right">Витрина — справа</button>
+            <button class="btn" type="button" data-scene="comp:center">Ось — по центру</button>
+            <button class="btn" type="button" data-scene="comp:far">Далеко</button>
+          </div>
+          <p class="demo-note">«Витрина» — дыра справа, текст слева (по умолчанию); «ось» — по центру в нижней трети, одна фраза над ней (<code>.hero.axis</code>); «далеко» — маленькая, высоко справа, больше дымки (<code>.hero.short</code>). В приложении переезд справа в центр — единственное движение сцены: пружина response 1,2 с, damping 0,85 (DESIGN-TODO п. 17).</p>
+        </div>
+        <div class="demo-section">
+          <h3 id="s-motion" data-toc="Кручение, толчок, пульс, энергия">Кручение-маховик, толчок, пульс, энергия</h3>
+          <div class="demo-row">
+            <button class="btn" type="button" data-scene="spin">Крутить / остановить</button>
+            <button class="btn" type="button" data-scene="kick">Толчок · spin(1)</button>
+            <button class="btn" type="button" data-scene="pulse">Вдох кольца · pulse('go')</button>
+            <button class="btn" type="button" data-scene="energy:1">Энергия → 1</button>
+            <button class="btn" type="button" data-scene="energy:0">Энергия → 0</button>
+          </div>
+          <p class="demo-note">Фазы вращения копятся по кадрам (маховик), энергия разгоняет и тормозит плавно; толчок — отклик на завершённое событие: разгон ≈ 0,2 с, выбег ≈ 4 с. «Крутить» — как загрузка в выдре: <code>pulse('go')</code> → <code>setEnergy(1)</code> → <code>pulse('done')</code>, <code>setEnergy(0)</code>.</p>
+        </div>
+        <div class="demo-section">
+          <h3 id="s-halo" data-toc="Ореол, лучи, дым">Ореол, лучи RTX, оттенки дыма</h3>
+          <div class="demo-row">
+            <button class="btn" type="button" data-scene="halo:calm">Ореол спокойный</button>
+            <button class="btn" type="button" data-scene="halo:chaotic">Ореол хаотичный</button>
+            <button class="btn" type="button" data-scene="rays">Лучи RTX вкл/выкл</button>
+          </div>
+          <div class="demo-row">
+            <button class="btn small" type="button" data-scene="smoke:neutral">нейтральный</button>
+            <button class="btn small" type="button" data-scene="smoke:cold">холодный</button>
+            <button class="btn small" type="button" data-scene="smoke:moon">лунный · умолчание</button>
+            <button class="btn small" type="button" data-scene="smoke:warm">тёплый</button>
+            <button class="btn small" type="button" data-scene="smoke:violet">дымчато-фиолетовый</button>
+            <button class="btn small" type="button" data-scene="smoke:ember">угольный</button>
+          </div>
+          <p class="demo-note">Хаос — неровная яркость, дрожь кромки, шире радужная кайма; лучи — рассеяние кольца перераспределяется в тонкие радиальные лучи. Дым — <code>setSmoke(name, k)</code>: оттенок тумана и каймы на оси излучения, по умолчанию лунный на 45 %; тёплый — пока пишется отзыв, угольный — на оценку ≤ 3.</p>
+        </div>
+        <div class="demo-section">
+          <h3 id="s-states" data-toc="Три состояния">Три состояния: живая · за горизонтом · спит</h3>
+          <div class="demo-row">
+            <button class="btn" type="button" data-scene="live">Живая — к первому экрану</button>
+            <button class="btn" type="button" data-scene="asleep">Усыпить / разбудить</button>
+          </div>
+          <p class="demo-note"><strong>Живая</strong> — герой на экране: параллакс от указателя, дыхание кольца. <strong>За горизонтом</strong> — герой ушёл вверх: кадр гаснет до 8 %, дыра уплывает медленнее страницы, рендер на паузе (вы сейчас в нём). <strong>Спит</strong> — внутренние страницы и приложение: размыта и погашена с первого кадра. Свёрнутая вкладка — рендер стоит; без WebGL — CSS-кольцо на том же месте; reduced motion — один статичный кадр.</p>
+        </div>
+      </div>
     </section>
 
-<section class="section" id="motion">
+    <section class="section" id="motion">
       <div class="section-head">
         <p class="kicker">движение</p>
         <h2>Всё, что двигается, — <span class="lit">пружина</span></h2>
-        <p>Каждый образец живой: нажмите, наведите, переключите. Под ним — параметры пружины из motion.js:
+        <p>Каждый образец живой: нажмите, наведите, переключите — или кнопка «ещё раз» в углу. Под ним — параметры пружины из motion.js:
         <code>response</code> — период в секундах (меньше — резче), <code>damping</code> — доля критического демпфирования (1 — без отскока).</p>
       </div>
       <div class="samples">
 
         <div class="sample">
-          <h3>Нажатие и подъём</h3>
+          <h3 id="m-press" data-toc="Нажатие и подъём">Нажатие и подъём</h3>
+          <button class="btn small replay" type="button" data-replay="press">ещё раз</button>
           <div class="sample-stage">
-            <div class="demo-row">
+            <div class="demo-row" id="m-press-row">
               <button class="btn primary">Раскалённая</button>
               <button class="btn">Плита</button>
               <button class="chip-btn"><svg><use href="../src/icons/sprite.svg#i-download"/></svg>Чип</button>
@@ -569,7 +767,8 @@
         </div>
 
         <div class="sample">
-          <h3>Состояние без скачка ширины</h3>
+          <h3 id="m-state" data-toc="Состояние кнопки">Состояние без скачка ширины</h3>
+          <button class="btn small replay" type="button" data-replay="state">ещё раз</button>
           <div class="sample-stage">
             <div class="demo-row">
               <button class="btn primary" id="state-btn"><span class="btn-label">Сохранить изменения</span></button>
@@ -583,9 +782,10 @@
         </div>
 
         <div class="sample">
-          <h3>Фокус с клавиатуры</h3>
+          <h3 id="m-focus" data-toc="Фокус">Фокус с клавиатуры</h3>
+          <button class="btn small replay" type="button" data-replay="focus">ещё раз</button>
           <div class="sample-stage">
-            <div class="demo-row">
+            <div class="demo-row" id="m-focus-row">
               <button class="btn">Первая</button><button class="btn">Вторая</button><button class="btn">Третья</button>
             </div>
             <p class="hint">Нажмите Tab: кольцо фокуса цвета излучения и короткий «вдох» кнопки. Space/Enter нажимают её так же, как палец.</p>
@@ -595,9 +795,10 @@
         </div>
 
         <div class="sample">
-          <h3>Переключатель — капля</h3>
+          <h3 id="m-switch" data-toc="Переключатель">Переключатель — капля</h3>
+          <button class="btn small replay" type="button" data-replay="switch">ещё раз</button>
           <div class="sample-stage">
-            <div class="demo-row" style="gap:24px">
+            <div class="demo-row" style="gap:24px" id="m-switch-row">
               <label class="switch"><input type="checkbox" checked><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Уведомления</span></label>
               <label class="switch"><input type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Тихий режим</span></label>
             </div>
@@ -608,9 +809,10 @@
         </div>
 
         <div class="sample">
-          <h3>Сегменты и вкладки — капля</h3>
+          <h3 id="m-ink" data-toc="Сегменты и вкладки">Сегменты и вкладки — капля</h3>
+          <button class="btn small replay" type="button" data-replay="ink">ещё раз</button>
           <div class="sample-stage">
-            <div class="pills glass" role="radiogroup" id="m-pills">
+            <div class="pills glass" role="radiogroup" id="m-pills" aria-label="Период">
               <button type="button" role="radio" aria-checked="true">День</button>
               <button type="button" role="radio" aria-checked="false">Неделя</button>
               <button type="button" role="radio" aria-checked="false">Месяц</button>
@@ -626,17 +828,18 @@
             <p class="hint">У плашки две кромки на своих пружинах: ведущая быстрее, ведомая догоняет — плашка перетекает, а не прыгает.</p>
           </div>
           <p class="sample-spec"><b>ведущая кромка</b> response .26 · damping .84 · <b>ведомая</b> response .42 · damping .80
-            <br>то же для полоски навигации в шапке (.nav-ink) · <code>moveInk(group, el)</code></p>
+            <br>то же для полоски навигации в шапке (.nav-ink) и плашки рейки (.rail-ink) · <code>moveInk(group, el)</code></p>
         </div>
 
         <div class="sample">
-          <h3>Чекбокс и радио</h3>
+          <h3 id="m-check" data-toc="Чекбокс и радио">Чекбокс и радио</h3>
+          <button class="btn small replay" type="button" data-replay="check">ещё раз</button>
           <div class="sample-stage">
-            <div class="demo-row" style="gap:24px">
+            <div class="demo-row" style="gap:24px" id="m-check-row">
               <label class="check"><input type="checkbox" checked><span class="check-box"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Сохранять копию</span></label>
               <label class="check"><input type="checkbox"><span class="check-box"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Открывать папку</span></label>
             </div>
-            <div class="demo-row" style="gap:24px">
+            <div class="demo-row" style="gap:24px" id="m-radio-row">
               <label class="radio"><input type="radio" name="q" checked><span class="radio-dot"><i></i></span><span>Макс</span></label>
               <label class="radio"><input type="radio" name="q"><span class="radio-dot"><i></i></span><span>1080p</span></label>
               <label class="radio"><input type="radio" name="q"><span class="radio-dot"><i></i></span><span>720p</span></label>
@@ -647,8 +850,9 @@
         </div>
 
         <div class="sample">
-          <h3>Раскрытие</h3>
-          <div class="sample-stage list">
+          <h3 id="m-disclosure" data-toc="Раскрытие">Раскрытие</h3>
+          <button class="btn small replay" type="button" data-replay="disclosure">ещё раз</button>
+          <div class="sample-stage list" id="m-disc-list">
             <div class="disclosure"><button class="disclosure-head" aria-expanded="false">Что внутри кита<svg class="disclosure-chev"><use href="../src/icons/sprite.svg#i-chev-r"/></svg></button>
               <div class="disclosure-body"><div class="disclosure-inner"><p>Три CSS, два ES-модуля, четыре шрифта, спрайт и одна текстура. Никакой сборки.</p></div></div></div>
             <div class="disclosure"><button class="disclosure-head" aria-expanded="false">Можно ли светлую тему<svg class="disclosure-chev"><use href="../src/icons/sprite.svg#i-chev-r"/></svg></button>
@@ -659,35 +863,38 @@
         </div>
 
         <div class="sample">
-          <h3>Модалка, шторка, тост</h3>
+          <h3 id="m-dialogs" data-toc="Модалка, шторка, тост">Модалка, шторка, тост</h3>
           <div class="sample-stage">
             <div class="demo-row">
               <button class="btn" data-open="#m-modal">Модальное окно</button>
               <button class="btn" data-open="#m-drawer">Шторка</button>
               <button class="btn" id="m-toast">Тост</button>
+              <button class="btn" id="m-toast-undo">Тост с «Отменить»</button>
             </div>
-            <p class="hint">Плита въезжает и уходит тем же путём; диалог закрывается только после ухода. Esc — так же.</p>
+            <p class="hint">Плита въезжает и уходит тем же путём; диалог закрывается только после ухода. Esc — так же. Шторку на телефоне можно смахнуть за хват.</p>
           </div>
           <p class="sample-spec"><b>модалка</b> y 18 · s .96 · blur 6 → 0 · response .48 · damping .78; уход y 10 · response .28
             <br><b>шторка</b> x 40 (телефон: y 48) · response .50 · damping .82 · <b>тост</b> y 20 → 0 · response .50 · damping .78; уход y 12
-            <br><b>подложка</b> opacity за --t-base · <code>openDialog()</code>, <code>closeDialog()</code>, <code>pushToast()</code></p>
+            <br><b>подложка</b> opacity за --t-base · <code>openDialog()</code>, <code>closeDialog()</code>, <code>pushToast()</code>, <code>attachSwipeToClose()</code></p>
         </div>
 
         <div class="sample">
-          <h3>Карточки: фон сцены и виньетка</h3>
+          <h3 id="m-cards" data-toc="Карточки при наведении">Карточки: фон сцены и виньетка</h3>
+          <button class="btn small replay" type="button" data-replay="cards">ещё раз</button>
           <div class="sample-stage">
-            <div class="demo-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
+            <div class="demo-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr))" id="m-cards-grid">
               <button class="card" data-glow><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder-open"/></svg></span><p class="card-title">С виньеткой</p><p class="card-sub">data-glow</p></button>
               <button class="card"><span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-folder"/></svg></span><p class="card-title">Обычная</p><p class="card-sub">фон сцены</p></button>
             </div>
           </div>
-          <p class="sample-spec"><b>без 3D</b> · <b>подъём</b> s 1.015 · response .40 · только мышь · <code>attachCards()</code>; обычная — при наведении плита полупрозрачна (<code>--surface-2</code>), сквозь неё видна сцена; <code>.card[data-glow]</code> — то же + слабая плавная виньетка у курсора; <code>.card.static</code> — без эффектов</p>
+          <p class="sample-spec"><b>без 3D</b> · <b>подъём</b> s 1.015 · response .40 · только мышь · <code>attachCards()</code>; обычная — при наведении плита полупрозрачна (<code>--surface-2</code>), сквозь неё видна сцена; <code>.card[data-glow]</code> — то же + слабая плавная виньетка у курсора; <code>.card.static</code> — тихий подъём на 2px</p>
         </div>
 
         <div class="sample">
-          <h3>Дерево: подсветка переезжает</h3>
+          <h3 id="m-tree" data-toc="Дерево и рейка">Дерево и рейка: подсветка переезжает</h3>
+          <button class="btn small replay" type="button" data-replay="tree">ещё раз</button>
           <div class="sample-stage rows" style="justify-items: stretch">
-            <nav class="tree-nav" id="m-tree" style="width:100%;max-width:280px;margin:0 auto">
+            <nav class="tree-nav" id="m-tree-nav" style="width:100%;max-width:280px;margin:0 auto">
               <div class="tnode open"><span class="tw"><svg><use href="../src/icons/sprite.svg#i-chev-r"/></svg></span><svg class="ti"><use href="../src/icons/sprite.svg#i-folder"/></svg><span class="tn">Библиотека</span><span class="tc">8</span></div>
               <div class="tkids">
                 <div class="tnode" aria-current="true"><span class="tw leaf"></span><svg class="ti"><use href="../src/icons/sprite.svg#i-file"/></svg><span class="tn">Лекции</span></div>
@@ -696,20 +903,69 @@
               </div>
             </nav>
           </div>
-          <p class="sample-spec"><b>плашка .tree-ink</b> ось y, две кромки: ведущая response .26 · ведомая .42 · <code>moveInk(tree, node, ink, { axis: 'y' })</code></p>
+          <p class="sample-spec"><b>плашка .tree-ink / .rail-ink</b> ось y, две кромки: ведущая response .26 · ведомая .42 · <code>moveInk(tree, node, ink, { axis: 'y' })</code>, <code>wireRail()</code></p>
         </div>
 
         <div class="sample">
-          <h3>Числа: счётчик и барабан</h3>
+          <h3 id="m-numbers" data-toc="Числа">Числа: счётчик и барабан</h3>
+          <button class="btn small replay" type="button" data-replay="numbers">ещё раз</button>
           <div class="sample-stage">
             <div class="demo-row" style="gap:40px">
               <div class="stat-big count" id="m-count">0</div>
               <div class="odometer big" id="m-odo"></div>
             </div>
-            <div class="demo-row"><button class="btn small" id="m-num">Новое значение</button></div>
           </div>
           <p class="sample-spec"><b>счётчик</b> одна пружина на число · response 1.2 · damping 1 — без перелёта, долгий выбег
             <br><b>барабан</b> колонка 0–9 на translateY · response .55 + .03/разряд · damping .78 · <code>countTo()</code>, <code>odometer()</code></p>
+        </div>
+
+        <div class="sample">
+          <h3 id="m-enter" data-toc="Вход экрана">Вход и уход экрана</h3>
+          <button class="btn small replay" type="button" data-replay="enter">ещё раз</button>
+          <div class="sample-stage">
+            <div class="panel enter-stage" id="m-enter-panel"><h3>Экран «Проверка»</h3><p>Так входят экраны приложения, секции при появлении и панель «Фон»: снизу, из лёгкого размытия, без перелёта. Уход — короче и тем же путём.</p></div>
+          </div>
+          <p class="sample-spec"><b>вход</b> y 14 · s .96 · blur 8 → 0 · o 0 → 1 · response .60 · damping .90 · <code>enter(el, opts)</code>
+            <br><b>уход</b> y 8 · s .97 · blur 6 · response .30 · damping 1 · <code>exit(el, opts)</code> — промис, ждать перед удалением</p>
+        </div>
+
+        <div class="sample">
+          <h3 id="m-flip" data-toc="Перестановка списка">Перестановка списка — FLIP</h3>
+          <button class="btn small replay" type="button" data-replay="flip">ещё раз</button>
+          <div class="sample-stage">
+            <div class="flip-list" id="m-flip">
+              <div class="item"><div class="item-body"><div class="item-title">Пикник на обочине</div><div class="item-meta">9 · прочитано</div></div></div>
+              <div class="item"><div class="item-body"><div class="item-title">Солярис</div><div class="item-meta">в очереди</div></div></div>
+              <div class="item"><div class="item-body"><div class="item-title">Превращение</div><div class="item-meta">8 · прочитано</div></div></div>
+              <div class="item"><div class="item-body"><div class="item-title">1984</div><div class="item-meta">6 · брошено</div></div></div>
+            </div>
+          </div>
+          <p class="sample-spec"><b>DOM меняется сразу</b>, дельта — transform · response .55 · damping .90 · новые — enter с шагом 32 мс · <code>flip(container, mutate, removed)</code></p>
+        </div>
+
+        <div class="sample">
+          <h3 id="m-process" data-toc="Долгий процесс">Долгий процесс: фаза, таймер, «Отменить»</h3>
+          <button class="btn small replay" type="button" data-replay="process">ещё раз</button>
+          <div class="sample-stage">
+            <div class="proc">
+              <div class="demo-row" style="justify-content:flex-start">
+                <button class="btn primary" id="p-run" type="button"><span class="btn-label">Скачать 4 файла</span></button>
+                <button class="btn" id="p-cancel" type="button" disabled>Отменить</button>
+              </div>
+              <div class="meter" id="p-meter"><div class="meter-fill" id="p-fill" style="--p:0"></div><div class="meter-glow" id="p-glow" style="--p:0"></div></div>
+              <div class="proc-row"><i class="live-dot" id="p-dot" hidden></i><span id="p-phase">Ждёт</span><b id="p-timer">00:00</b></div>
+            </div>
+          </div>
+          <p class="sample-spec"><b>до 1 с</b> — ничего · <b>от 1 с</b> — <code>.meter.indet</code> и busy-кнопка · <b>от 10 с</b> — фаза словами, таймер, «Отменить»; сцена: <code>pulse('go')</code>, <code>setEnergy(1)</code>, на финише <code>pulse('done')</code> + <code>spin(1)</code>, результат — тостом (UX.md §8)</p>
+        </div>
+
+        <div class="sample">
+          <h3 id="m-stream" data-toc="Поток ответа">Поток ответа и каретка</h3>
+          <button class="btn small replay" type="button" data-replay="stream">ещё раз</button>
+          <div class="sample-stage">
+            <div class="md" style="max-width:420px;text-align:left" id="m-stream-md"><p>Текст приходит словами без переходов — частое не анимируется; дышит только каретка.<span class="caret" aria-hidden="true"></span></p></div>
+          </div>
+          <p class="sample-spec"><b>текст</b> — без анимации (UX.md §7) · <b>каретка</b> .caret — кадры breathe 1.1 с, как .live-dot · <b>фаза · таймер</b> — .msg-run · полный чат — выше в разделе «Чат»</p>
         </div>
 
       </div>
@@ -717,7 +973,7 @@
 
 <section class="section" id="kosmos">
       <div class="section-head"><p class="kicker">kocmoc · три компонента</p><h2>Свет принадлежит <span class="lit">линии</span></h2><p>Из уровня KOCMOC (Geometry Dash, ремейк Neiro «RTX: ON») взято только то, что выглядит так, будто всегда было частью кита: линейные глифы, пульс в такт и HUD-панель. Цвет — только через <code>data-accent</code>.</p></div>
-      <div class="section-head"><p class="kicker">1 · глифы</p><h2>Линейные глифы</h2><p>Тонкая белая линия и свет, который принадлежит ей, а не фону. Тот же штрих, что у UI-иконок кита; цвет света — ступень излучения.</p></div>
+      <div class="section-head"><p class="kicker">1 · глифы</p><h2 id="k-glyphs" data-toc="Глифы">Линейные глифы</h2><p>Тонкая белая линия и свет, который принадлежит ей, а не фону. Тот же штрих, что у UI-иконок кита; цвет света — ступень излучения.</p></div>
       <div class="k-row">
         <span class="glyph"><svg><use href="../src/icons/sprite.svg#k-spike"/></svg></span>
         <span class="glyph"><svg><use href="../src/icons/sprite.svg#k-spikes"/></svg></span>
@@ -733,13 +989,14 @@
         <span class="glyph large"><svg><use href="../src/icons/sprite.svg#k-orb"/></svg></span>
         <span class="glyph small" data-accent="gold"><svg><use href="../src/icons/sprite.svg#k-gear"/></svg></span>
         <span class="glyph small" data-accent="ice"><svg><use href="../src/icons/sprite.svg#k-spike"/></svg></span>
+        <span class="glyph spin fast"><svg><use href="../src/icons/sprite.svg#k-gear"/></svg></span>
       </div>
       <div class="spikes" style="max-width:760px;margin:24px auto 0"></div>
-      <p class="demo-note" style="margin:16px auto 0;text-align:center"><code>.glyph</code> / <code>.small</code> / <code>.large</code> / <code>.dim</code> / <code>.spin</code>; ряд шипов — <code>.spikes</code>.</p>
+      <p class="demo-note" style="margin:16px auto 0;text-align:center"><code>.glyph</code> / <code>.small</code> / <code>.large</code> / <code>.dim</code> / <code>.spin</code> / <code>.spin.fast</code>; ряд шипов — <code>.spikes</code>.</p>
     </section>
 
     <section class="section">
-      <div class="section-head"><p class="kicker">2 · такт</p><h2>Пульс «в такт»</h2><p>Кольцо расходится из точки события и гаснет, ядро вздрагивает. Для прихода события и «живых» индикаторов — не для декора по таймеру.</p></div>
+      <div class="section-head"><p class="kicker">2 · такт</p><h2 id="k-pulse" data-toc="Пульс">Пульс «в такт»</h2><p>Кольцо расходится из точки события и гаснет, ядро вздрагивает. Для прихода события и «живых» индикаторов — не для декора по таймеру.</p></div>
       <div class="k-stage">
         <div class="pulse-host" id="beat" style="width:72px;height:72px"><span class="beat-dot"></span></div>
         <div class="demo-row">
@@ -751,7 +1008,7 @@
     </section>
 
     <section class="section">
-      <div class="section-head"><p class="kicker">3 · hud</p><h2>HUD-панель</h2><p>Финальный экран уровня, переведённый в монохром: рамка с уголками, тихая развёртка, терминальный список с отточиями, кольцо-индикатор с барабаном. Здесь — в «углях» через <code>data-accent</code> на самом блоке.</p></div>
+      <div class="section-head"><p class="kicker">3 · hud</p><h2 id="k-hud" data-toc="HUD-панель">HUD-панель</h2><p>Финальный экран уровня, переведённый в монохром: рамка с уголками, тихая развёртка, терминальный список с отточиями, кольцо-индикатор с барабаном. Здесь — в «углях» через <code>data-accent</code> на самом блоке.</p></div>
       <div class="hud-wrap">
         <div class="hud" id="hud" data-accent="ember">
           <span class="hud-corner tl"></span><span class="hud-corner tr"></span><span class="hud-corner bl"></span><span class="hud-corner br"></span>
@@ -781,7 +1038,46 @@
       <p class="demo-note" style="margin:16px auto 0;text-align:center"><b>строки</b> x −8 → 0, o 0 → 1 · response .4 · шаг 70 мс · <b>дуга</b> --p пружиной response .9 · damping .9 · <code>hudType(list)</code>, <code>hudRing(el, p, { odo })</code></p>
     </section>
 
-    
+    <!-- было и будет: что ушло из кита и куда, и что открыто в DESIGN-TODO — без поддельной реализации -->
+    <section class="section" id="future">
+      <div class="section-head">
+        <p class="kicker">было и будет</p>
+        <h2>Что ушло из кита и что в нём появится</h2>
+        <p>Слева — приёмы прошлых версий и то, во что они превратились. Справа — открытые пункты журнала <code>DESIGN-TODO.md</code>: описание, не реализация.</p>
+      </div>
+      <div class="future">
+        <div class="panel">
+          <h3>Было — и куда делось</h3>
+          <ul>
+            <li><b>3D-наклон карточек к курсору</b> → выключен по умолчанию (<code>attachCards(…, { tilt: 4 })</code> возвращает); осталась только виньетка у <code>data-glow</code>.</li>
+            <li><b>Магнит кнопок к курсору</b> → убран (решение пользователя: к кнопке идут, а не она к курсору); осталось нажатие и подъём на месте.</li>
+            <li><b>Отметки золотом и серебром <code>.mark-gold</code> / <code>.mark-silver</code></b> → серебряная тема карточек <code>.card.silver</code> и токены золочения <code>--gilt*</code> для точечных отметок.</li>
+            <li><b>«Ещё» под раскрытием <code>.more-row</code></b> → открытая группа <code>.group</code>: прятать то, что помещается, нельзя.</li>
+            <li><b>Строка шагов сеткой равных ячеек</b> → ряд от края до края с линиями <code>.step-sep</code> («капец как неровно» — проверено на пользователе).</li>
+            <li><b>Тёплая «бумага» и золотой кикер по умолчанию (ветка ux)</b> → пресет <code>data-palette="paper"</code> + <code>data-accent="gold"</code>; умолчание — нейтральная; старая серая — <code>data-palette="grey"</code>.</li>
+            <li><b>Чернила выдры Lc 100 / 63 / 41</b> → Lc 90 / 78 / 62 по APCA (не слепит, подписи читаются); старые — тема «Серая».</li>
+            <li><b>Процедурные звёзды</b> → эксперимент, по умолчанию выключен (<code>stars: 'procedural'</code>, сверка — <a href="stars.html">demo/stars.html</a>).</li>
+            <li><b>Кручение как t × скорость</b> → маховик: фазы копятся по кадрам, без рывка угла при смене энергии; толчок <code>spin(k)</code>.</li>
+            <li><b>Оттенки дыма 0.22–0.45</b> → 65 % от палитры выдры: насыщенный источник, заметная подкраска; по умолчанию лунный на 45 %.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Будет — открыто в DESIGN-TODO</h3>
+          <ul>
+            <li><b>Светлая тема</b> (п. 2) — отложена до конца: «отпечаток» проектировать заново, решить, как ведёт себя сцена (<code>setInvert</code> — заготовка).</li>
+            <li><b>Карточки данных</b> (п. 4) — медиа-карточка с прогрессом и бейджами из <code>.card</code>, <code>.meter</code>, <code>.chip</code>, <code>.tag</code>, когда появится сайт, которому она нужна.</li>
+            <li><b>Бренд-знак и предметные глифы</b> (п. 5) — <code>i-mark</code> остаётся кольцом-заглушкой; свой знак рисуется под сайт.</li>
+            <li><b>Производительность сцены</b> (п. 7) — пороги <code>_lite</code>/<code>resScale</code> не пересматривались; при «оси» левая половина беднее частицами.</li>
+            <li><b>Движение на сенсоре</b> (п. 11) — проверить на живом телефоне press-масштаб карточек; барабан не анимирует смену числа разрядов.</li>
+            <li><b>Глубокие оттенки дыма из abook</b> (п. 13) — ночь, сапфир, аметист, янтарь, угли как кандидаты в <code>SMOKE</code> вместо части пастельных.</li>
+            <li><b>Кастомный выпадающий список <code>.dd</code></b> (п. 16, 18) — клавиатура, поиск по первой букве, открытие вверх; переносить вместе с JS.</li>
+            <li><b>Графики</b> (п. 18) — <code>svg[role=img]</code> из abook пока не переносились.</li>
+            <li><b>Правка сообщения в чате</b> (п. 19) — в ките только стиль <code>.bubble.edit</code>; механика показана в этой витрине, в <code>site.js</code> не входит.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
     <!-- подключение (короткий контент-блок с прозой) -->
     <section class="section" id="connect">
       <div class="section-head">
@@ -789,7 +1085,7 @@
         <h2>Скопировать <code>src/</code> — и всё</h2>
       </div>
       <div class="prose">
-        <p>Кит — плоский набор статических файлов: три CSS, два ES-модуля, шрифты, спрайт и одна текстура. Никакой сборки.
+        <p>Кит — плоский набор статических файлов: три CSS, три ES-модуля, шрифты, спрайт и одна текстура. Никакой сборки.
         В <code>&lt;head&gt;</code> подключаются <strong>fonts.css → tokens.css → components.css</strong>, дальше — свои стили сайта.</p>
         <p>Как собирать страницу, какие правила композиции и тона соблюдать, где излучение уместно, а где нет — описано в
         навыке <code>.agents/skills/cosmos-site/SKILL.md</code>. Этот сайт собран ровно по нему.</p>
@@ -804,7 +1100,7 @@
         </div>
         <div class="footer-col">
           <h5>Кит</h5>
-          <a href="#language">Язык</a><a href="#accents">Акценты</a><a href="#components">Компоненты</a><a href="#scene">Сцена</a>
+          <a href="#toc">Оглавление</a><a href="#accents">Темы</a><a href="#components">Компоненты</a><a href="#scene">Сцена</a><a href="#future">Было и будет</a>
         </div>
         <div class="footer-col">
           <h5>Файлы</h5>
@@ -812,8 +1108,19 @@
         </div>
         <div class="footer-col">
           <h5>Документы</h5>
-          <a href="../README.md">README</a><a href="../DESIGN-TODO.md">DESIGN-TODO</a><a href="../.agents/skills/cosmos-site/SKILL.md">SKILL: cosmos-site</a>
+          <a href="../README.md">README</a><a href="../DESIGN-TODO.md">DESIGN-TODO</a><a href="../UX.md">UX</a><a href="../.agents/skills/cosmos-site/SKILL.md">SKILL: cosmos-site</a>
         </div>
+      </div>
+      <!-- переключатель тем — последний ряд страницы, ничего не плавает поверх содержимого -->
+      <div class="footer-theme">
+        <span>Тема витрины</span>
+        <div class="pills glass" role="radiogroup" aria-label="Тема" id="theme-pills-footer">
+          <button type="button" role="radio" data-theme="neutral" aria-checked="true">Нейтральная</button>
+          <button type="button" role="radio" data-theme="grey" aria-checked="false">Серая · 0.2.0</button>
+          <button type="button" role="radio" data-theme="gold" aria-checked="false">Золотистая</button>
+          <span class="pill-ink" aria-hidden="true"></span>
+        </div>
+        <span>клавиша <kbd>T</kbd> — по кругу · выбор помнится · <code>?theme=grey</code></span>
       </div>
       <div class="footer-bottom">
         <span>cosmos-kit · 2026</span>
@@ -830,6 +1137,22 @@
       </header>
       <p class="modal-text">Общий вид диалогов кита: подложка с блюром, плита, шапка-кикер, действия справа снизу.</p>
       <div class="btn-row modal-actions"><button class="btn primary" data-close type="button">Понятно</button></div>
+    </div>
+  </dialog>
+
+  <dialog class="modal" id="keys-modal">
+    <div class="modal-box" tabindex="-1">
+      <header class="drawer-head">
+        <div><p class="drawer-kicker"><svg><use href="../src/icons/sprite.svg#i-keyboard"/></svg>Клавиши</p><h3>Подсказка клавиш · .cheat-list</h3></div>
+        <button class="icon-btn" data-close type="button" aria-label="Закрыть"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button>
+      </header>
+      <dl class="cheat-list">
+        <dt><kbd>Enter</kbd></dt><dd>Отправить сообщение</dd>
+        <dt><kbd>Shift</kbd>+<kbd>Enter</kbd></dt><dd>Новая строка</dd>
+        <dt><kbd>↑</kbd></dt><dd>Изменить последнее сообщение (в пустом поле)</dd>
+        <dt><kbd>Esc</kbd></dt><dd>Остановить ответ · закрыть всплывающее · стереть запрос в поиске</dd>
+        <dt><kbd>T</kbd></dt><dd>Следующая тема витрины</dd>
+      </dl>
     </div>
   </dialog>
 
@@ -895,6 +1218,7 @@
       </header>
       <div class="drawer-scroll">
         <div class="card-block"><h4><svg><use href="../src/icons/sprite.svg#i-info"/></svg>Блок настроек</h4><p class="modal-text">Содержимое шторки — секции card-block.</p></div>
+        <div class="card-block"><h4><svg><use href="../src/icons/sprite.svg#i-sliders"/></svg>Ещё блок</h4><label class="switch"><input type="checkbox" checked><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">Переключатель в шторке</span></label></div>
       </div>
     </div>
   </dialog>
@@ -978,44 +1302,22 @@
   <div class="toasts" id="toasts" aria-live="polite"></div>
 
   <script type="module">
-    import { boot, shell, wireSegmented, wireTree, wirePalette, wireChatDemo, wireRateDialog } from './demo.js';
-    import { buttonState, countTo, odometer, enter, exit, moveInk, closeDialog } from '../src/js/motion.js';
+    import { boot, shell, buildToc, wireSegmented, wireTree, wireTheme, wireChatDemo, wireRateDialog, pressDemo, breathDemo, hoverDemo } from './demo.js';
+    import { buttonState, countTo, odometer, enter, exit, flip, moveInk, closeDialog } from '../src/js/motion.js';
     import { pulse, hudRing, hudType } from '../src/js/kosmos.js';
     shell('index');
-    import('../src/js/motion.js').then(({ countTo }) => document.querySelectorAll('.hero-stats .count').forEach((el, i) => setTimeout(() => countTo(el, +el.dataset.to, { response: 1.4 }), 600 + i * 120)));
+    buildToc(document.getElementById('toc-nav'));
+    document.querySelectorAll('.hero-stats .count').forEach((el, i) => setTimeout(() => countTo(el, +el.dataset.to, { response: 1.4 }), 600 + i * 120));
     const hero = document.getElementById('hero');
-    const { api: cosmosApi, wrap, toast } = boot({ hero });
+    const { api: cosmosApi, wrap, toast, toastAction } = boot({ hero });
     const reducedQuery = matchMedia('(prefers-reduced-motion: reduce)');
+    const $ = (id) => document.getElementById(id);
+    const toTop = () => $('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' });
 
-    // мини-приложение: рейка показывает свой экран, чипы переключаются, форма отвечает тостом
-    import('../src/js/site.js').then(({ wireRail }) => wireRail(document.getElementById('demo-rail'), (el) =>
-      document.querySelectorAll('.demo-app .view').forEach((v) => { v.hidden = v.id !== el.dataset.view; })));
-    document.querySelectorAll('#demo-choices .choice').forEach((b) => b.addEventListener('click', () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'))));
-    document.getElementById('demo-app-form').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Сохранено'); });
-    // чат, анкета, жалоба и палитра
-    wireChatDemo(document.getElementById('demo-chat'), toast);
-    wireRateDialog(document.getElementById('rate'), toast);
-    const reasons = document.getElementById('report-reasons'), reportSend = document.getElementById('report-send');
-    reasons.querySelectorAll('.choice').forEach((c) => c.addEventListener('click', () => { reasons.querySelectorAll('.choice').forEach((o) => o.setAttribute('aria-checked', String(o === c))); reportSend.disabled = false; }));
-    reportSend.addEventListener('click', () => { closeDialog(document.getElementById('report')); toast('ok', 'Запись отмечена — ищу другую'); });
-    document.querySelectorAll('#demo-wizard .choices').forEach((g) => g.querySelectorAll('.choice').forEach((b) => b.addEventListener('click', () => {
-      if (g.getAttribute('role') === 'radiogroup') g.querySelectorAll('.choice').forEach((o) => o.setAttribute('aria-checked', String(o === b)));
-      else b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'));
-    })));
-    document.getElementById('demo-wizard').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Переход к итогу (пример)'); });
-    // две дороги в анкету: по шагам или своими словами; «Заполнить» ведёт к проверке на шаге «Итог»
-    wireSegmented(document.getElementById('demo-ways'), 'aria-checked', (it) => { const text = it.dataset.way === 'text';
-      document.getElementById('demo-wizard-text').hidden = !text; document.getElementById('demo-wizard').hidden = text; });
-    document.getElementById('demo-wizard-text').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Заполнено 5 разделов — проверьте в «Итоге» (пример)');
-      document.getElementById('demo-ways').querySelector('[data-way="steps"]').click(); });
-    wirePalette(document.getElementById('palette-pills'), cosmosApi);
-    document.addEventListener('palette', (e) => swatches.forEach((s) => s.setAttribute('aria-pressed', String(s.dataset.accent === (e.detail === 'paper' ? 'gold' : 'white')))));
-    wireSegmented(document.getElementById('demo-tabs'), 'aria-selected');
-    wireSegmented(document.getElementById('demo-pills'), 'aria-checked');
-    wireSegmented(document.getElementById('demo-island').querySelector('.tabs'), 'aria-selected');
-
-    // ось акцентов (tokens.css: [data-accent]) — сцена перекрашивается в тот же --el-a
+    // темы: секция «Темы» и подвал — один переключатель; свотчи оси следуют за темой
     const swatches = [...document.querySelectorAll('.swatch')];
+    wireTheme([$('theme-pills'), $('theme-pills-footer')], cosmosApi);
+    document.addEventListener('theme', (e) => swatches.forEach((s) => s.setAttribute('aria-pressed', String(s.dataset.accent === (e.detail === 'gold' ? 'gold' : 'white')))));
     swatches.forEach((btn) => btn.addEventListener('click', () => {
       const v = btn.dataset.accent;
       swatches.forEach((s) => s.setAttribute('aria-pressed', String(s === btn)));
@@ -1024,118 +1326,211 @@
       cosmosApi.setAccent(getComputedStyle(document.documentElement).getPropertyValue('--el-a').trim(), 1);
     }));
 
-    // композиции дыры: токены на обёртке; герой «ось» — текст над дырой по центру
+    // мини-приложение: рейка показывает свой экран (экран входит снизу), чипы переключаются, форма отвечает тостом
+    import('../src/js/site.js').then(({ wireRail }) => wireRail($('demo-rail'), (el) =>
+      document.querySelectorAll('.demo-app .view').forEach((v) => { const show = v.id === el.dataset.view;
+        if (show && v.hidden) { v.hidden = false; enter(v, { dy: 10, scale: 1, blur: 0, response: 0.5, damping: 0.85 }); } else if (!show) v.hidden = true; })));
+    document.querySelectorAll('#demo-choices .choice, #demo-choices-cat .choice:not(.more)').forEach((b) => b.addEventListener('click', () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'))));
+    document.querySelector('#demo-choices-cat .more').addEventListener('click', () => toast('', 'Пример: раскрылись бы остальные 9 — только для списков длиннее 24'));
+    $('demo-app-form').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Сохранено'); });
+    $('c-form').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Сохранено'); });
+    // чат, оценка, жалоба, анкета
+    const chat = wireChatDemo($('demo-chat'), toast);
+    $('chat-replay').addEventListener('click', () => { chat.replay(); $('chat').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth', block: 'start' }); });
+    wireRateDialog($('rate'), toast);
+    const reasons = $('report-reasons'), reportSend = $('report-send');
+    reasons.querySelectorAll('.choice').forEach((c) => c.addEventListener('click', () => { reasons.querySelectorAll('.choice').forEach((o) => o.setAttribute('aria-checked', String(o === c))); reportSend.disabled = false; }));
+    reportSend.addEventListener('click', () => { closeDialog($('report')); toast('ok', 'Запись отмечена — ищу другую'); });
+    document.querySelectorAll('#demo-wizard .choices').forEach((g) => g.querySelectorAll('.choice').forEach((b) => b.addEventListener('click', () => {
+      if (g.getAttribute('role') === 'radiogroup') g.querySelectorAll('.choice').forEach((o) => o.setAttribute('aria-checked', String(o === b)));
+      else b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'));
+    })));
+    document.querySelectorAll('#demo-steps .step').forEach((s) => s.addEventListener('click', () => { document.querySelectorAll('#demo-steps .step').forEach((o) => { o.classList.toggle('on', o === s); if (o === s) o.setAttribute('aria-current', 'step'); else o.removeAttribute('aria-current'); }); }));
+    $('demo-wizard').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Переход к итогу (пример)'); });
+    wireSegmented($('demo-ways'), 'aria-checked', (it) => { const text = it.dataset.way === 'text'; $('demo-wizard-text').hidden = !text; $('demo-wizard').hidden = text; });
+    $('demo-wizard-text').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Заполнено 5 разделов — проверьте в «Итоге» (пример)'); $('demo-ways').querySelector('[data-way="steps"]').click(); });
+    wireSegmented($('demo-tabs'), 'aria-selected');
+    wireSegmented($('demo-pills'), 'aria-checked');
+    wireSegmented($('demo-pills-small'), 'aria-checked');
+    wireSegmented($('demo-island').querySelector('.tabs'), 'aria-selected');
+    wireTree($('c-tree-nav'));
+
+    // поле-портал: состояния каймы и нырок стрелки
+    const field = $('demo-field');
+    field.addEventListener('submit', (e) => { e.preventDefault(); field.querySelector('.go-btn').classList.add('fire'); setTimeout(() => field.querySelector('.go-btn').classList.remove('fire'), 800); });
+    document.querySelectorAll('[data-field]').forEach((b) => b.addEventListener('click', () => {
+      const v = b.dataset.field; field.classList.toggle('lit', v === 'lit'); field.classList.toggle('busy', v === 'busy');
+      if (v === 'fire') field.requestSubmit();
+    }));
+    // необратимое и обратимое
+    $('undo-demo').addEventListener('click', () => toastAction('', 'Разговор удалён', 'Отменить', () => toast('ok', 'Разговор восстановлен')));
+    $('fire-toast-ok').addEventListener('click', () => toast('ok', 'Готово'));
+    $('fire-toast-err').addEventListener('click', () => toast('err', 'Не получилось'));
+    $('fire-toast-warn').addEventListener('click', () => toast('warn', 'Диск D: недоступен'));
+    $('fire-toast-plain').addEventListener('click', () => toast('', 'Скопировано'));
+    $('toggle-motion').addEventListener('click', (e) => {
+      document.documentElement.classList.toggle('motion-off');
+      e.target.textContent = document.documentElement.classList.contains('motion-off') ? 'Reduced motion: включён' : 'Reduced motion: авто';
+    });
+
+    // ---- сцена: панель «Фон» и кнопки раздела «Сцена» делают одно и то же ----
     const sceneScroll = () => dispatchEvent(new Event('scroll'));
-    wireSegmented(document.getElementById('comp-pills'), 'aria-checked', (it) => {
+    wireSegmented($('comp-pills'), 'aria-checked', (it) => {
       wrap.dataset.comp = it.dataset.comp;
       hero.classList.toggle('axis', it.dataset.comp === 'center');
       hero.classList.toggle('short', it.dataset.comp === 'far');
-      cosmosApi.resize(); sceneScroll();
-      document.getElementById('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' });
+      cosmosApi.resize(); sceneScroll(); toTop();
     });
-    document.getElementById('toggle-asleep').addEventListener('click', (e) => {
+    $('toggle-asleep').addEventListener('click', (e) => {
       const asleep = wrap.classList.toggle('asleep');
       if (asleep) cosmosApi.pause(); else cosmosApi.resume();
       e.currentTarget.querySelector('.btn-label')?.remove();
       e.currentTarget.textContent = asleep ? 'Сцена: разбудить' : 'Сцена: усыпить';
-      if (asleep) document.getElementById('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' });
+      if (asleep) toTop();
     });
-    document.getElementById('toggle-motion').addEventListener('click', (e) => {
-      document.documentElement.classList.toggle('motion-off');
-      e.target.textContent = document.documentElement.classList.contains('motion-off') ? 'Reduced motion: включён' : 'Reduced motion: авто';
-    });
-    document.getElementById('fire-toast-ok').addEventListener('click', () => toast('ok', 'Готово'));
-    document.getElementById('fire-toast-err').addEventListener('click', () => toast('err', 'Не получилось'));
-    document.getElementById('pulse-go').addEventListener('click', () => cosmosApi.pulse('go'));
+    $('pulse-go').addEventListener('click', () => cosmosApi.pulse('go'));
     // толчок-маховик: разгон ≈ 0,2 с, выбег ≈ 4 с; как «сохранили» или «отправили» — событие, не процесс
-    document.getElementById('spin-kick').addEventListener('click', () => { cosmosApi.spin(1); cosmosApi.pulse('done'); });
+    $('spin-kick').addEventListener('click', () => { cosmosApi.spin(1); cosmosApi.pulse('done'); });
     // «Крутить»: энергия 0 ↔ 1 с пульсом на старте и финише — как загрузка в «выдре»
     let spinning = false;
-    document.getElementById('spin-btn').addEventListener('click', (e) => {
+    $('spin-btn').addEventListener('click', (e) => {
       spinning = !spinning;
       if (spinning) { cosmosApi.pulse('go'); cosmosApi.setEnergy(1); } else { cosmosApi.setEnergy(0); cosmosApi.pulse('done'); }
       e.currentTarget.querySelector('.btn-label').textContent = spinning ? 'Остановить' : 'Крутить';
       e.currentTarget.classList.toggle('busy', spinning);
-      document.getElementById('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' });
+      toTop();
     });
     // текстура фона: по умолчанию ESRGAN испр. (plate-hd), «Старый» — исходный plate.webp
     const plateQ = new URLSearchParams(location.search).get('plate') === 'old' ? 'old' : 'hd';
     document.querySelectorAll('#plate-pills [data-plate]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.plate === plateQ)));
-    wireSegmented(document.getElementById('plate-pills'), 'aria-checked', (it) => {
+    wireSegmented($('plate-pills'), 'aria-checked', (it) => {
       const u = new URL(location.href); if (it.dataset.plate === 'old') u.searchParams.set('plate', 'old'); else u.searchParams.delete('plate'); location.replace(u);
     });
     // панель «Фон»: открыть/закрыть с пружиной, Esc и клик мимо закрывают, фокус возвращается на кнопку
-    const dock = document.getElementById('scene-dock'), dockBtn = document.getElementById('scene-dock-btn');
+    const dock = $('scene-dock'), dockBtn = $('scene-dock-btn');
+    let closing = false;
     const openDock = () => { if (closing) return; dock.hidden = false; dockBtn.setAttribute('aria-expanded', 'true');
       // плашки переключателей считались, пока панель была скрыта, — ставим их на место сразу, без анимации
-      dock.querySelectorAll('.pills').forEach((g) => { const on = g.querySelector('[aria-checked="true"]'); if (on) moveInk(g, on, undefined, { immediate: true }); }); if (!reducedQuery.matches) enter(dock, { dy: 16, scale: 0.97, blur: 6, response: 0.42, damping: 0.82 }); dock.querySelector('button').focus({ preventScroll: true }); };
-    let closing = false;
+      dock.querySelectorAll('.pills').forEach((g) => { const on = g.querySelector('[aria-checked="true"]'); if (on) moveInk(g, on, undefined, { immediate: true }); });
+      if (!reducedQuery.matches) enter(dock, { dy: 16, scale: 0.97, blur: 6, response: 0.42, damping: 0.82 }); dock.querySelector('button').focus({ preventScroll: true }); };
     const closeDock = async () => {
       if (dock.hidden || closing) return; closing = true; dockBtn.setAttribute('aria-expanded', 'false');
       if (!reducedQuery.matches) await Promise.race([exit(dock, { dy: 12, scale: 0.98 }), new Promise((r) => setTimeout(r, 320))]);   // уход не дольше 320 мс
       dock.hidden = true; closing = false; dockBtn.focus({ preventScroll: true });
     };
     dockBtn.addEventListener('click', () => (dock.hidden ? openDock() : closeDock()));
-    document.getElementById('scene-dock-close').addEventListener('click', closeDock);
+    $('scene-dock-close').addEventListener('click', closeDock);
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !dock.hidden) closeDock(); });
     document.addEventListener('pointerdown', (e) => { if (!dock.hidden && !dock.contains(e.target) && !dockBtn.contains(e.target)) closeDock(); });
     // по умолчанию: хаотичный ореол (умолчание кита), лунный дым едва заметно (умолчание кита), сцена крутится
-    requestAnimationFrame(() => document.getElementById('spin-btn').click());
+    requestAnimationFrame(() => $('spin-btn').click());
     // оттенки дыма
     document.querySelectorAll('#smoke-row [data-smoke]').forEach((b) => b.addEventListener('click', () => {
       document.querySelectorAll('#smoke-row [data-smoke]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-      cosmosApi.setSmoke(b.dataset.smoke);
-      document.getElementById('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' });
+      cosmosApi.setSmoke(b.dataset.smoke); toTop();
     }));
-    document.getElementById('energy-up').addEventListener('click', () => cosmosApi.setEnergy(1));
-    document.getElementById('energy-down').addEventListener('click', () => cosmosApi.setEnergy(0));
-    document.getElementById('demo-field').addEventListener('submit', (e) => e.preventDefault());
-
-    // варианты сцены: ореол и лучи
-    wireSegmented(document.getElementById('halo-pills'), 'aria-checked', (it) => { cosmosApi.setHalo(it.dataset.halo); document.getElementById('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' }); });
-    document.getElementById('rays-switch').addEventListener('change', (e) => { cosmosApi.setRays(e.target.checked); document.getElementById('top').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth' }); });
+    $('energy-up').addEventListener('click', () => cosmosApi.setEnergy(1));
+    $('energy-down').addEventListener('click', () => cosmosApi.setEnergy(0));
+    wireSegmented($('halo-pills'), 'aria-checked', (it) => { cosmosApi.setHalo(it.dataset.halo); toTop(); });
+    $('rays-switch').addEventListener('change', (e) => { cosmosApi.setRays(e.target.checked); toTop(); });
+    // кнопки раздела «Сцена» — через те же органы панели «Фон», чтобы состояние было одно
+    document.querySelectorAll('[data-scene]').forEach((b) => b.addEventListener('click', () => {
+      const [k, v] = b.dataset.scene.split(':');
+      if (k === 'comp') $('comp-pills').querySelector(`[data-comp="${v}"]`).click();
+      else if (k === 'halo') $('halo-pills').querySelector(`[data-halo="${v}"]`).click();
+      else if (k === 'rays') $('rays-switch').click();
+      else if (k === 'smoke') $('smoke-row').querySelector(`[data-smoke="${v}"]`).click();
+      else if (k === 'spin') $('spin-btn').click();
+      else if (k === 'kick') { $('spin-kick').click(); toTop(); }
+      else if (k === 'pulse') { $('pulse-go').click(); toTop(); }
+      else if (k === 'energy') { (v === '1' ? $('energy-up') : $('energy-down')).click(); toTop(); }
+      else if (k === 'asleep') $('toggle-asleep').click();
+      else if (k === 'live') toTop();
+    }));
 
     // ---- секция «Движение» ----
-    wireSegmented(document.getElementById('m-pills'), 'aria-checked');
-    wireSegmented(document.getElementById('m-tabs'), 'aria-selected');
-    wireTree(document.getElementById('m-tree'));
+    const mPills = wireSegmented($('m-pills'), 'aria-checked');
+    const mTabs = wireSegmented($('m-tabs'), 'aria-selected');
+    const mTree = wireTree($('m-tree-nav'));
     // состояние кнопки: busy 1.4 s → done 1.2 s → idle
-    for (const id of ['state-btn', 'state-btn-2']) {
-      const b = document.getElementById(id);
-      b.addEventListener('click', async () => {
-        if (b.dataset.state && b.dataset.state !== 'idle') return;
-        await buttonState(b, 'busy'); await new Promise((r) => setTimeout(r, 1400));
-        await buttonState(b, 'done'); await new Promise((r) => setTimeout(r, 1200));
-        buttonState(b, 'idle');
-      });
-    }
-    document.getElementById('m-toast').addEventListener('click', () => toast('ok', 'Сохранено'));
+    const runState = async (b) => {
+      if (b.dataset.state && b.dataset.state !== 'idle') return;
+      await buttonState(b, 'busy'); await new Promise((r) => setTimeout(r, 1400));
+      await buttonState(b, 'done'); await new Promise((r) => setTimeout(r, 1200));
+      buttonState(b, 'idle');
+    };
+    for (const id of ['state-btn', 'state-btn-2']) $(id).addEventListener('click', () => runState($(id)));
+    $('m-toast').addEventListener('click', () => toast('ok', 'Сохранено'));
+    $('m-toast-undo').addEventListener('click', () => toastAction('', 'Книга убрана из очереди', 'Отменить', () => toast('ok', 'Вернул в очередь')));
     // числа
-    const cnt = document.getElementById('m-count'), odo = document.getElementById('m-odo');
+    const cnt = $('m-count'), odo = $('m-odo');
     let v = 1284;
     const roll = () => { countTo(cnt, v); odometer(odo, v, { digits: 4 }); v = 100 + Math.floor(Math.random() * 9800); };
-    // числа стартуют, когда образец виден
     new IntersectionObserver((es, io) => { if (es.some((x) => x.isIntersecting)) { roll(); setTimeout(roll, 600); io.disconnect(); } }, { threshold: 0.3 }).observe(cnt);
-    document.getElementById('m-num').addEventListener('click', roll);
+    // вход экрана, FLIP, поток
+    const enterPanel = $('m-enter-panel');
+    const replayEnter = () => exit(enterPanel, { dy: 8 }).then(() => enter(enterPanel, { dy: 14, scale: 0.96, blur: 8, response: 0.6, damping: 0.9 }));
+    const flipList = $('m-flip');
+    const shuffle = () => flip(flipList, () => { const kids = [...flipList.children]; for (let i = kids.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [kids[i], kids[j]] = [kids[j], kids[i]]; } kids.forEach((k) => flipList.append(k)); });
+    const streamMd = $('m-stream-md'), streamHtml = streamMd.innerHTML.replace('<span class="caret" aria-hidden="true"></span>', '');
+    let sTimer = 0;
+    const replayStream = () => { clearInterval(sTimer); const words = streamHtml.split(' '); let i = 0;
+      if (reducedQuery.matches) { streamMd.innerHTML = streamHtml; return; }
+      sTimer = setInterval(() => { i += 1 + Math.floor(Math.random() * 2); streamMd.innerHTML = words.slice(0, i).join(' ') + '<span class="caret" aria-hidden="true"></span>'; if (i >= words.length) { clearInterval(sTimer); streamMd.innerHTML = streamHtml + '<span class="caret" aria-hidden="true"></span>'; } }, 90); };
+    // долгий процесс: фазы, таймер, отмена, сцена
+    let pTimer = 0;
+    const pSet = (p) => { $('p-fill').style.setProperty('--p', p); $('p-glow').style.setProperty('--p', p); };
+    const pStop = (how) => {
+      clearInterval(pTimer); pTimer = 0; $('p-meter').classList.remove('indet'); $('p-cancel').disabled = true; $('p-dot').hidden = true; cosmosApi.setEnergy(0);
+      if (how === 'done') { pSet(1); $('p-phase').textContent = 'Готово: 4 файла в библиотеке'; cosmosApi.pulse('done'); cosmosApi.spin(1); buttonState($('p-run'), 'done').then(() => setTimeout(() => buttonState($('p-run'), 'idle'), 1200)); toast('ok', 'Скачано 4 файла'); }
+      else { pSet(0); $('p-phase').textContent = 'Отменено'; buttonState($('p-run'), 'idle'); toast('', 'Отменено'); }
+    };
+    const pStart = () => {
+      if (pTimer) return; const t0 = Date.now(); const phases = ['Скачиваю', 'Проверяю полноту', 'Конвертирую', 'Сохраняю'];
+      $('p-cancel').disabled = false; $('p-dot').hidden = false; pSet(0); buttonState($('p-run'), 'busy'); $('p-meter').classList.add('indet'); $('p-phase').textContent = 'Подготовка…'; $('p-timer').textContent = '00:00';
+      cosmosApi.pulse('go'); cosmosApi.setEnergy(1);
+      pTimer = setInterval(() => {
+        const s = (Date.now() - t0) / 1000; $('p-timer').textContent = '00:' + String(Math.floor(s)).padStart(2, '0');
+        if (s > 1.2) { $('p-meter').classList.remove('indet'); const p = Math.min(1, (s - 1.2) / 3.2); pSet(p.toFixed(2)); $('p-phase').textContent = phases[Math.min(3, Math.floor(p * 4))] + '…'; if (p >= 1) pStop('done'); }
+      }, reducedQuery.matches ? 400 : 120);
+    };
+    $('p-run').addEventListener('click', pStart);
+    $('p-cancel').addEventListener('click', () => pStop('cancel'));
+    // «ещё раз» — у каждого образца своя кнопка
+    const REPLAY = {
+      press: () => [...$('m-press-row').children].forEach((b, i) => setTimeout(() => pressDemo(b), i * 120)),
+      state: () => { runState($('state-btn')); setTimeout(() => runState($('state-btn-2')), 300); },
+      focus: () => { const bs = [...$('m-focus-row').children]; bs.forEach((b, i) => setTimeout(() => { b.focus({ preventScroll: true }); breathDemo(b); }, i * 450)); setTimeout(() => bs[2].blur(), 1600); },
+      switch: () => $('m-switch-row').querySelectorAll('input').forEach((i, n) => setTimeout(() => i.click(), n * 250)),
+      ink: () => { mPills.next(); setTimeout(mTabs.next, 200); },
+      check: () => { $('m-check-row').querySelectorAll('input').forEach((i, n) => setTimeout(() => i.click(), n * 200)); const rs = [...$('m-radio-row').querySelectorAll('input')]; const cur = rs.findIndex((r) => r.checked); setTimeout(() => rs[(cur + 1) % rs.length].click(), 450); },
+      disclosure: () => $('m-disc-list').querySelectorAll('.disclosure-head').forEach((h, n) => setTimeout(() => h.click(), n * 220)),
+      cards: () => [...$('m-cards-grid').children].forEach((c, i) => setTimeout(() => hoverDemo(c, 1.015), i * 250)),
+      tree: mTree.next,
+      numbers: roll,
+      enter: replayEnter,
+      flip: shuffle,
+      process: () => { if (pTimer) pStop('cancel'); setTimeout(pStart, 200); },
+      stream: replayStream,
+    };
+    document.querySelectorAll('[data-replay]').forEach((b) => b.addEventListener('click', () => REPLAY[b.dataset.replay]?.()));
+    new IntersectionObserver((es, io) => { if (es.some((x) => x.isIntersecting)) { replayStream(); io.disconnect(); } }, { threshold: 0.3 }).observe(streamMd);
 
     // ---- секция KOCMOC ----
-    // пульс
-    const beat = document.getElementById('beat');
-    document.getElementById('beat-once').addEventListener('click', () => pulse(beat));
+    const beat = $('beat');
+    $('beat-once').addEventListener('click', () => pulse(beat));
     let timer = 0;
     let beatOn = false, beatVisible = false;
     const beatSync = () => { clearInterval(timer); timer = 0; if (beatOn && beatVisible) { pulse(beat); timer = setInterval(() => pulse(beat), 60000 / 96); } };
-    document.getElementById('beat-auto').addEventListener('change', (e) => { beatOn = e.target.checked; beatSync(); });
+    $('beat-auto').addEventListener('change', (e) => { beatOn = e.target.checked; beatSync(); });
     new IntersectionObserver((es) => { beatVisible = es.some((x) => x.isIntersecting); beatSync(); }).observe(beat);   // такт только в видимой области
-    // HUD
-    const ring = document.getElementById('hud-ring'), hodo = document.getElementById('hud-odo'), list = document.getElementById('hud-list');
+    const ring = $('hud-ring'), hodo = $('hud-odo'), list = $('hud-list');
     const show = (p) => { hudType(list); hudRing(ring, p, { odo: (v) => odometer(hodo, v, { digits: 3 }) }); };
     odometer(hodo, 0, { digits: 3 });
     const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { show(1); io.disconnect(); } }, { threshold: 0.4 });
-    io.observe(document.getElementById('hud'));
-    document.getElementById('hud-replay').addEventListener('click', () => { hudRing(ring, 0, { odo: (v) => odometer(hodo, v, { digits: 3 }) }); setTimeout(() => show(1), 350); });
-    document.getElementById('hud-rand').addEventListener('click', () => hudRing(ring, 0.3 + Math.random() * 0.7, { odo: (v) => odometer(hodo, v, { digits: 3 }) }));
-
+    io.observe($('hud'));
+    $('hud-replay').addEventListener('click', () => { hudRing(ring, 0, { odo: (v) => odometer(hodo, v, { digits: 3 }) }); setTimeout(() => show(1), 350); });
+    $('hud-rand').addEventListener('click', () => hudRing(ring, 0.3 + Math.random() * 0.7, { odo: (v) => odometer(hodo, v, { digits: 3 }) }));
   </script>
 </body>
 </html>

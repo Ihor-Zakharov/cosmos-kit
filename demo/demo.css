@@ -21,7 +21,7 @@
 .samples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 1100px; margin: 0 auto; }
 .sample { display: grid; grid-template-rows: auto 1fr auto; gap: 14px; padding: 20px; border-radius: var(--r-l); border: 1px solid var(--line-1); background: var(--s1); }
 .sample.wide { grid-column: 1 / -1; }
-.sample h3 { margin: 0; font: 600 16px/1.25 var(--font-display); letter-spacing: -.02em; color: var(--ink); text-align: center; }
+.sample h3 { margin: 0; padding: 0 84px; font: 600 16px/1.25 var(--font-display); letter-spacing: -.02em; color: var(--ink); text-align: center; }   /* поля — под кнопку «ещё раз» */
 .sample-stage { display: grid; place-items: center; gap: 12px; min-height: 120px; padding: 20px 12px; border-radius: var(--r-m); background: var(--bg); border: 1px solid var(--line-1); }
 .sample-stage.rows { grid-auto-flow: row; justify-items: center; }
 /* список (раскрытия): обычный поток без зазоров, поля сверху и снизу равны */
@@ -74,3 +74,43 @@
 .demo-wizard { max-width: 1120px; text-align: left; gap: 18px; }
 .demo-wizard .form-actions .spacer { flex: 1; }
 
+
+/* оглавление: группы по секциям, колонки по ширине окна — на 2560 всё видно без прокрутки */
+.toc { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px 24px; width: 100%; max-width: 1400px; text-align: left; }
+.toc-group { display: grid; gap: 2px; align-content: start; }
+.toc-head { margin-bottom: 4px; font: 500 11.5px/1.4 var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.toc-group a:not(.toc-head) { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); text-decoration: none; transition: color var(--t-fast); }
+.toc-group a:hover { color: var(--ink); }
+
+/* кнопка «ещё раз» у образца движения — в правом верхнем углу карточки */
+.sample { position: relative; }
+.sample > .replay { position: absolute; top: 14px; right: 14px; }
+.sample-stage { position: relative; }
+
+/* контекстное меню в витрине стоит в потоке, а не fixed — чтобы было видно без правого клика */
+.demo-stage .ctx { position: static; }
+
+/* процесс: фаза, таймер, «Отменить» — всё из деталей кита */
+.proc { display: grid; gap: 10px; width: 100%; max-width: 420px; text-align: left; }
+.proc-row { display: flex; align-items: center; gap: 10px; min-height: 24px; font-size: 13.5px; color: var(--ink-2); }
+.proc-row b { margin-left: auto; font: 500 12px/1 var(--font-mono); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+/* стенд входа экрана и FLIP */
+.enter-stage { width: 100%; max-width: 420px; }
+.flip-list { display: grid; gap: 6px; width: 100%; max-width: 420px; position: relative; }
+.flip-list .item { padding: 10px 14px; }
+
+/* «было и будет» — две колонки списков */
+.future { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; text-align: left; }
+.future .panel li { margin: 0 0 10px; line-height: 1.5; font-size: 14.5px; color: var(--ink-2); }
+.future .panel li b { color: var(--ink); font-weight: 600; }
+.future .panel ul { margin: 0; padding-left: 18px; }
+@media (max-width: 980px) { .future { grid-template-columns: 1fr; } }
+
+/* переключатель тем в подвале — последний ряд страницы; клавиша T */
+.footer-theme { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; width: 100%; font: 500 12.5px/1.4 var(--font-text); color: var(--ink-3); }
+/* золочение — токены отметок, показываем как свотчи */
+.gilt-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.gilt-row span { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: var(--r-s); font: 500 12px/1 var(--font-mono); color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--gilt-ring); background: var(--gilt-tint); }
+.gilt-row span i { width: 12px; height: 12px; border-radius: 50%; background: var(--gilt); box-shadow: var(--gilt-glow); }
+.gilt-row span.deep i { background: var(--gilt-deep); box-shadow: none; }

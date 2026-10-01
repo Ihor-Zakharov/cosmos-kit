@@ -53,6 +53,14 @@
       <a href="#site" aria-current="page">Сайт</a>
       <a href="#app">Приложение</a>
     </nav>
+    <div class="topbar-actions">
+      <div class="pills small" role="radiogroup" aria-label="Тема" id="theme-pills">
+        <button type="button" role="radio" data-theme="neutral" aria-checked="true">Нейтральная</button>
+        <button type="button" role="radio" data-theme="grey" aria-checked="false">Серая</button>
+        <button type="button" role="radio" data-theme="gold" aria-checked="false">Золотистая</button>
+        <span class="pill-ink" aria-hidden="true"></span>
+      </div>
+    </div>
   </header>
 
   <div class="site" id="top">
@@ -72,6 +80,7 @@
 
   <script type="module">
     import { bootSite } from '../src/js/site.js';
+    import { wireTheme } from './demo.js';
     // порядок и группы — как в src/blocks/INDEX.md
     const GROUPS = [
       ['site', 'Сайт', ['topbar', 'hero', 'features', 'steps', 'text', 'stats', 'pricing', 'faq', 'cta', 'contact', 'footer']],
@@ -102,6 +111,7 @@
       }
     }
     const site = bootSite({ page: 'inner' });
+    wireTheme(document.getElementById('theme-pills'), site.cosmos);   // та же тема, что на витрине: localStorage, ?theme=, клавиша T
     // живые мелочи блоков: чипы-переключатели и формы отвечают тостом
     document.querySelectorAll('.blk .choice').forEach((b) => b.addEventListener('click', () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'))));
     document.querySelectorAll('.blk form').forEach((f) => f.addEventListener('submit', (e) => { e.preventDefault(); site.toast('ok', 'Отправлено (пример)'); }));
