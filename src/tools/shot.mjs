@@ -4,10 +4,11 @@
  * Без зависимостей: Node ≥ 22 (встроенный WebSocket) + любой Chrome/Chromium/Edge (из WSL — Windows Chrome).
  *
  *   node kit/tools/shot.mjs                      все страницы (cosmos.json "pages" или *.html в корне), ширины 1440 и 390
- *   node kit/tools/shot.mjs index.html --w 390   одна страница, одна ширина
+ *   node kit/tools/shot.mjs index.html --w 390   одна страница, одна ширина (высота окна: --h 945; телефон всегда 844)
  *   node kit/tools/shot.mjs --base http://127.0.0.1:8790/ --pages /      уже запущенное приложение
  *   node kit/tools/shot.mjs --full               ещё и снимок всей страницы (<страница>-<ширина>-full.png)
  *   node kit/tools/shot.mjs --skip B4,B5         не проверять эти коды (витрины с несколькими образцами)
+ *   node kit/tools/shot.mjs index.html --at #faq  снимок не с начала страницы, а с этого элемента (<страница>-<ширина>-at_faq.png)
  * Страницы отдаёт сам (встроенный статический сервер) или командой из cosmos.json "serve" ("… --port {port}").
  * Снимки — .cosmos/shots/<страница>-<ширина>.png (только первый экран: дёшево смотреть модели).
  * Выход: 0 — ошибок нет, 1 — есть, 3 — браузер не найден (проверка пропущена).
@@ -38,6 +39,8 @@ const OUT = join(ROOT, '.cosmos', 'shots');
 let BASE = null; const BASE_OUT = {};
 try { if (!argv.includes('--baseline')) BASE = JSON.parse(readFileSync(join(ROOT, '.cosmos', 'baseline.json'), 'utf8')); } catch {}
 const WIDTHS = (opt('--w') || '1440,390').split(',').map(Number);
+const HEIGHT = +(opt('--h') || 900);
+const AT = opt('--at') || '';                       // селектор элемента, к которому прокрутить перед снимком                 // высота окна для широких ширин: экран пользователя — 2560×945 и 1920×945 (UX.md §13)
 
 if (typeof WebSocket === 'undefined') { console.log('· B0  нужен Node ≥ 22 (встроенный WebSocket) — браузерная проверка пропущена'); process.exit(3); }
 
@@ -206,16 +209,16 @@ try {
       cdp.listen('Network.responseReceived', (p, sid) => { if (sid === s && p.response.status >= 400) bad.push(`${p.response.status} ${p.response.url.replace(srv.base, '/')}`); });
       cdp.listen('Network.loadingFailed', (p, sid) => { if (sid === s && !p.canceled && p.errorText !== 'net::ERR_ABORTED') bad.push(`${p.errorText} ${p.requestId}`); });
       await Promise.all(['Page.enable', 'Runtime.enable', 'Network.enable'].map((m) => cdp.send(m, {}, s)));
-      await cdp.send('Emulation.setDeviceMetricsOverride', { width: w, height: w < 700 ? 844 : 900, deviceScaleFactor: 1, mobile: w < 700 }, s);
+      await cdp.send('Emulation.setDeviceMetricsOverride', { width: w, height: w < 700 ? 844 : HEIGHT, deviceScaleFactor: 1, mobile: w < 700 }, s);
       const loaded = new Promise((r) => { cdp.listen('Page.loadEventFired', (p, sid) => { if (sid === s) r(); }); setTimeout(r, 15000); });
       await cdp.send('Page.navigate', { url }, s);
       await loaded; await sleep(1400);                                    // сцена, шрифты, появление
       let a = {};
       try { a = JSON.parse((await cdp.send('Runtime.evaluate', { expression: AUDIT, returnByValue: true }, s)).result.value); }
       catch (e) { add('err', where, 'B1', 'аудит не выполнился: ' + e.message); }
-      await cdp.send('Runtime.evaluate', { expression: 'scrollTo(0,0)' }, s); await sleep(250);
+      await cdp.send('Runtime.evaluate', { expression: AT ? `document.documentElement.style.scrollBehavior='auto';document.querySelector(${JSON.stringify(AT)})?.scrollIntoView({ block: 'start' })` : 'scrollTo(0,0)' }, s); await sleep(AT ? 900 : 250);
       const shot = await cdp.send('Page.captureScreenshot', { format: 'png' }, s);
-      const file = join(OUT, `${name}-${w}.png`); writeFileSync(file, Buffer.from(shot.data, 'base64')); shots.push(relative(ROOT, file));
+      const file = join(OUT, `${name}-${w}${AT ? '-at_' + AT.replace(/[^\w-]+/g, '') : ''}.png`); writeFileSync(file, Buffer.from(shot.data, 'base64')); shots.push(relative(ROOT, file));
       if (argv.includes('--full') && w >= 1000) {                        // вся страница — только широкая (телефон — первый экран)                                     // вся страница — для глаз и cosmos-critic (дороже смотреть)
         const m = await cdp.send('Page.getLayoutMetrics', {}, s); const hh = Math.min(Math.ceil(m.cssContentSize.height), 9000);
         const full = await cdp.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, clip: { x: 0, y: 0, width: w, height: hh, scale: 1 } }, s);

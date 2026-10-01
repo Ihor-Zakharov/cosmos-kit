@@ -104,7 +104,7 @@ export function wireTree(tree) {
 
 /** шапка + меню витрины: одна страница, все разделы — якоря */
 export function shell() {
-  const nav = [['#language', 'Язык'], ['#accents', 'Акценты'], ['#components', 'Компоненты'], ['#app', 'Приложение'], ['blocks.html', 'Блоки'], ['#scene', 'Сцена'], ['#motion', 'Движение'], ['#kosmos', 'KOCMOC']];
+  const nav = [['#language', 'Язык'], ['#accents', 'Акценты'], ['#components', 'Компоненты'], ['#app', 'Приложение'], ['#chat', 'Чат'], ['blocks.html', 'Блоки'], ['#scene', 'Сцена'], ['#motion', 'Движение'], ['#kosmos', 'KOCMOC']];
   const links = nav.map(([h, t], i) => `<a href="${h}"${i === 0 ? ' aria-current="page"' : ''}>${t}</a>`).join('');
   document.getElementById('topbar').innerHTML = `
     <a class="brand" href="#top"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>cosmos</a>
@@ -114,4 +114,132 @@ export function shell() {
       <button class="icon-btn menu-btn" type="button" data-open="#menu-drawer" aria-label="Меню"><svg><use href="../src/icons/sprite.svg#i-menu"/></svg></button>
     </div>`;
   document.getElementById('menu-drawer').querySelector('.drawer-links').innerHTML = nav.map(([h, t]) => `<a href="${h}" data-close>${t}</a>`).join('') + '<a href="#connect" data-close>Подключить</a>';
+}
+
+/** палитра витрины: по умолчанию — нейтральная (0.2.0); «бумага-золото» — пример пресета data-palette="paper" + data-accent="gold".
+    ?palette=paper в адресе включает пример сразу (для снимков). Возвращает функцию set(name). */
+export function wirePalette(group, api) {
+  const set = (name, push) => {
+    const paper = name === 'paper';
+    const root = document.documentElement;
+    if (paper) { root.dataset.palette = 'paper'; root.dataset.accent = 'gold'; } else { delete root.dataset.palette; delete root.dataset.accent; }
+    api?.setAccent(paper ? getComputedStyle(root).getPropertyValue('--el-a').trim() : null, 1);
+    group?.querySelectorAll('[data-palette]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.palette === (paper ? 'paper' : 'default'))));
+    document.dispatchEvent(new CustomEvent('palette', { detail: paper ? 'paper' : 'default' }));
+    if (push) { const u = new URL(location.href); if (paper) u.searchParams.set('palette', 'paper'); else u.searchParams.delete('palette'); history.replaceState(null, '', u); }
+  };
+  const q = new URLSearchParams(location.search).get('palette');
+  set(q === 'paper' ? 'paper' : 'default');
+  if (group) wireSegmented(group, 'aria-checked', (it) => set(it.dataset.palette, true));
+  return set;
+}
+
+/** чат витрины: поток ответа с кареткой, отправка, новый чат, инкогнито, реакции и «пожаловаться» — всё без сервера.
+    root — элемент .chat; стартовый разговор берётся из разметки, поток — из data-stream у последнего ответа. */
+export function wireChatDemo(root, toast) {
+  const $ = (s) => root.querySelector(s);
+  const main = $('.chat-main'), col = $('.chat-col'), scroll = $('.chat-scroll'), ta = $('.composer textarea'), send = $('.composer .btn.primary');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const seed = col.innerHTML, title = $('.chat-head h2, .chat-head h1');
+  const titleText = title.textContent;
+  let timer = 0;
+  const bottom = () => { scroll.scrollTop = scroll.scrollHeight; };
+  const grow = () => { ta.style.height = 'auto'; ta.style.height = Math.min(200, ta.scrollHeight) + 'px'; };
+  ta.addEventListener('input', grow);
+  // поток: слова появляются по одному, каретка дышит, под текстом — фаза и таймер; в конце — действия
+  const stream = (msg, text, words) => {
+    clearInterval(timer);
+    const md = msg.querySelector('.md'), run = msg.querySelector('.msg-run'), tm = run?.querySelector('b');
+    const parts = words || text.split(' ');
+    let i = 0; const t0 = Date.now();
+    send.textContent = 'Остановить'; send.classList.remove('primary');
+    const finish = () => { clearInterval(timer); md.innerHTML = text; run?.remove(); msg.classList.add('last'); send.textContent = 'Отправить'; send.classList.add('primary');
+      col.querySelectorAll('.msg.ai.last').forEach((m) => { if (m !== msg) m.classList.remove('last'); }); bottom(); };
+    if (reduced) { finish(); return; }
+    timer = setInterval(() => {
+      i += 1 + Math.floor(Math.random() * 2);
+      md.innerHTML = parts.slice(0, i).join(' ') + '<span class="caret" aria-hidden="true"></span>';
+      if (tm) { const s = Math.floor((Date.now() - t0) / 1000); tm.textContent = '00:' + String(s).padStart(2, '0'); }
+      bottom();
+      if (i >= parts.length) finish();
+    }, 90);
+    send.onclick = () => { if (send.classList.contains('primary')) ask(); else finish(); };
+  };
+  const live = col.querySelector('[data-stream]');
+  if (live) stream(live, live.dataset.stream);
+  const ask = () => {
+    const text = ta.value.trim(); if (!text) { ta.focus(); return; }
+    ta.value = ''; grow();
+    if (main.classList.contains('blank')) { main.classList.remove('blank'); col.innerHTML = ''; title.textContent = text.slice(0, 48); }
+    col.querySelectorAll('.msg.ai.last').forEach((m) => m.classList.remove('last'));
+    const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    const mode = [...root.querySelectorAll('.composer .pills')].map((g) => g.querySelector('[aria-checked="true"]')?.textContent.toLowerCase()).filter(Boolean).join(' · ');
+    col.insertAdjacentHTML('beforeend', `<div class="msg user"><div class="bubble"></div><div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button">Изменить</button></div></div>`);
+    const b = col.lastElementChild.querySelector('.bubble'); b.textContent = text; b.insertAdjacentHTML('beforeend', `<small>${time} · ${mode}</small>`);
+    col.insertAdjacentHTML('beforeend', `<div class="msg ai"><div class="md"></div><div class="msg-run"><i class="live-dot"></i><span>Собираю контекст: профиль, отзывы, память</span><b>00:00</b></div></div>`);
+    const a = col.lastElementChild;
+    bottom();
+    const answer = main.classList.contains('incognito')
+      ? '<p>Инкогнито: отвечаю без профиля и памяти. По запросу <strong>«' + text.replace(/</g, '&lt;') + '»</strong> в каталоге есть три записи — две полные и одна радиопостановка. Какую длину предпочитаете?</p>'
+      : '<p>Понял: <strong>«' + text.replace(/</g, '&lt;') + '»</strong>. Судя по вашим отзывам, подойдут две книги рядом и один «мост» в документальную прозу — ниже каждая с причиной. Скажите «покороче» или «мрачнее», и я сдвину подбор.</p>';
+    setTimeout(() => stream(a, answer), reduced ? 0 : 700);
+  };
+  send.onclick = ask;
+  ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (send.classList.contains('primary')) ask(); } });
+  // новый чат → пустое состояние с полем по центру; инкогнито — пунктир и свой текст пустого состояния
+  const blank = () => {
+    clearInterval(timer); main.classList.add('blank'); title.textContent = 'Новый чат';
+    root.querySelectorAll('.chat-row').forEach((r) => r.classList.remove('on'));
+    const inc = main.classList.contains('incognito');
+    col.innerHTML = `<div class="chat-empty"><h3>${inc ? 'Инкогнито: начнём с чистого листа' : 'Что послушать дальше?'}</h3>
+      <p>${inc ? 'Не вижу ваших отзывов, анкеты и памяти и ничего не запомню. Ищу по всей библиотеке и каталогу источников.' : 'Я вижу ваши отзывы, анкету и память о вкусе. Советую книги рядом и «мосты» в другие жанры — каждую можно поставить в очередь или отправить одной кнопкой, даже если её ещё нет на диске.'}</p>
+      <div class="choices"><button class="choice" type="button">Что после последней пятёрки?</button><button class="choice" type="button">Мрачное и короткое, до 5 часов</button><button class="choice" type="button">Удиви меня чем-нибудь не из фантастики</button><button class="choice" type="button">Радиоспектакль на вечер</button></div></div>`;
+    send.textContent = 'Отправить'; send.classList.add('primary'); ta.focus({ preventScroll: true });
+  };
+  $('.chat-side > .btn')?.addEventListener('click', blank);
+  const inc = $('.chat-head .switch input');
+  inc?.addEventListener('change', () => { main.classList.toggle('incognito', inc.checked); $('.chat-head .sub').textContent = inc.checked ? 'инкогнито · без профиля и памяти' : 'помнит ваш вкус'; blank(); });
+  // разговоры: клик по строке возвращает стартовый разговор
+  root.querySelectorAll('.chat-row > button:first-child').forEach((b) => b.addEventListener('click', () => {
+    clearInterval(timer); root.querySelectorAll('.chat-row').forEach((r) => r.classList.toggle('on', r.contains(b)));
+    main.classList.remove('blank'); if (inc) { inc.checked = false; main.classList.remove('incognito'); }
+    title.textContent = b.childNodes[0].textContent.trim() || titleText; col.innerHTML = seed; wireRows(); bottom();
+  }));
+  root.querySelectorAll('.chat-row .x').forEach((x) => x.addEventListener('click', () => { x.closest('.chat-row').remove(); toast?.('', 'Разговор удалён'); }));
+  // подсказки, реакции, действия советов — по клику
+  const wireRows = () => {
+    col.querySelectorAll('.choice').forEach((c) => c.addEventListener('click', () => { ta.value = c.textContent; grow(); ask(); }));
+    col.querySelectorAll('.reacts').forEach((g) => g.querySelectorAll('.react').forEach((r) => r.addEventListener('click', () => {
+      const on = r.getAttribute('aria-pressed') !== 'true';
+      g.querySelectorAll('.react').forEach((o) => o.setAttribute('aria-pressed', String(o === r && on)));
+      r.closest('.advice-row')?.classList.toggle('gone', on && !r.querySelector('use[href$="i-thumb-up"]'));
+      const rate = !r.querySelector('svg') && document.getElementById('rate');
+      if (rate && on) { r.textContent = '✓ Читал'; rate.querySelector('h3').textContent = '«' + (r.closest('.advice-row')?.querySelector('.advice-title')?.textContent || 'книга') + '» — уже читали'; openDialog(rate); return; }
+      if (rate) r.textContent = 'Уже читал';
+      toast?.('', on ? (r.getAttribute('aria-label') || 'Отмечено как прочитанное').split(' — ')[0] + ' — учту' : 'Отметка снята');
+    })));
+    col.querySelectorAll('.fetch-acts .btn, .advice-side .btn-row .btn').forEach((b) => b.addEventListener('click', () => {
+      const t = b.textContent.trim();
+      if (/Скачать/.test(t)) { b.textContent = 'качается…'; b.disabled = true; toast?.('', 'Скачиваю — проверю и положу в библиотеку'); }
+      else if (/очередь/.test(t)) { b.classList.toggle('on'); b.textContent = b.classList.contains('on') ? '✓ в очереди' : '+ в очередь'; }
+      else if (/Ссылка/.test(t)) toast?.('', 'Ссылка скопирована');
+      else toast?.('', 'Отправлю, как только скачается');
+    }));
+    col.querySelectorAll('.msg-acts .text-btn').forEach((b) => b.addEventListener('click', () => toast?.('', b.textContent.trim() === 'Копировать' ? 'Скопировано' : 'Пример: ' + b.textContent.trim())));
+  };
+  wireRows();
+  col.addEventListener('click', (e) => { const c = e.target.closest('.chat-empty .choice'); if (c) { ta.value = c.textContent; grow(); ask(); } });
+  root.querySelectorAll('.composer .pills').forEach((g) => wireSegmented(g, 'aria-checked'));
+  requestAnimationFrame(bottom);
+  return { ask, blank };
+}
+
+/** диалог быстрой оценки (.scale): клик по плите или цифра с клавиатуры (0 = 10) — оценка сохранена сразу; «Просто отметить», «Полный отзыв →» — тостом */
+export function wireRateDialog(dlg, toast) {
+  const pick = (n) => { closeDialog(dlg); toast?.('ok', `Оценка ${n}/10 сохранена · учту в подборе`); };
+  dlg.querySelectorAll('.scale button').forEach((b) => b.addEventListener('click', () => pick(+b.textContent)));
+  dlg.addEventListener('keydown', (e) => { if (/^[0-9]$/.test(e.key) && !e.target.matches('input, textarea')) { e.preventDefault(); pick(e.key === '0' ? 10 : +e.key); } });
+  const [mark, full] = [...dlg.querySelectorAll('.modal-actions .btn')].slice(-2);
+  mark?.addEventListener('click', () => toast?.('', 'Отмечено как прочитанное'));
+  full?.addEventListener('click', () => toast?.('', 'Пример: открылась бы карточка отзыва'));
 }

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>cosmos-kit — чат</title>
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../src/icons/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../src/fonts/fonts.css">
+<link rel="stylesheet" href="../src/css/tokens.css">
+<link rel="stylesheet" href="../src/css/components.css">
+<link rel="stylesheet" href="demo.css">
+<style>
+  /* чат — отдельный экран во всю высоту: .view без полей, колонка на всю ширину экрана приложения */
+  .app-main.chat-screen { padding: 0; }
+  .app-main.chat-screen > .view { max-width: none; }
+</style>
+</head>
+<body>
+  <div class="cosmos-wrap asleep" id="cosmos-wrap" aria-hidden="true">
+    <canvas class="cosmos" id="cosmos"></canvas>
+    <div class="cosmos-fallback"></div>
+    <div class="grain"></div>
+  </div>
+
+  <div class="app">
+    <aside class="rail">
+      <a class="brand" href="index.html"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>книги</a>
+      <nav class="rail-nav" aria-label="Экраны">
+        <a href="index.html#app"><svg><use href="../src/icons/sprite.svg#i-home"/></svg><span class="l">Обзор</span></a>
+        <a href="index.html#app"><svg><use href="../src/icons/sprite.svg#i-list"/></svg><span class="l">Библиотека</span><small>564</small></a>
+        <a href="chat.html" aria-current="page"><svg><use href="../src/icons/sprite.svg#i-wave"/></svg><span class="l">Чат</span></a>
+        <a href="index.html#wizard"><svg><use href="../src/icons/sprite.svg#i-pencil"/></svg><span class="l">Анкета</span></a>
+      </nav>
+      <div class="rail-foot">
+        <div class="pills small" role="radiogroup" aria-label="Палитра" id="palette-pills" data-segmented>
+          <button type="button" role="radio" data-palette="default" aria-checked="true">обычная</button>
+          <button type="button" role="radio" data-palette="paper" aria-checked="false">бумага-золото</button>
+          <span class="pill-ink" aria-hidden="true"></span>
+        </div>
+        <a class="btn" href="index.html#chat">К витрине</a>
+      </div>
+    </aside>
+    <main class="app-main chat-screen">
+      <section class="view">
+        <div class="chat" id="chat">
+          <aside class="chat-side">
+            <button class="btn small" type="button">+ Новый чат</button>
+            <div class="chat-list">
+              <div class="chat-group">Сегодня</div>
+              <div class="chat-row on"><button type="button">Хочу что-то мрачное, но короткое<small>19:42 · 1 вопрос</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
+              <div class="chat-row"><button type="button">Радиоспектакль на вечер<small>18:11 · 3 вопроса</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
+              <div class="chat-group">Вчера</div>
+              <div class="chat-row"><button type="button">Что-то похожее на «Убик», 1969<small>10:22 · 2 вопроса · инкогнито</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
+              <div class="chat-group">На этой неделе</div>
+              <div class="chat-row"><button type="button">Документальное про Арктику<small>пн · 4 вопроса</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
+            </div>
+            <div class="chat-side-foot"><button type="button">Память: 2 факта</button></div>
+          </aside>
+          <div class="chat-main">
+            <header class="chat-head">
+              <h1>Хочу что-то мрачное, но короткое</h1><p class="sub">помнит ваш вкус</p><span class="spacer"></span>
+              <label class="switch" title="Не видит анкету, отзывы и память и ничего не запоминает"><input type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">инкогнито</span></label>
+            </header>
+            <div class="chat-scroll" aria-live="polite">
+              <div class="chat-col">
+                <div class="msg user">
+                  <div class="bubble">Хочу что-то мрачное, но короткое<small>19:42 · рядом · авто</small></div>
+                  <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button">Изменить</button></div>
+                </div>
+                <div class="msg ai">
+                  <div class="md"><p>Раз вам зашли <strong>«Женщина в песках»</strong> и мрачные притчи, вот что предложу:</p>
+                    <ul><li>одну книгу рядом — уже на диске;</li><li>и два <em>моста</em> в другие жанры.</li></ul>
+                    <p>Первый мост лежит в каталоге, второй найду в сети.</p></div>
+                  <div class="advice">
+                    <div class="advice-row">
+                      <div class="advice-body">
+                        <div class="advice-tags"><span class="tag">рядом</span><span class="tag">роман</span></div>
+                        <div class="advice-title link">Кобо Абэ — «Женщина в песках»</div>
+                        <div class="advice-why">Тест: на диске. Та же клаустрофобия и песок, который не кончается; 5 часов — как раз «короткое».</div>
+                        <div class="advice-meta">5 ч · не указан (живой голос) · ✓ на диске · отзыв: прослушано</div>
+                      </div>
+                      <div class="advice-side">
+                        <div class="btn-row"><span class="tag">прослушано</span><button class="btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-external"/></svg>в Telegram</button></div>
+                        <div class="reacts">
+                          <button class="react" type="button" aria-pressed="false" aria-label="Нравится — больше такого"><svg><use href="../src/icons/sprite.svg#i-thumb-up"/></svg></button>
+                          <button class="react" type="button" aria-pressed="false" aria-label="Не моё — меньше такого"><svg><use href="../src/icons/sprite.svg#i-thumb-down"/></svg></button>
+                          <button class="react" type="button" aria-pressed="true">✓ Читал</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="advice-row">
+                      <div class="advice-body">
+                        <div class="advice-tags"><span class="tag accent">мост</span><span class="tag">роман</span></div>
+                        <div class="advice-title">Патрик О’Лири — «Дверь номер три»</div>
+                        <div class="advice-chain">Женщина в песках <i>→</i> замкнутое пространство <i>→</i> Дверь</div>
+                        <div class="advice-why">В каталоге, не скачана: разговорный психологический триллер, где комната важнее сюжета.</div>
+                        <div class="advice-meta">~10,8 ч · Олег Булдаков · в каталоге, не скачана</div>
+                      </div>
+                      <div class="advice-side">
+                        <div class="btn-row fetch-acts">
+                          <button class="btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-link"/></svg>Ссылка</button>
+                          <button class="btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-download"/></svg>Скачать</button>
+                          <button class="btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-external"/></svg>в Telegram</button>
+                          <button class="text-btn small" type="button" data-open="#report" aria-label="Пожаловаться на запись"><svg><use href="../src/icons/sprite.svg#i-flag"/></svg></button>
+                        </div>
+                        <div class="reacts">
+                          <button class="react" type="button" aria-pressed="false" aria-label="Нравится — больше такого"><svg><use href="../src/icons/sprite.svg#i-thumb-up"/></svg></button>
+                          <button class="react" type="button" aria-pressed="false" aria-label="Не моё — меньше такого"><svg><use href="../src/icons/sprite.svg#i-thumb-down"/></svg></button>
+                          <button class="react" type="button" aria-pressed="false">Уже читал</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="advice-row">
+                      <div class="advice-body">
+                        <div class="advice-tags"><span class="tag accent">мост</span><span class="tag">повесть</span></div>
+                        <div class="advice-title">Роберт Маккаммон — «Я подорожую ночами»</div>
+                        <div class="advice-chain">Убик <i>→</i> ночь <i>→</i> книга</div>
+                        <div class="advice-why">Вне библиотеки, есть в каталоге источников: ночной роуд-хоррор на четыре часа.</div>
+                        <div class="advice-meta">нет в библиотеке — найду и скачаю · уверенность 50%</div>
+                      </div>
+                      <div class="advice-side">
+                        <div class="btn-row fetch-acts">
+                          <button class="btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-link"/></svg>Ссылка</button>
+                          <button class="btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-download"/></svg>Скачать</button>
+                          <button class="btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-external"/></svg>в Telegram</button>
+                          <button class="text-btn small" type="button" data-open="#report" aria-label="Пожаловаться на запись"><svg><use href="../src/icons/sprite.svg#i-flag"/></svg></button>
+                        </div>
+                        <div class="reacts">
+                          <button class="react" type="button" aria-pressed="false" aria-label="Нравится — больше такого"><svg><use href="../src/icons/sprite.svg#i-thumb-up"/></svg></button>
+                          <button class="react" type="button" aria-pressed="false" aria-label="Не моё — меньше такого"><svg><use href="../src/icons/sprite.svg#i-thumb-down"/></svg></button>
+                          <button class="react" type="button" aria-pressed="false">Уже читал</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="choices"><button class="choice" type="button">А покороче?</button><button class="choice" type="button">Что-нибудь светлее</button></div>
+                  <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-refresh"/></svg>Другой ответ</button><span class="meta">00:19</span></div>
+                </div>
+                <div class="msg user">
+                  <div class="bubble">А покороче?<small>19:44 · рядом · 3 книги</small></div>
+                  <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button">Изменить</button></div>
+                </div>
+                <div class="msg ai" data-stream="<p>Короче пяти часов и в том же настроении — три записи. Первая уже на диске: <strong>«Превращение»</strong> Кафки в чтении Терновского, 2 ч 10 мин. Вторая — радиоспектакль <strong>«Пикник на обочине»</strong>, 3 ч. Третья — мост в документальное: <strong>«Ночь»</strong> Эли Визеля, 3 ч 40 мин; её найду в сети и скачаю, если скажете.</p>">
+                  <div class="md"></div>
+                  <div class="msg-run"><i class="live-dot"></i><span>Собираю контекст: профиль, отзывы, память</span><b>00:00</b></div>
+                </div>
+              </div>
+            </div>
+            <div class="composer">
+              <div class="composer-box">
+                <textarea rows="1" maxlength="2000" aria-label="Сообщение консультанту" placeholder="Чего хочется послушать?"></textarea>
+                <div class="composer-bar">
+                  <span class="composer-lbl">Прыжок</span>
+                  <div class="pills small" role="radiogroup" aria-label="Насколько далеко от запроса">
+                    <button type="button" role="radio" aria-checked="false" title="тот же жанр и настроение">Близко</button>
+                    <button type="button" role="radio" aria-checked="true" title="соседние жанры">Рядом</button>
+                    <button type="button" role="radio" aria-checked="false" title="другой жанр, эпоха или форма">Дальше</button>
+                    <button type="button" role="radio" aria-checked="false" title="то, о чём вы вряд ли думали">Далеко</button>
+                    <button type="button" role="radio" aria-checked="false" class="spark" title="смелые мосты в неожиданное">Удиви</button>
+                    <span class="pill-ink" aria-hidden="true"></span>
+                  </div>
+                  <span class="composer-lbl">Книг</span>
+                  <div class="pills small" role="radiogroup" aria-label="Сколько книг советовать">
+                    <button type="button" role="radio" aria-checked="true" title="столько, сколько сильных попаданий">Авто</button>
+                    <button type="button" role="radio" aria-checked="false">3</button>
+                    <button type="button" role="radio" aria-checked="false">5</button>
+                    <button type="button" role="radio" aria-checked="false">10</button>
+                    <span class="pill-ink" aria-hidden="true"></span>
+                  </div>
+                  <span class="spacer"></span>
+                  <button class="btn primary" type="button">Отправить</button>
+                </div>
+              </div>
+              <p class="composer-keys">Enter — отправить · Shift+Enter — новая строка · ↑ — изменить последнее · Esc — остановить</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="modal" id="rate" aria-labelledby="rate-title">
+    <div class="modal-box" tabindex="-1">
+      <header class="drawer-head"><h3 id="rate-title">«Женщина в песках» — уже читали</h3></header>
+      <p class="modal-text">Оцените одним нажатием — это сразу уточнит подбор. Цифра с клавиатуры тоже подойдёт.</p>
+      <div class="scale" role="group" aria-label="Оценка от 1 до 10">
+        <button type="button" aria-label="Оценка 1">1</button><button type="button" aria-label="Оценка 2">2</button><button type="button" aria-label="Оценка 3">3</button>
+        <button type="button" aria-label="Оценка 4">4</button><button type="button" aria-label="Оценка 5">5</button><button type="button" aria-label="Оценка 6">6</button>
+        <button type="button" aria-label="Оценка 7">7</button><button type="button" aria-label="Оценка 8">8</button><button type="button" aria-label="Оценка 9">9</button>
+        <button type="button" aria-label="Оценка 10">10</button>
+      </div>
+      <div class="btn-row modal-actions"><button class="btn" type="button" data-close>Отмена</button><span class="spacer"></span><button class="btn" type="button" data-close>Просто отметить</button><button class="btn primary" type="button" data-close>Полный отзыв →</button></div>
+    </div>
+  </dialog>
+
+  <dialog class="modal" id="report" aria-labelledby="report-title">
+    <div class="modal-box" tabindex="-1">
+      <header class="drawer-head"><h3 id="report-title">Что не так с записью?</h3></header>
+      <p class="modal-text">Патрик О’Лири — «Дверь номер три». Отметка сразу убирает запись из поиска и ссылок.</p>
+      <div class="choices" role="radiogroup" aria-label="Причина" id="report-reasons">
+        <button class="choice" type="button" role="radio" aria-checked="false">только для спонсоров</button>
+        <button class="choice" type="button" role="radio" aria-checked="false">неполная</button>
+        <button class="choice" type="button" role="radio" aria-checked="false">не та книга</button>
+        <button class="choice" type="button" role="radio" aria-checked="false">плохое качество</button>
+        <button class="choice" type="button" role="radio" aria-checked="false">другое</button>
+      </div>
+      <label class="lbl">Подробнее, если хочется<input class="in" maxlength="500" placeholder="«обрывается на 3-й части», «это пересказ»…"></label>
+      <label class="switch"><input type="checkbox" checked><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">найти другую запись</span></label>
+      <div class="btn-row modal-actions"><button class="btn" type="button" data-close>Отмена</button><button class="btn primary" type="button" id="report-send" disabled>Пожаловаться</button></div>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script type="module">
+    import { bootSite } from '../src/js/site.js';
+    import { closeDialog } from '../src/js/motion.js';
+    import { wirePalette, wireChatDemo, wireRateDialog } from './demo.js';
+    const site = bootSite({ page: 'app' });
+    wirePalette(document.getElementById('palette-pills'), site.cosmos);
+    wireChatDemo(document.getElementById('chat'), site.toast);
+    wireRateDialog(document.getElementById('rate'), site.toast);
+    // жалоба: одна причина, действие становится доступным после выбора; отметка — сразу, тостом
+    const reasons = document.getElementById('report-reasons'), sendBtn = document.getElementById('report-send');
+    reasons.querySelectorAll('.choice').forEach((c) => c.addEventListener('click', () => { reasons.querySelectorAll('.choice').forEach((o) => o.setAttribute('aria-checked', String(o === c))); sendBtn.disabled = false; }));
+    sendBtn.addEventListener('click', () => { closeDialog(document.getElementById('report')); site.toast('ok', 'Запись отмечена — ищу другую'); });
+  </script>
+</body>
+</html>

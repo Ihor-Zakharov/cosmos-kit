@@ -36,7 +36,7 @@
         </div>
         <div class="hero-stats">
           <div class="stat"><b class="count" data-to="4">0</b><span>шрифта · OFL</span></div>
-          <div class="stat"><b class="count" data-to="47">0</b><span>глифов в спрайте</span></div>
+          <div class="stat"><b class="count" data-to="50">0</b><span>глифов в спрайте</span></div>
           <div class="stat"><b class="count" data-to="5">0</b><span>ступеней излучения</span></div>
           <div class="stat"><b class="count" data-to="0">0</b><span>зависимостей</span></div>
         </div>
@@ -54,7 +54,7 @@
         <div class="card static">
           <span class="card-glyph"><svg><use href="../src/icons/sprite.svg#i-layers"/></svg></span>
           <p class="card-title">Поверхности — монохром</p>
-          <p class="card-text">Четыре плиты от #0b0b0e до #222228, три тона чернил, три волосяные линии. Ни одна плита,
+          <p class="card-text">Четыре плиты от #0b0b0e до #222228, три тона чернил (APCA Lc 90 / 78 / 62), три волосяные линии. Ни одна плита,
           карточка или фон не красится напрямую — глубина делается тенью и тоном, не цветом.</p>
         </div>
         <div class="card static">
@@ -89,6 +89,18 @@
       </div>
       <p class="demo-note" style="margin-top:16px">Ступень ставится атрибутом <code>data-accent</code> на <code>&lt;html&gt;</code>; сцена перекрашивает туман и кайму
       через <code>cosmosApi.setAccent(--el-a)</code>. Поверхности при этом не меняются — только то, что светится.</p>
+      <div class="demo-section" style="margin-top:40px">
+        <h3>Палитра нейтралей — по умолчанию и пример «бумага-золото»</h3>
+        <div class="demo-row">
+          <div class="pills glass" role="radiogroup" aria-label="Палитра" id="palette-pills">
+            <button type="button" role="radio" data-palette="default" aria-checked="true">По умолчанию</button>
+            <button type="button" role="radio" data-palette="paper" aria-checked="false">Бумага-золото · пример</button>
+            <span class="pill-ink" aria-hidden="true"></span>
+          </div>
+        </div>
+        <p class="demo-note">По умолчанию чернила и поверхности нейтральные, холодно-белые, свет белый — как в выдре. Чернила приглушены до APCA Lc 90 / 78 / 62, чтобы не слепили.
+        «Бумага» — тёплые нейтрали прохода «книжный шарм»: <code>&lt;html data-palette="paper" data-accent="gold"&gt;</code>. Это пресет-пример, не умолчание.</p>
+      </div>
     </section>
 
     <!-- каталог компонентов -->
@@ -319,6 +331,199 @@
         </div>
       </div>
       <div class="demo-row"><p class="demo-note">В приложении сцена спит (<code>bootSite({ page: 'app' })</code>), на телефоне рейка становится верхней полосой. Целая страница — <code>starter/app.html</code>.</p></div>
+    </section>
+
+    <!-- чат и советы: отдельный экран во всю высоту (demo/chat.html), здесь — в рамке (components.css, блок «Чат и советы») -->
+    <section class="section" id="chat">
+      <div class="section-head">
+        <p class="kicker">чат и советы</p>
+        <h2>Разговор — как в браузерном Claude</h2>
+        <p>Слева разговоры по датам, в центре колонка сообщений не шире 880px, поле ввода — последним рядом. Вопрос — пузырь, ответ — текст
+        без пузыря, советы — строками с реакциями. Отдельным экраном во всю высоту — <a href="chat.html">demo/chat.html</a>.</p>
+      </div>
+      <div class="demo-app">
+        <div class="chat" id="demo-chat">
+          <aside class="chat-side">
+            <button class="btn small" type="button">+ Новый чат</button>
+            <div class="chat-list">
+              <div class="chat-group">Сегодня</div>
+              <div class="chat-row on"><button type="button">Хочу что-то мрачное, но короткое<small>19:42 · 1 вопрос</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
+              <div class="chat-row"><button type="button">Радиоспектакль на вечер<small>18:11 · 3 вопроса</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
+              <div class="chat-group">Вчера</div>
+              <div class="chat-row"><button type="button">Что-то похожее на «Убик», 1969<small>10:22 · 2 вопроса · инкогнито</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
+            </div>
+            <div class="chat-side-foot"><button type="button">Память: 2 факта</button></div>
+          </aside>
+          <div class="chat-main">
+            <header class="chat-head">
+              <h2>Хочу что-то мрачное, но короткое</h2><p class="sub">помнит ваш вкус</p><span class="spacer"></span>
+              <label class="switch"><input type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">инкогнито</span></label>
+            </header>
+            <div class="chat-scroll" aria-live="polite">
+              <div class="chat-col">
+                <div class="msg user">
+                  <div class="bubble">Хочу что-то мрачное, но короткое<small>19:42 · рядом · авто</small></div>
+                  <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button">Изменить</button></div>
+                </div>
+                <div class="msg ai">
+                  <div class="md"><p>Раз вам зашли <strong>«Женщина в песках»</strong> и мрачные притчи, вот что предложу: одну книгу рядом — уже на диске — и один <em>мост</em> в другой жанр.</p></div>
+                  <div class="advice">
+                    <div class="advice-row">
+                      <div class="advice-body">
+                        <div class="advice-tags"><span class="tag">рядом</span><span class="tag">роман</span></div>
+                        <div class="advice-title link">Кобо Абэ — «Женщина в песках»</div>
+                        <div class="advice-why">На диске. Та же клаустрофобия и песок, который не кончается; 5 часов — как раз «короткое».</div>
+                        <div class="advice-meta">5 ч · ✓ на диске · отзыв: прослушано</div>
+                      </div>
+                      <div class="advice-side">
+                        <div class="btn-row"><button class="btn small" type="button">+ в очередь</button><button class="btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-external"/></svg>в Telegram</button></div>
+                        <div class="reacts">
+                          <button class="react" type="button" aria-pressed="false" aria-label="Нравится — больше такого"><svg><use href="../src/icons/sprite.svg#i-thumb-up"/></svg></button>
+                          <button class="react" type="button" aria-pressed="false" aria-label="Не моё — меньше такого"><svg><use href="../src/icons/sprite.svg#i-thumb-down"/></svg></button>
+                          <button class="react" type="button" aria-pressed="false">Уже читал</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="advice-row">
+                      <div class="advice-body">
+                        <div class="advice-tags"><span class="tag accent">мост</span><span class="tag">повесть</span></div>
+                        <div class="advice-title">Роберт Маккаммон — «Я подорожую ночами»</div>
+                        <div class="advice-chain">Убик <i>→</i> ночь <i>→</i> книга</div>
+                        <div class="advice-meta">нет в библиотеке — найду и скачаю · уверенность 50%</div>
+                      </div>
+                      <div class="advice-side">
+                        <div class="btn-row fetch-acts">
+                          <button class="btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-link"/></svg>Ссылка</button>
+                          <button class="btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-download"/></svg>Скачать</button>
+                          <button class="btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-external"/></svg>в Telegram</button>
+                          <button class="text-btn small" type="button" data-open="#report" aria-label="Пожаловаться на запись"><svg><use href="../src/icons/sprite.svg#i-flag"/></svg></button>
+                        </div>
+                        <div class="reacts">
+                          <button class="react" type="button" aria-pressed="false" aria-label="Нравится — больше такого"><svg><use href="../src/icons/sprite.svg#i-thumb-up"/></svg></button>
+                          <button class="react" type="button" aria-pressed="false" aria-label="Не моё — меньше такого"><svg><use href="../src/icons/sprite.svg#i-thumb-down"/></svg></button>
+                          <button class="react" type="button" aria-pressed="false">Уже читал</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="choices"><button class="choice" type="button">А покороче?</button><button class="choice" type="button">Что-нибудь светлее</button></div>
+                  <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button"><svg><use href="../src/icons/sprite.svg#i-refresh"/></svg>Другой ответ</button><span class="meta">00:19</span></div>
+                </div>
+                <div class="msg user">
+                  <div class="bubble">А покороче?<small>19:44 · рядом · 3 книги</small></div>
+                  <div class="msg-acts"><button class="text-btn small" type="button">Копировать</button><button class="text-btn small" type="button">Изменить</button></div>
+                </div>
+                <div class="msg ai" data-stream="<p>Короче пяти часов и в том же настроении: <strong>«Превращение»</strong> Кафки, 2 ч 10 мин, уже на диске; радиоспектакль <strong>«Пикник на обочине»</strong>, 3 ч; и мост в документальное — <strong>«Ночь»</strong> Эли Визеля, найду в сети и скачаю, если скажете.</p>">
+                  <div class="md"></div>
+                  <div class="msg-run"><i class="live-dot"></i><span>Собираю контекст: профиль, отзывы, память</span><b>00:00</b></div>
+                </div>
+              </div>
+            </div>
+            <div class="composer">
+              <div class="composer-box">
+                <textarea rows="1" maxlength="2000" aria-label="Сообщение консультанту" placeholder="Чего хочется послушать?"></textarea>
+                <div class="composer-bar">
+                  <span class="composer-lbl">Прыжок</span>
+                  <div class="pills small" role="radiogroup" aria-label="Насколько далеко от запроса">
+                    <button type="button" role="radio" aria-checked="false">Близко</button>
+                    <button type="button" role="radio" aria-checked="true">Рядом</button>
+                    <button type="button" role="radio" aria-checked="false">Дальше</button>
+                    <button type="button" role="radio" aria-checked="false">Далеко</button>
+                    <button type="button" role="radio" aria-checked="false" class="spark">Удиви</button>
+                    <span class="pill-ink" aria-hidden="true"></span>
+                  </div>
+                  <span class="composer-lbl">Книг</span>
+                  <div class="pills small" role="radiogroup" aria-label="Сколько книг советовать">
+                    <button type="button" role="radio" aria-checked="true">Авто</button>
+                    <button type="button" role="radio" aria-checked="false">3</button>
+                    <button type="button" role="radio" aria-checked="false">5</button>
+                    <button type="button" role="radio" aria-checked="false">10</button>
+                    <span class="pill-ink" aria-hidden="true"></span>
+                  </div>
+                  <span class="spacer"></span>
+                  <button class="btn primary" type="button">Отправить</button>
+                </div>
+              </div>
+              <p class="composer-keys">Enter — отправить · Shift+Enter — новая строка · ↑ — изменить последнее · Esc — остановить</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-row"><p class="demo-note">Нажмите «+ Новый чат» — пустое состояние с полем по центру; включите «инкогнито» — поле пунктиром. Поток печатается с кареткой <code>.caret</code>
+      (дышит той же механикой, что <code>.live-dot</code>). Реакции и «Скачать» — живые. Шкала «Прыжок»: крайний «✦ Удиви» — <code>.pills button.spark</code>.
+      Флажок у нескачанной записи открывает жалобу — диалог причины, не красная кнопка.</p></div>
+    </section>
+
+    <!-- анкета по шагам: строка шагов, открытые группы, все варианты сразу, действия последним рядом -->
+    <section class="section" id="wizard">
+      <div class="section-head">
+        <p class="kicker">анкета по шагам</p>
+        <h2>Семь шагов, всё видно сразу</h2>
+        <p>Строка шагов от края до края, вопросы открытыми группами, варианты чипами без «ещё», действия и статус сохранения — последним рядом карточки. Ничего не плавает поверх полей.</p>
+      </div>
+      <div class="ways">
+        <div class="pills glass" role="radiogroup" aria-label="Как заполнить" id="demo-ways">
+          <button type="button" role="radio" aria-checked="true" data-way="steps">По шагам</button>
+          <button type="button" role="radio" aria-checked="false" data-way="text">Рассказать своими словами</button>
+          <span class="pill-ink" aria-hidden="true"></span>
+        </div>
+      </div>
+      <form class="panel demo-wizard" id="demo-wizard-text" hidden>
+        <h3>Расскажите, что вам нравится</h3>
+        <p>Свободно, как другу: любимые книги и почему, что бросили, фильмы и игры, когда и где слушаете, чего не хотите. Рассказ разложится по анкете — заполненное вами не перетрётся, — и вы проверите всё в «Итоге».</p>
+        <div class="field area">
+          <div class="field-ring" aria-hidden="true"></div>
+          <div class="field-body"><textarea maxlength="8000" aria-label="Рассказ о вкусе" placeholder="«Обожаю „Убик“ и „Конец вечности“ — люблю, когда реальность трескается. „Улисс“ бросил на трети: слишком словесно. Из кино — „Интерстеллар“, „Остров проклятых“. Слушаю в дороге, часа по два, мрачное — да, но без жестокости к детям…»"></textarea></div>
+        </div>
+        <div class="form-actions"><button class="btn primary" type="submit">Заполнить анкету</button><span class="item-meta">≈ 10–20 с · заполненное руками не перетрётся</span></div>
+      </form>
+      <form class="panel demo-wizard" id="demo-wizard">
+        <nav class="steps" aria-label="Шаги анкеты">
+          <button class="step done" type="button"><span class="n">1</span><span class="l">Любимые книги</span></button><span class="step-sep"></span>
+          <button class="step done" type="button"><span class="n">2</span><span class="l">Не зашли</span></button><span class="step-sep"></span>
+          <button class="step done" type="button"><span class="n">3</span><span class="l">Как слушаете</span></button><span class="step-sep"></span>
+          <button class="step" type="button"><span class="n">4</span><span class="l">Кино и игры</span></button><span class="step-sep"></span>
+          <button class="step done" type="button"><span class="n">5</span><span class="l">О вас</span></button><span class="step-sep"></span>
+          <button class="step on" type="button" aria-current="step"><span class="n">6</span><span class="l">Что ещё</span></button><span class="step-sep"></span>
+          <button class="step" type="button"><span class="n">7</span><span class="l">Итог</span></button>
+        </nav>
+        <div class="view-head"><div><h3>Что ещё нужно знать</h3><p>Запреты, настроение, где слушаете — и вопросы, которые консультант хочет уточнить. Всё необязательно.</p></div></div>
+        <div class="form-grid">
+          <label>Не предлагать авторов <small>никогда</small><input class="in" placeholder="Автор, Enter"></label>
+          <label>Не предлагать темы<input class="in" placeholder="Тема, Enter: «насилие над детьми», «война»…"></label>
+          <div class="lbl">Сколько мрачности
+            <div class="choices" role="radiogroup" aria-label="Сколько мрачности">
+              <button class="choice" type="button" role="radio" aria-checked="false">лучше светлое</button>
+              <button class="choice" type="button" role="radio" aria-checked="true">баланс</button>
+              <button class="choice" type="button" role="radio" aria-checked="false">мрачное — да</button>
+              <button class="choice" type="button" role="radio" aria-checked="false">чем мрачнее, тем лучше</button>
+            </div>
+          </div>
+          <div class="lbl">Где слушаете
+            <div class="choices" role="group" aria-label="Где слушаете">
+              <button class="choice" type="button" aria-pressed="true">в дороге</button>
+              <button class="choice" type="button" aria-pressed="false">за рулём</button>
+              <button class="choice" type="button" aria-pressed="false">спорт</button>
+              <button class="choice" type="button" aria-pressed="true">дома</button>
+              <button class="choice" type="button" aria-pressed="false">перед сном</button>
+              <button class="choice" type="button" aria-pressed="false">на работе</button>
+            </div>
+          </div>
+          <label class="wide">Что ещё важно<input class="in" placeholder="Свободно: «люблю, когда финал переворачивает всё», «не выношу медленное начало»…"></label>
+        </div>
+        <div class="group">
+          <h3>Вопросы консультанта</h3>
+          <div class="lbl">Насколько важен чтец?
+            <div class="choices" role="radiogroup" aria-label="Насколько важен чтец">
+              <button class="choice" type="button" role="radio" aria-checked="false">решает всё</button>
+              <button class="choice" type="button" role="radio" aria-checked="true">важен, но не главное</button>
+              <button class="choice" type="button" role="radio" aria-checked="false">всё равно</button>
+            </div>
+          </div>
+          <div class="btn-row" style="margin-top:12px"><button class="btn" type="button">Ещё вопросы</button></div>
+        </div>
+        <div class="form-actions"><button class="btn" type="button">← Назад</button><span class="spacer"></span><span class="item-meta">✓ черновик сохранён · 14:31</span><button class="btn primary" type="submit">К итогу →</button></div>
+      </form>
     </section>
 
     <!-- сцена: композиции и состояния -->
@@ -628,6 +833,37 @@
     </div>
   </dialog>
 
+  <dialog class="modal" id="rate" aria-labelledby="rate-title">
+    <div class="modal-box" tabindex="-1">
+      <header class="drawer-head"><h3 id="rate-title">«Женщина в песках» — уже читали</h3></header>
+      <p class="modal-text">Оцените одним нажатием — это сразу уточнит подбор. Цифра с клавиатуры тоже подойдёт.</p>
+      <div class="scale" role="group" aria-label="Оценка от 1 до 10">
+        <button type="button" aria-label="Оценка 1">1</button><button type="button" aria-label="Оценка 2">2</button><button type="button" aria-label="Оценка 3">3</button>
+        <button type="button" aria-label="Оценка 4">4</button><button type="button" aria-label="Оценка 5">5</button><button type="button" aria-label="Оценка 6">6</button>
+        <button type="button" aria-label="Оценка 7">7</button><button type="button" aria-label="Оценка 8">8</button><button type="button" aria-label="Оценка 9">9</button>
+        <button type="button" aria-label="Оценка 10">10</button>
+      </div>
+      <div class="btn-row modal-actions"><button class="btn" type="button" data-close>Отмена</button><span class="spacer"></span><button class="btn" type="button" data-close>Просто отметить</button><button class="btn primary" type="button" data-close>Полный отзыв →</button></div>
+    </div>
+  </dialog>
+
+  <dialog class="modal" id="report" aria-labelledby="report-title">
+    <div class="modal-box" tabindex="-1">
+      <header class="drawer-head"><h3 id="report-title">Что не так с записью?</h3></header>
+      <p class="modal-text">Роберт Маккаммон — «Я подорожую ночами». Отметка сразу убирает запись из поиска и ссылок.</p>
+      <div class="choices" role="radiogroup" aria-label="Причина" id="report-reasons">
+        <button class="choice" type="button" role="radio" aria-checked="false">только для спонсоров</button>
+        <button class="choice" type="button" role="radio" aria-checked="false">неполная</button>
+        <button class="choice" type="button" role="radio" aria-checked="false">не та книга</button>
+        <button class="choice" type="button" role="radio" aria-checked="false">плохое качество</button>
+        <button class="choice" type="button" role="radio" aria-checked="false">другое</button>
+      </div>
+      <label class="lbl">Подробнее, если хочется<input class="in" maxlength="500" placeholder="«обрывается на 3-й части», «это пересказ»…"></label>
+      <label class="switch"><input type="checkbox" checked><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">найти другую запись</span></label>
+      <div class="btn-row modal-actions"><button class="btn" type="button" data-close>Отмена</button><button class="btn primary" type="button" id="report-send" disabled>Пожаловаться</button></div>
+    </div>
+  </dialog>
+
   <dialog class="modal" id="danger-modal">
     <div class="modal-box" tabindex="-1">
       <header class="drawer-head">
@@ -742,8 +978,8 @@
   <div class="toasts" id="toasts" aria-live="polite"></div>
 
   <script type="module">
-    import { boot, shell, wireSegmented, wireTree } from './demo.js';
-    import { buttonState, countTo, odometer, enter, exit, moveInk } from '../src/js/motion.js';
+    import { boot, shell, wireSegmented, wireTree, wirePalette, wireChatDemo, wireRateDialog } from './demo.js';
+    import { buttonState, countTo, odometer, enter, exit, moveInk, closeDialog } from '../src/js/motion.js';
     import { pulse, hudRing, hudType } from '../src/js/kosmos.js';
     shell('index');
     import('../src/js/motion.js').then(({ countTo }) => document.querySelectorAll('.hero-stats .count').forEach((el, i) => setTimeout(() => countTo(el, +el.dataset.to, { response: 1.4 }), 600 + i * 120)));
@@ -756,6 +992,24 @@
       document.querySelectorAll('.demo-app .view').forEach((v) => { v.hidden = v.id !== el.dataset.view; })));
     document.querySelectorAll('#demo-choices .choice').forEach((b) => b.addEventListener('click', () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'))));
     document.getElementById('demo-app-form').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Сохранено'); });
+    // чат, анкета, жалоба и палитра
+    wireChatDemo(document.getElementById('demo-chat'), toast);
+    wireRateDialog(document.getElementById('rate'), toast);
+    const reasons = document.getElementById('report-reasons'), reportSend = document.getElementById('report-send');
+    reasons.querySelectorAll('.choice').forEach((c) => c.addEventListener('click', () => { reasons.querySelectorAll('.choice').forEach((o) => o.setAttribute('aria-checked', String(o === c))); reportSend.disabled = false; }));
+    reportSend.addEventListener('click', () => { closeDialog(document.getElementById('report')); toast('ok', 'Запись отмечена — ищу другую'); });
+    document.querySelectorAll('#demo-wizard .choices').forEach((g) => g.querySelectorAll('.choice').forEach((b) => b.addEventListener('click', () => {
+      if (g.getAttribute('role') === 'radiogroup') g.querySelectorAll('.choice').forEach((o) => o.setAttribute('aria-checked', String(o === b)));
+      else b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'));
+    })));
+    document.getElementById('demo-wizard').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Переход к итогу (пример)'); });
+    // две дороги в анкету: по шагам или своими словами; «Заполнить» ведёт к проверке на шаге «Итог»
+    wireSegmented(document.getElementById('demo-ways'), 'aria-checked', (it) => { const text = it.dataset.way === 'text';
+      document.getElementById('demo-wizard-text').hidden = !text; document.getElementById('demo-wizard').hidden = text; });
+    document.getElementById('demo-wizard-text').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Заполнено 5 разделов — проверьте в «Итоге» (пример)');
+      document.getElementById('demo-ways').querySelector('[data-way="steps"]').click(); });
+    wirePalette(document.getElementById('palette-pills'), cosmosApi);
+    document.addEventListener('palette', (e) => swatches.forEach((s) => s.setAttribute('aria-pressed', String(s.dataset.accent === (e.detail === 'paper' ? 'gold' : 'white')))));
     wireSegmented(document.getElementById('demo-tabs'), 'aria-selected');
     wireSegmented(document.getElementById('demo-pills'), 'aria-checked');
     wireSegmented(document.getElementById('demo-island').querySelector('.tabs'), 'aria-selected');

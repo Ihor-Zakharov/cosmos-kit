@@ -70,4 +70,7 @@
 .demo-app .rail { position: relative; height: 100%; }
 .demo-app .app-main { overflow-y: auto; padding-top: 24px; padding-bottom: 32px; }
 @media (max-width: 760px) { .demo-app .app { height: auto; } .demo-app .rail { height: auto; } }
+.demo-app .chat { height: 640px; text-align: left; }
+.demo-wizard { max-width: 1120px; text-align: left; gap: 18px; }
+.demo-wizard .form-actions .spacer { flex: 1; }
 
