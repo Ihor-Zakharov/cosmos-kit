@@ -5,7 +5,10 @@
                                                 пусто — новый сайт из заготовки); повторный запуск безопасен
   python3 <кит>/tools/cosmos.py init --app      новый проект — приложение (боковая навигация), а не сайт-лендинг
   python3 kit/tools/cosmos.py status            где мы и что дальше (коротко)
-  python3 kit/tools/cosmos.py done              финальная проверка: линтер + браузер; только после OK работа сдана
+  python3 kit/tools/cosmos.py done              финальная проверка: линтер + браузер; только после OK работа сдана;
+                                                после OK печатает чек-лист того, что линтер не видит
+  python3 kit/tools/cosmos.py quiz [--key|--check]   экзамен для модели: 10 типовых ошибок (--key — ответы, --check — линтер ловит сам)
+  python3 kit/tools/cosmos.py selfcheck         для репозитория кита: копии топ-10 одинаковы, UX.md один, экзамен проходит
   python3 kit/tools/cosmos.py setup             проверить и доставить инструменты (Node ≥ 22, браузер, …)
   python3 kit/tools/cosmos.py update            обновить кит из источника (git/архив), свои файлы не трогаются
   python3 kit/tools/cosmos.py hook <pre|post|stop|session|prompt>   хуки Claude Code (читают JSON из stdin)
@@ -221,7 +224,7 @@ def cmd_init(args):
         # эталон «как было»: сколько текста и записей видно на страницах до перевода — done сравнит (B10)
         (root / ".cosmos").mkdir(exist_ok=True)
         try:
-            subprocess.run([shutil.which("node"), str(root / kit_dir / "tools" / "shot.mjs"), "--baseline", "--w", "1440"], cwd=root,
+            subprocess.run([shutil.which("node"), str(root / kit_dir / "tools" / "shot.mjs"), "--baseline", "--w", "1920"], cwd=root,
                            capture_output=True, text=True, timeout=120)
         except subprocess.TimeoutExpired:
             pass
@@ -339,9 +342,19 @@ def cmd_done(args):
     say(out2)
     if rc2 == 1:
         say("cosmos-done: НЕТ — ошибки в браузере"); return 1
-    say("cosmos-done: OK" + (" (браузер недоступен — проверено только линтером)" if rc2 == 3 else "") +
-        "\n  в отчёте: что сделано · снимки .cosmos/shots/*.png · допущения (что придумано без пользователя)")
+    say("cosmos-done: OK" + (" (браузер недоступен — проверено только линтером)" if rc2 == 3 else ""))
+    say(EYES.format(kit=cfg.get("kit_dir", "kit")))
     return 0
+
+
+# то, что линтер и браузер не видят: печатается после OK — последнее, что модель прочитает перед отчётом
+EYES = """  глазами, прежде чем писать отчёт:
+  · снимки .cosmos/shots/<страница>-2560-full.png, -1920.png, -390.png — открыть каждый: ничего не уезжает к краю, не наезжает, не обрезано;
+    проект переключает палитры (data-palette) — снять каждую: node {kit}/tools/shot.mjs --palette grey (или paper)
+  · состояния: текст читается в обычном / сделанном / активном / наведении / фокусе; переключатели не двигают соседей (B11, B12 ловят не всё)
+  · клавиатура: Tab по порядку, фокус виден и ничем не перекрыт, Esc закрывает, Enter/Space нажимают
+  · тексты: кнопка называет результат, заголовок — утверждение, пустое состояние ведёт к действию, язык один на всех страницах
+  в отчёте: что сделано · файлы · «cosmos-done OK» · снимки · допущения (что придумано без пользователя)"""
 
 
 # ---------------- setup / update ----------------
@@ -498,6 +511,9 @@ def hook_post(data, root, cfg):
     if rc:
         errs = [l for l in out.splitlines() if l.startswith("✗")][:15]
         block("cosmos-check нашёл ошибки в том, что вы только что записали — исправьте до следующего шага:\n" + "\n".join(errs))
+    warns = [l for l in out.splitlines() if l.startswith("·")][:8]       # предупреждения — коротко, только нарушения с кодом
+    if warns:
+        context("PostToolUse", "cosmos-check, предупреждения в записанном файле (исправить или обосновать в отчёте):\n" + "\n".join(warns))
     return 0
 
 
@@ -653,12 +669,90 @@ def cmd_hook(args):
         return 0
 
 
+# ---------------- экзамен и самопроверка правил ----------------
+
+QUIZ = TOOLS / "agent-quiz.md"
+TOP_MARK = ("<!-- cosmos-top:begin -->", "<!-- cosmos-top:end -->")
+
+
+def quiz_cases():
+    """[(номер, заголовок, [(язык, код)…], коды из ответов)] — из agent-quiz.md."""
+    text = QUIZ.read_text(encoding="utf-8")
+    body, _, key = text.partition("\n## Ответы")
+    answers = {int(m.group(1)): m.group(2) for m in re.finditer(r"^\|\s*(\d+)\s*\|\s*([^|]+)\|", key, re.M)}
+    cases = []
+    for m in re.finditer(r"^## (\d+)\. (.*?)\n(.*?)(?=^## |\Z)", body, re.M | re.S):
+        n = int(m.group(1))
+        blocks = re.findall(r"```(\w+)\n(.*?)```", m.group(3), re.S)
+        cases.append((n, m.group(2).strip(), blocks, answers.get(n, "")))
+    return cases, body
+
+
+def cmd_quiz(args):
+    cases, body = quiz_cases()
+    if "--key" in args:
+        say(QUIZ.read_text(encoding="utf-8").partition("\n## Ответы")[2].strip()); return 0
+    if "--check" not in args:
+        say(body.strip()); return 0
+    import tempfile
+    bad, mech = [], 0
+    with tempfile.TemporaryDirectory() as td:
+        for n, title, blocks, codes in cases:
+            want = [c for c in re.findall(r"[A-Z]\d+", codes) if not c.startswith("B")]
+            if not want:
+                continue
+            mech += 1
+            files = []
+            for i, (lang, code) in enumerate(blocks):
+                f = Path(td) / f"case{n}_{i}.{ {'html': 'html', 'css': 'css', 'js': 'js'}.get(lang, 'html') }"
+                f.write_text(code, encoding="utf-8"); files.append(str(f))
+            r = subprocess.run([sys.executable, str(TOOLS / "check.py"), *files], cwd=td, capture_output=True, text=True)
+            got = set(re.findall(r"^[✗·] \S+\s+([A-Z]\d+)", r.stdout, re.M))
+            miss = [c for c in want if c not in got]
+            if miss:
+                bad.append(f"  {n}. {title}: линтер не поймал {', '.join(miss)} (нашёл: {', '.join(sorted(got)) or '—'})")
+    say("\n".join(bad) if bad else f"quiz: {mech} механических случаев из {len(cases)} — линтер ловит все")
+    return 1 if bad else 0
+
+
+def top_block(text):
+    b, e = TOP_MARK
+    return [m.strip() for m in re.findall(re.escape(b) + r"(.*?)" + re.escape(e), text, re.S)]
+
+
+def cmd_selfcheck(args):
+    """Один источник правды: топ-10 (agent/TOP.md) в каждом входном файле слово в слово, UX.md = references/ux.md, экзамен проходит."""
+    base = REPO or KIT.parent
+    top = top_block((KIT / "agent" / "TOP.md").read_text(encoding="utf-8"))[0]
+    bad = []
+    entries = [KIT / "agent" / "AGENTS-block.md", KIT / "agent" / "skills" / "cosmos-site" / "SKILL.md", base / "AGENT.md", base / "global" / "cosmos-ui" / "SKILL.md"]
+    for f in entries:
+        if not f.exists():
+            bad.append(f"  нет файла {f}"); continue
+        blocks = top_block(f.read_text(encoding="utf-8"))
+        if len(blocks) < 2:
+            bad.append(f"  {f.relative_to(base)}: топ-10 должен быть сверху и повторён перед сдачей (найдено {len(blocks)})")
+        for i, b in enumerate(blocks):
+            if b.replace("{kit}/", "kit/") != top:
+                bad.append(f"  {f.relative_to(base)}: копия топ-10 №{i + 1} отличается от agent/TOP.md")
+    ux, ref = base / "UX.md", KIT / "agent" / "skills" / "cosmos-site" / "references" / "ux.md"
+    if ux.exists() and ref.exists() and ux.read_bytes() != ref.read_bytes():
+        bad.append("  UX.md и references/ux.md разошлись: cp UX.md src/agent/skills/cosmos-site/references/ux.md")
+    skill = KIT / "agent" / "skills" / "cosmos-site" / "SKILL.md"
+    n = len(skill.read_text(encoding="utf-8").splitlines())
+    if n > 140:
+        bad.append(f"  SKILL.md: {n} строк (> 140) — подробности в references/")
+    rc = cmd_quiz(["--check"])
+    say("\n".join(bad) if bad else "selfcheck: OK (топ-10 в 4 файлах ×2, UX.md один, SKILL.md %d строк)" % n)
+    return 1 if bad or rc else 0
+
+
 def main(argv):
     if not argv or argv[0] in ("-h", "--help", "help"):
         say(__doc__); return 0
     cmd, rest = argv[0], argv[1:]
     fn = {"init": cmd_init, "status": cmd_status, "done": cmd_done, "setup": cmd_setup, "update": cmd_update, "hook": cmd_hook,
-          "global-install": cmd_global_install}.get(cmd)
+          "global-install": cmd_global_install, "quiz": cmd_quiz, "selfcheck": cmd_selfcheck}.get(cmd)
     if not fn:
         say(f"неизвестная команда {cmd}\n{__doc__}"); return 2
     return fn(rest) or 0

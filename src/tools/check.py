@@ -60,7 +60,8 @@ RULES = {
     "S4": "токен var(--x) должен существовать в ките или быть объявлен у себя",
     "S5": "не переопределять компоненты кита (.btn { … }) — собрать из токенов свой класс",
     "S6": "без !important и без inline style (кроме CSS-переменных вида style=\"--p:.6\")",
-    "S7": "текст не мельче 13px, основной — 14–16px (мелкий моно — только числа и коды, классами кита)",
+    "S7": "текст не мельче 13px: основной 15–16px, подписи 13–14px; моно 11–12px — только числа, коды, кикеры классами кита",
+    "S10": "в одном правиле color и background на одном токене (color: var(--ink); background: var(--ink)) — текст исчезает; на заливке --ink текст — var(--bg)",
     "S9": "outline: none в своих стилях — только вместе с другим признаком фокуса (:focus-within у контейнера, как .composer-box)",
     "S8": "колонки грида — minmax(0, 1fr), а не голый 1fr (иначе поле растянет колонку и будет горизонтальная прокрутка)",
     # скрипты
@@ -75,6 +76,16 @@ RULES = {
     "K1": "файлы kit/ не правятся (обновление затрёт); всё своё — site.css/site.js",
 }
 WARN_ONLY = {"H7", "H8", "H11", "H12", "S5", "S7", "S8", "S9", "T1", "T2", "T3", "P6"}     # P6 — ошибка в полном прогоне, предупреждение по одному файлу
+# правила браузерной проверки (kit/tools/shot.mjs) — здесь только для списка --rules, ловит их cosmos.py done
+BROWSER = {
+    "B1": "нет ошибок в консоли и необработанных исключений", "B2": "нет горизонтальной прокрутки на 2560, 1920 и 390",
+    "B3": "все файлы страницы загрузились (нет 4xx/5xx)", "B4": "на одном экране одно раскалённое действие (.btn.primary / .go-btn)",
+    "B5": "<h1> виден ровно один", "B6": "цель нажатия на телефоне ≥ 24×24px", "B7": "текст не мельче 12px (моно 11px)",
+    "B8": "картинки загрузились", "B9": "таблица/список не пустые — или показан блок .empty",
+    "B10": "после «примени UI» не пропали записи и текст (сравнение с эталоном .cosmos/baseline.json)",
+    "B11": "любой текст читается: контраст ≥ 3:1 с фоном (< 1.5:1 — ошибка), и после нажатия переключателя/шага (состояния .on/.done)",
+    "B12": "переключатель (.switch, .pills, шаг) не двигает соседей: позиция и высота ориентиров до и после одинаковы (±2px)",
+}
 
 CSS_COLOR = re.compile(r"#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|oklch|oklab|lab|lch|hwb)\(", re.I)
 NAMED_COLORS = re.compile(r"(?<![\w-])(?:white|black|red|green|blue|yellow|orange|purple|pink|gray|grey|silver|gold|"
@@ -176,6 +187,7 @@ def check_css(text, path, out, kit_classes, known_tokens, base_line=0):
         out.add(path, base_line + raw[:m.start()].count("\n") + 1, "P5", "внешний импорт", "шрифты и стили — только из kit/")
     s5 = set()
     has_focus_within = ":focus-within" in raw
+    paint = {}                                            # S10: (селектор) → {color: токен, background: токен}
     for ln, sel, prop, val in css_decls(text):
         L = base_line + ln
         v = re.sub(r"url\([^)]*\)", "", val)
@@ -202,9 +214,18 @@ def check_css(text, path, out, kit_classes, known_tokens, base_line=0):
         if prop == "font-size":
             m = re.fullmatch(r"(\d+(?:\.\d+)?)px", v)
             if m and float(m.group(1)) < 13:
-                out.add(path, L, "S7", f"font-size: {v}", "читаемый текст ≥ 14px (подписи 13+); мельче — только моно-числа/коды классами кита (.kicker, .chip.mono)")
+                out.add(path, L, "S7", f"font-size: {v}", "основной 15–16px, подписи 13–14px; мельче — только моно-числа/коды классами кита (.kicker, .chip.mono)")
         if prop in ("grid-template-columns",) and re.search(r"(?<![\w(,])\s*1fr", v) and "minmax(0" not in v:
             out.add(path, L, "S8", f"{prop}: {val[:50]}", "repeat(N, minmax(0, 1fr))")
+        if prop in ("color", "background", "background-color"):
+            tk = re.fullmatch(r"var\(\s*(--[\w-]+)\s*\)", v)
+            if tk:
+                d = paint.setdefault(sel, {})
+                k = "color" if prop == "color" else "bg"
+                d[k] = (tk.group(1), L)
+                if "color" in d and "bg" in d and d["color"][0] == d["bg"][0]:
+                    out.add(path, L, "S10", f"{sel.split(' ⟩ ')[-1][:40]} {{ color и background: var({d['color'][0]}) }}",
+                            "текст на заливке --ink — color: var(--bg); на поверхности --s*/--surface — color: var(--ink)")
         leaf = sel.split(" ⟩ ")[-1]
         if leaf and not leaf.startswith("@"):
             for part in leaf.split(","):
@@ -574,6 +595,9 @@ def main(argv):
         return argv[i + 1] if i + 1 < len(argv) else ""
     if "--rules" in flags:
         for k, v in RULES.items():
+            print(f"{k}  {v}")
+        print("— браузер (cosmos.py done / shot.mjs) —")
+        for k, v in BROWSER.items():
             print(f"{k}  {v}")
         return 0
     if "--classes" in flags:

@@ -3,12 +3,13 @@
  * cosmos-shot — браузерная проверка сайта на cosmos-kit: то, что видно только в живой странице.
  * Без зависимостей: Node ≥ 22 (встроенный WebSocket) + любой Chrome/Chromium/Edge (из WSL — Windows Chrome).
  *
- *   node kit/tools/shot.mjs                      все страницы (cosmos.json "pages" или *.html в корне), ширины 1440 и 390
- *   node kit/tools/shot.mjs index.html --w 390   одна страница, одна ширина (высота окна: --h 945; телефон всегда 844)
+ *   node kit/tools/shot.mjs                      все страницы (cosmos.json "pages" или *.html в корне), ширины 2560, 1920 и 390
+ *   node kit/tools/shot.mjs index.html --w 390   одна страница, одна ширина (высота окна: --h 945 по умолчанию; телефон всегда 844)
  *   node kit/tools/shot.mjs --base http://127.0.0.1:8790/ --pages /      уже запущенное приложение
  *   node kit/tools/shot.mjs --full               ещё и снимок всей страницы (<страница>-<ширина>-full.png)
  *   node kit/tools/shot.mjs --skip B4,B5         не проверять эти коды (витрины с несколькими образцами)
  *   node kit/tools/shot.mjs index.html --at #faq  снимок не с начала страницы, а с этого элемента (<страница>-<ширина>-at_faq.png)
+ *   node kit/tools/shot.mjs --palette grey       та же проверка в другой палитре кита (data-palette на <html>): снимки <страница>-<ширина>-grey.png
  * Страницы отдаёт сам (встроенный статический сервер) или командой из cosmos.json "serve" ("… --port {port}").
  * Снимки — .cosmos/shots/<страница>-<ширина>.png (только первый экран: дёшево смотреть модели).
  * Выход: 0 — ошибок нет, 1 — есть, 3 — браузер не найден (проверка пропущена).
@@ -17,6 +18,8 @@
  *       B4 больше одного раскалённого действия на экране · B5 <h1> не один · B6 цель нажатия < 24px (телефон)
  *       B7 текст мельче 12px (моно — 11px) · B8 битая картинка · B9 пустая таблица/список без .empty
  *       B10 (после «применить») пропали записи или текст по сравнению с эталоном .cosmos/baseline.json
+ *       B11 текст сливается с фоном: контраст < 3:1 (ошибка — < 1.5:1), в том числе после переключения состояния
+ *       B12 переключатель (.switch, .pills, шаг .step) сдвигает раскладку: соседний элемент поменял позицию или высоту
  */
 import { spawn, execSync } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -38,9 +41,11 @@ const OUT = join(ROOT, '.cosmos', 'shots');
 // эталон «до кита» (cosmos.py init в режиме «применить» снимает его: --baseline); done сравнивает с ним (B10)
 let BASE = null; const BASE_OUT = {};
 try { if (!argv.includes('--baseline')) BASE = JSON.parse(readFileSync(join(ROOT, '.cosmos', 'baseline.json'), 'utf8')); } catch {}
-const WIDTHS = (opt('--w') || '1440,390').split(',').map(Number);
-const HEIGHT = +(opt('--h') || 900);
-const AT = opt('--at') || '';                       // селектор элемента, к которому прокрутить перед снимком                 // высота окна для широких ширин: экран пользователя — 2560×945 и 1920×945 (UX.md §13)
+// экран пользователя — 2560×945 и 1920×945 (UX.md §13, правило 17), телефон 390 — обязателен, но вторым
+const WIDTHS = (opt('--w') || '2560,1920,390').split(',').map(Number);
+const HEIGHT = +(opt('--h') || 945);
+const AT = opt('--at') || '';                       // селектор элемента, к которому прокрутить перед снимком
+const PALETTE = opt('--palette') || '';             // data-palette на <html> до первого кадра: проверить сайт в каждой палитре, которую он переключает
 
 if (typeof WebSocket === 'undefined') { console.log('· B0  нужен Node ≥ 22 (встроенный WebSocket) — браузерная проверка пропущена'); process.exit(3); }
 
@@ -104,8 +109,8 @@ class CDP {
       if (m.id && this.wait.has(m.id)) { const { ok, no } = this.wait.get(m.id); this.wait.delete(m.id); m.error ? no(new Error(m.error.message)) : ok(m.result); }
       else if (m.method) (this.on.get(m.method) || []).forEach((f) => f(m.params, m.sessionId)); };
     this.ready = new Promise((r, j) => { this.ws.onopen = r; this.ws.onerror = j; }); }
-  send(method, params = {}, sessionId) { const id = ++this.id; this.ws.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }));
-    return new Promise((ok, no) => { this.wait.set(id, { ok, no }); setTimeout(() => { if (this.wait.has(id)) { this.wait.delete(id); no(new Error('timeout ' + method)); } }, 30000); }); }
+  send(method, params = {}, sessionId, ms = 30000) { const id = ++this.id; this.ws.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }));
+    return new Promise((ok, no) => { this.wait.set(id, { ok, no }); setTimeout(() => { if (this.wait.has(id)) { this.wait.delete(id); no(new Error('timeout ' + method)); } }, ms); }); }
   listen(ev, f) { if (!this.on.has(ev)) this.on.set(ev, []); this.on.get(ev).push(f); }
 }
 
@@ -141,12 +146,32 @@ function pageList() {
   return readdirSync(ROOT).filter((f) => f.endsWith('.html')).sort((a, b) => (a === 'index.html' ? -1 : b === 'index.html' ? 1 : a.localeCompare(b)));
 }
 
-// аудит в странице: всё считаем по живому DOM
-const AUDIT = `(() => {
+// общее для аудита и пробы состояний: видимость, путь элемента, контраст текста на составном фоне
+const LIB = `
   const vw = innerWidth, vh = innerHeight, vis = (el) => { const r = el.getBoundingClientRect(), s = getComputedStyle(el);
     return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && +s.opacity > 0 && !el.closest('dialog:not([open])'); };
+  const shown = (el) => el.checkVisibility ? el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) && !el.closest('dialog:not([open])') && el.getBoundingClientRect().width > 0
+    : vis(el);
   const sel = (el) => { let s = el.tagName.toLowerCase(); if (el.id) return s + '#' + el.id; if (el.classList.length) s += '.' + [...el.classList].slice(0, 2).join('.'); return s; };
   const path = (el) => { const p = []; for (let x = el; x && x !== document.body && p.length < 3; x = x.parentElement) p.unshift(sel(x)); return p.join(' > '); };
+  const rgba = (c) => { const m = (c || '').match(/[\\d.]+/g); return m && m.length >= 3 ? [+m[0], +m[1], +m[2], m.length > 3 ? +m[3] : 1] : null; };
+  const over_ = (top, c) => { const a = c[3]; return [top[0] * (1 - a) + c[0] * a, top[1] * (1 - a) + c[1] * a, top[2] * (1 - a) + c[2] * a, 1]; };
+  const lum = ([r, g, b]) => { const f = (v) => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }; return .2126 * f(r) + .7152 * f(g) + .0722 * f(b); };
+  // фон под текстом: фоны предков сверху вниз, составленные по alpha; градиент или картинка на пути — не считаем (null)
+  const effBg = (el) => { const chain = []; for (let x = el; x; x = x.parentElement) chain.unshift(x);
+    let bg = rgba(getComputedStyle(document.body).backgroundColor); bg = bg && bg[3] === 1 ? bg : [0, 0, 0, 1];
+    for (const x of chain) { const cs = getComputedStyle(x); if (cs.backgroundImage !== 'none' && !x.matches('body, html')) return null;
+      const c = rgba(cs.backgroundColor); if (c && c[3] > 0) bg = over_(bg, c); } return bg; };
+  const ratio = (fg, bg) => { const [a, b] = [lum(fg[3] < 1 ? over_(bg, fg) : fg), lum(bg)].sort((p, q) => q - p); return (a + .05) / (b + .05); };
+  // B11: собственный текст элемента, который видно, но не прочитать — контраст с фоном ниже 3:1 (ниже 1.5 — ошибка)
+  const SKIPC = '.cosmos-wrap, svg, [aria-hidden="true"], [disabled], [aria-disabled="true"], .skel, .skeleton, .toasts, .grain, [contenteditable]';
+  const lowContrast = (root, max) => { const out = []; for (const e of (root || document.body).querySelectorAll('*')) { if (out.length >= max) break;
+    const own = [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); if (!own || e.closest(SKIPC) || !shown(e)) continue;
+    const fg = rgba(getComputedStyle(e).color); if (!fg || fg[3] < .5) continue; const bg = effBg(e); if (!bg) continue;
+    const r = ratio(fg, bg); if (r < 3) out.push({ where: path(e) + ' «' + e.textContent.trim().slice(0, 18) + '»', r: +r.toFixed(1) }); } return out; };
+`;
+// аудит в странице: всё считаем по живому DOM
+const AUDIT = `(() => {${LIB}
   const over = document.documentElement.scrollWidth - vw;
   const wide = []; if (over > 1) for (const el of document.body.querySelectorAll('*')) { const r = el.getBoundingClientRect();
     if (r.right > vw + 1 && r.width <= vw * 2 && vis(el) && !el.closest('.cosmos-wrap') && ![...el.children].some((c) => c.getBoundingClientRect().right > vw + 1)) { wide.push(path(el) + ' (+' + Math.round(r.right - vw) + 'px)'); if (wide.length > 2) break; } }
@@ -173,7 +198,52 @@ const AUDIT = `(() => {
   }
   const text = (document.body.innerText || '').replace(/\\s+/g, ' ').trim().length;
   const rows = document.querySelectorAll('tbody tr, tr td:first-child, .list > *, li, .item, .card').length;
-  return JSON.stringify({ over, wide, h1, maxPrim, where, small, tiny, broken, hollow: hollow.slice(0, 3), text, rows, title: document.title });
+  const low = lowContrast(document.body, 3);
+  return JSON.stringify({ over, wide, h1, maxPrim, where, small, tiny, broken, hollow: hollow.slice(0, 3), text, rows, low, title: document.title });
+})()`;
+
+// проба состояний: нажать каждый переключатель (.switch, сегменты .pills, шаг .step) и посмотреть, что стало —
+// B12: соседи сдвинулись или изменили высоту (раскладка «скачет», UX.md §5) · B11: текст в новом состоянии не читается
+// (например, цифра текущего шага цвета заливки). Состояние возвращается обратно тем же нажатием. Только на широком экране.
+const PROBE = `(async () => {${LIB}
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const LAND = 'h1, h2, h3, form, .composer, .chat-empty, .btn.primary, textarea, .field, .panel, .card, table, .list, .steps, .form-actions, .choices, .group, label';
+  const box = (t) => t.closest('.chat, dialog, form, .panel, .setup, .view, section, main') || document.body;
+  const groupOf = (t) => t.closest('.pills, .tabs, [role="radiogroup"], .steps');
+  const current = (g) => g && g.querySelector('[aria-checked="true"], [aria-pressed="true"], .on, [aria-current]');
+  const togglers = [];
+  for (const [q, cap] of [['.steps .step', 2], ['label.switch', 3], ['.pills > button, .pills > [role="radio"]', 3]]) {   // по видам, одна проба на группу
+    let n = 0;
+    for (const el of document.querySelectorAll(q)) {
+      if (!shown(el) || el.disabled || el.querySelector('input:disabled') || el.closest('.tabs') || el.matches('[aria-checked="true"], [aria-pressed="true"], .on, [aria-current]')) continue;
+      const g = groupOf(el); if (g && togglers.some((t) => groupOf(t) === g)) continue;
+      togglers.push(el); if (++n >= cap) break;
+    }
+  }
+  const moves = [], low = [], t0 = performance.now();
+  // страница ещё пишет (поток ответа, появление строк) — ждём тишины, иначе движение потока сойдёт за «скачок»
+  for (let last = -1, n = 0; performance.now() - t0 < 10000; last = n) { n = document.body.innerText.length + document.documentElement.scrollHeight; if (n === last) break; await wait(600); }
+  // ориентиры ключом «путь + порядковый номер», а не узлом: перерисованная разметка (innerHTML) сравнивается с прежней
+  const snap = (c) => { const m = new Map(), seen = {}; for (const e of [...c.querySelectorAll(LAND)].filter(shown)) { const r = e.getBoundingClientRect(), p = path(e), k = p + '#' + (seen[p] = (seen[p] || 0) + 1);
+    m.set(k, { e, p, y: Math.round(r.top + scrollY), h: Math.round(r.height) }); } return m; };
+  const diff = (from, to, skip) => { const bad = []; for (const [k, a] of from) { const n = to.get(k); if (!n || skip(a.e) || skip(n.e)) continue;
+    if (Math.abs(n.y - a.y) > 2 || Math.abs(n.h - a.h) > 2) bad.push(a.p + ' ' + (Math.abs(n.y - a.y) > 2 ? ((n.y - a.y > 0 ? '+' : '') + (n.y - a.y) + 'px по вертикали') : ('высота ' + a.h + ' → ' + n.h))); if (bad.length >= 2) break; } return bad; };
+  for (const t of togglers) {
+    const c = box(t), g = groupOf(t), was = current(g), name = (t.closest('label')?.textContent || t.textContent || t.getAttribute('aria-label') || '').trim().slice(0, 22) || path(t);
+    const s0 = snap(c); await wait(300); const before = snap(c);
+    const moving = new Set([...s0].filter(([k, v]) => { const n = before.get(k); return !n || n.y !== v.y || n.h !== v.h; }).map(([k]) => k));   // само едет (поток, появление) — не считаем
+    const skip = (e) => (g && g.contains(e)) || t.contains(e) || e.contains(t);
+    for (const k of moving) before.delete(k);
+    t.click(); await wait(420);
+    const after = snap(c), bad = diff(before, after, skip);
+    for (const l of lowContrast(g || t.closest('.switch, form, .panel, .card, .chat-main') || c, 2)) low.push({ t: name, ...l });
+    if (t.matches('label.switch')) t.click(); else if (was && was !== t) was.click();            // вернуть как было
+    await wait(420);
+    bad.push(...diff(after, snap(c), skip).map((b) => b + ' (обратно)'));                      // и обратный ход: пустое состояние в двух режимах и т. п.
+    if (bad.length) moves.push({ t: name, bad: bad.slice(0, 2) });
+    if (moves.length >= 3 || low.length >= 3) break;
+  }
+  return JSON.stringify({ moves, low, n: togglers.length, ms: Math.round(performance.now() - t0) });
 })()`;
 
 // ---------------- запуск ----------------
@@ -209,6 +279,7 @@ try {
       cdp.listen('Network.responseReceived', (p, sid) => { if (sid === s && p.response.status >= 400) bad.push(`${p.response.status} ${p.response.url.replace(srv.base, '/')}`); });
       cdp.listen('Network.loadingFailed', (p, sid) => { if (sid === s && !p.canceled && p.errorText !== 'net::ERR_ABORTED') bad.push(`${p.errorText} ${p.requestId}`); });
       await Promise.all(['Page.enable', 'Runtime.enable', 'Network.enable'].map((m) => cdp.send(m, {}, s)));
+      if (PALETTE) await cdp.send('Page.addScriptToEvaluateOnNewDocument', { source: `new MutationObserver((_, o) => { if (document.documentElement) { document.documentElement.setAttribute('data-palette', ${JSON.stringify(PALETTE)}); o.disconnect(); } }).observe(document, { childList: true });` }, s);
       await cdp.send('Emulation.setDeviceMetricsOverride', { width: w, height: w < 700 ? 844 : HEIGHT, deviceScaleFactor: 1, mobile: w < 700 }, s);
       const loaded = new Promise((r) => { cdp.listen('Page.loadEventFired', (p, sid) => { if (sid === s) r(); }); setTimeout(r, 15000); });
       await cdp.send('Page.navigate', { url }, s);
@@ -218,11 +289,17 @@ try {
       catch (e) { add('err', where, 'B1', 'аудит не выполнился: ' + e.message); }
       await cdp.send('Runtime.evaluate', { expression: AT ? `document.documentElement.style.scrollBehavior='auto';document.querySelector(${JSON.stringify(AT)})?.scrollIntoView({ block: 'start' })` : 'scrollTo(0,0)' }, s); await sleep(AT ? 900 : 250);
       const shot = await cdp.send('Page.captureScreenshot', { format: 'png' }, s);
-      const file = join(OUT, `${name}-${w}${AT ? '-at_' + AT.replace(/[^\w-]+/g, '') : ''}.png`); writeFileSync(file, Buffer.from(shot.data, 'base64')); shots.push(relative(ROOT, file));
-      if (argv.includes('--full') && w >= 1000) {                        // вся страница — только широкая (телефон — первый экран)                                     // вся страница — для глаз и cosmos-critic (дороже смотреть)
+      const file = join(OUT, `${name}-${w}${AT ? '-at_' + AT.replace(/[^\w-]+/g, '') : ''}${PALETTE ? '-' + PALETTE : ''}.png`); writeFileSync(file, Buffer.from(shot.data, 'base64')); shots.push(relative(ROOT, file));
+      const firstWide = w === WIDTHS.find((x) => x >= 1000);
+      if (argv.includes('--full') && firstWide) {                        // вся страница — только на первой широкой ширине (для глаз и cosmos-critic; дороже смотреть)
         const m = await cdp.send('Page.getLayoutMetrics', {}, s); const hh = Math.min(Math.ceil(m.cssContentSize.height), 9000);
         const full = await cdp.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, clip: { x: 0, y: 0, width: w, height: hh, scale: 1 } }, s);
-        const ff = join(OUT, `${name}-${w}-full.png`); writeFileSync(ff, Buffer.from(full.data, 'base64')); shots.push(relative(ROOT, ff));
+        const ff = join(OUT, `${name}-${w}-full${PALETTE ? '-' + PALETTE : ''}.png`); writeFileSync(ff, Buffer.from(full.data, 'base64')); shots.push(relative(ROOT, ff));
+      }
+      let pr = { moves: [], low: [] };
+      if (firstWide && !argv.includes('--baseline') && !(SKIP.includes('B11') && SKIP.includes('B12'))) {   // проба состояний — после снимков, чтобы не испортить их
+        try { pr = JSON.parse((await cdp.send('Runtime.evaluate', { expression: PROBE, returnByValue: true, awaitPromise: true, timeout: 55000 }, s, 60000)).result.value); if (process.env.COSMOS_DEBUG) console.log('проба:', JSON.stringify(pr)); }
+        catch (e) { add('warn', where, 'B12', 'проба переключателей не выполнилась: ' + e.message); }
       }
       for (const e of [...new Set(errs)].slice(0, 3)) add('err', where, 'B1', e, 'открыть страницу, исправить скрипт');
       for (const e of [...new Set(bad)].filter((x) => !/favicon/.test(x)).slice(0, 4)) add('err', where, 'B3', e, 'путь к файлу/кит в kit/');
@@ -233,6 +310,9 @@ try {
       for (const t of a.small || []) add('warn', where, 'B7', `мелкий текст ${t}`, 'текст ≥ 13px; мельче — только моно-числа');
       for (const t of a.broken || []) add('err', where, 'B8', `картинка не загрузилась ${t}`, 'путь / формат');
       for (const t of a.hollow || []) add('err', where, 'B9', `пусто: ${t} — ни одной строки и нет .empty`, 'данные не отрисовались? (скрипт не запустился: import() после DOMContentLoaded, ошибка в пути) — или покажите блок empty');
+      for (const l of a.low || []) add(l.r < 1.5 ? 'err' : 'warn', where, 'B11', `текст не читается: ${l.where} ${l.r}:1`, 'цвет текста ≠ цвет фона: --ink на --s*/--surface, --bg на заливке --ink; ≥ 3:1 (kit/tools/contrast.py)');
+      for (const l of pr.low || []) add(l.r < 1.5 ? 'err' : 'warn', where, 'B11', `после «${l.t}» текст не читается: ${l.where} ${l.r}:1`, 'в состоянии .on/.done/[aria-current] задать и фон, и цвет текста (например .x.on.done .n { background: var(--ink); color: var(--bg) })');
+      for (const m of pr.moves || []) add('warn', where, 'B12', `переключатель «${m.t}» двигает раскладку: ${m.bad.join('; ')}`, 'место под переменное содержимое — min-height / фиксированная высота блока; меняется текст и рамка, не позиция (UX.md §5)');
       if (BASE && BASE[where]) {                                         // режим «применить»: сравнение с тем, что было до кита
         const b0 = BASE[where];
         if (b0.rows >= 3 && a.rows < b0.rows * 0.5) add('err', where, 'B10', `пропали записи: было ${b0.rows}, стало ${a.rows}`, 'логика сломана при переводе — вернуть рендер/обработчики, менять только классы');

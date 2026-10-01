@@ -677,7 +677,9 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 .step.done .n { background: var(--ink); color: var(--bg); box-shadow: none; }
 .step.on, .step[aria-current="step"] { color: var(--ink); background: var(--surface-2); border-color: var(--line-2); }
 .step.on .n, .step[aria-current="step"] .n { box-shadow: inset 0 0 0 1.5px var(--ink); color: var(--ink); }
-.step.on.done .n { box-shadow: none; }
+/* текущий и уже сделанный шаг: кружок остаётся заполненным (признак «сделан»), цифра тёмная, как у всех сделанных;
+   текущий отличает плашка .step.on, а не заливка — иначе цифра цвета заливки исчезала (демо, 01.10; линтер S10 / B11) */
+.step.on.done .n, .step[aria-current="step"].done .n { background: var(--ink); color: var(--bg); box-shadow: none; }
 @media (max-width: 1100px) { .step:not(.on):not([aria-current="step"]) .l { display: none; } .step:not(.on):not([aria-current="step"]) { padding: 0 7px; } }
 @media (max-width: 760px) { .steps { gap: 4px; } .step-sep { min-width: 4px; } .step:not(.on):not([aria-current="step"]) { padding: 0; border-width: 0; } .step { height: 34px; } }
 
@@ -870,7 +872,10 @@ table.data .strong { color: var(--ink); }
 .msg.ai .choices { justify-content: flex-start; }
 /* пустое состояние: поле ввода поднимается к центру, подсказки — прямо над ним */
 .chat-main.blank .chat-scroll { display: flex; align-items: flex-end; }
-.chat-main.blank .chat-empty { padding: 0 0 18px; }
+/* место под текст пустого состояния зарезервировано (min-height ≈ заголовок + 4 строки + ряд подсказок): смена текста
+   (инкогнито ↔ обычный, другой провайдер) не двигает заголовок и поле — заголовок прижат к верху, подсказки к низу (UX.md §5) */
+.chat-main.blank .chat-empty { padding: 0 0 18px; min-height: 236px; justify-content: flex-start; }
+.chat-main.blank .chat-empty .choices { margin-top: auto; }
 .chat-main.blank .composer { padding-bottom: 24vh; }
 .chat-main.incognito .composer-box { border-style: dashed; }
 

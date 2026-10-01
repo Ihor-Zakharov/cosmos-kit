@@ -60,7 +60,7 @@
    attachSwitches(document); attachChecks(document); attachDisclosures(document); attachCards(document);
    // диалоги — только через openDialog()/closeDialog(), тосты — pushToast(), числа — countTo()/odometer()
    ```
-   Эталон подключения — `demo/demo.js` (`boot()`), живые образцы каждой анимации с параметрами — секция «Движение» в `demo/index.html` (`#motion`).
+   Эталон подключения — `bootSite()` в `kit/js/site.js` (демо кита агенту читать не нужно; параметры пружин — `references/motion.md`).
    Внутренние страницы (не главная): `<div class="cosmos-wrap asleep">` и `api.pause()` сразу после
    создания — сцена размыта и погашена с первого кадра, без анимации появления.
 5. Композиция дыры — `data-comp` на `.cosmos-wrap`: `right` (текст слева, дыра справа — по умолчанию),

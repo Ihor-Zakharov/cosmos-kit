@@ -6,6 +6,8 @@ cd "$(dirname "$0")"
 PY=python3; command -v python3 >/dev/null 2>&1 || PY=python
 node --check src/js/site.js && node --check src/js/motion.js && node --check src/tools/shot.mjs
 "$PY" -m py_compile src/tools/check.py src/tools/cosmos.py src/tools/contrast.py
+# правила для агентов: топ-10 одинаков во всех входных файлах, UX.md один, экзамен — линтер ловит все механические случаи
+"$PY" src/tools/cosmos.py selfcheck | tail -1
 "$PY" src/tools/check.py --self src/blocks/*.html starter/*.html | tail -1
 T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
 "$PY" src/tools/cosmos.py init "$T/site" >/dev/null && "$PY" src/tools/cosmos.py init "$T/app" --app >/dev/null
@@ -16,5 +18,6 @@ for d in site app; do
   if [ "${1:-}" != "--no-browser" ]; then (cd "$T/$d" && node kit/tools/shot.mjs | tail -1); fi
 done
 # витрины кита: все блоки (грузятся из src/blocks) и главная демо — без ошибок консоли, 404 и прокрутки
-if [ "${1:-}" != "--no-browser" ]; then node src/tools/shot.mjs demo/blocks.html demo/index.html demo/chat.html --skip B4,B5,B6,B7 | tail -1; fi
+# витрина index — все образцы и движения сразу: проба переключателей (B11/B12) там долгая и не показательна; блоки и чат проходят её
+if [ "${1:-}" != "--no-browser" ]; then node src/tools/shot.mjs demo/blocks.html demo/chat.html --skip B4,B5,B6,B7 | tail -1; node src/tools/shot.mjs demo/index.html --skip B4,B5,B6,B7,B11,B12 | tail -1; fi
 echo "selftest: OK"

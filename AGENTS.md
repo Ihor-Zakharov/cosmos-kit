@@ -38,8 +38,8 @@
 - `demo/index.html` — витрина, одна страница: сайт, каталог, «Движение» (живые образцы с параметрами пружин),
   KOCMOC, сцена; общие `demo.css`/`demo.js`.
 - `src/tools/` — ИИ-воркфлоу (едет в проект как `kit/tools/`): `cosmos.py` (init/status/done/setup/update/hook,
-  global-install), `check.py` (линтер правил кодами; `--classes/--tokens/--icons`), `shot.mjs` (браузерная проверка),
-  `contrast.py` (APCA).
+  global-install, quiz, selfcheck), `check.py` (линтер правил кодами; `--classes/--tokens/--icons/--rules`), `shot.mjs`
+  (браузерная проверка: 2560/1920/390, B1–B12, `--palette`), `contrast.py` (APCA), `agent-quiz.md` (экзамен для модели).
 - `src/blocks/` — готовые блоки разметки + `INDEX.md`; каждый блок обязан проходить `check.py --self`.
 - `src/agent/` — навык `skills/cosmos-site` (SKILL.md — короткий цикл, `references/` — подробности), агенты
   `agents/cosmos-eyes.md`, `cosmos-critic.md`, `AGENTS-block.md` (блок правил, который `init` вставляет в AGENTS.md проекта).
@@ -53,8 +53,13 @@
 
 - ИИ-воркфлоу держит качество механикой: правило, которое можно проверить машиной, добавляется в `check.py`
   (или `shot.mjs`) с кодом и подсказкой «→ как исправить», а в SKILL.md — одной строкой с тем же кодом. Прозу в навыке
-  не раздувать: SKILL.md — до ~100 строк, остальное — `references/`. Проверять на слабой модели:
-  `claude -p "…" --model haiku --effort low` в пустой папке.
+  не раздувать: SKILL.md — до ~140 строк (включая два топ-10), остальное — `references/`. Проверять на слабой модели:
+  `claude -p "…" --model haiku --effort low` в пустой папке и экзаменом `python3 src/tools/cosmos.py quiz` (10 типовых ошибок).
+- Правила против забывания: топ-10 живёт в `src/agent/TOP.md` и вставлен слово в слово (между `<!-- cosmos-top:begin/end -->`)
+  сверху и в конце `AGENT.md`, `src/agent/AGENTS-block.md` (там пути `{kit}/`), `SKILL.md`, `global/cosmos-ui/SKILL.md`; меняется
+  только TOP.md, копии правятся следом, расхождение валит `cosmos.py selfcheck` (в `selftest.sh`). Каждое правило — «делай X»
+  с числом или примером и кодом линтера; расплывчатых формулировок («аккуратно», «по возможности») не писать. Один источник
+  правды на тему: пороги — `UX.md` (`references/ux.md` — та же копия байт в байт, selfcheck сверяет), опыт — `lessons.md`, цикл — `SKILL.md`.
 
 - Дизайнерские решения принимаются только дизайнерским проходом и записываются в `DESIGN-TODO.md`
   (решено/отложено/открыто) — не по ходу реализации. Ось акцентов, поведение сцены, навигация и

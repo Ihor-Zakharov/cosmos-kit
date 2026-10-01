@@ -382,7 +382,8 @@ export function wireChatDemo(root, toast) {
     setSend(false); syncDown(); ta.focus({ preventScroll: true });
   };
   const incInput = head.querySelector('.switch input');
-  incInput?.addEventListener('change', () => { main.classList.toggle('incognito', incInput.checked); if (sub) sub.textContent = incInput.checked ? 'инкогнито · без профиля и памяти' : 'помнит ваш вкус'; blank(); });
+  // инкогнито — режим, а не новый экран: меняются подпись и рамка поля, раскладка стоит на месте (B12); в пустом чате — свой текст
+  incInput?.addEventListener('change', () => { main.classList.toggle('incognito', incInput.checked); if (sub) sub.textContent = incInput.checked ? 'инкогнито · без профиля и памяти' : 'помнит ваш вкус'; if (main.classList.contains('blank')) blank(); });
   const first = rows().find((r) => r.classList.contains('on'));
   const select = (row) => {
     stop(); rows().forEach((r) => r.classList.toggle('on', r === row)); main.classList.remove('blank');
