@@ -114,3 +114,10 @@
 .gilt-row span { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: var(--r-s); font: 500 12px/1 var(--font-mono); color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--gilt-ring); background: var(--gilt-tint); }
 .gilt-row span i { width: 12px; height: 12px; border-radius: 50%; background: var(--gilt); box-shadow: var(--gilt-glow); }
 .gilt-row span.deep i { background: var(--gilt-deep); box-shadow: none; }
+
+/* мастер первого запуска в рамке приложения: список шагов целиком, без внутренней прокрутки */
+.demo-app.tall .app { height: auto; min-height: 0; }
+.demo-app.tall .rail { height: auto; }
+/* анкета: панели шагов — одна видна (1–2 книги, 3–5 как слушаете, 6–7 что ещё) */
+.wz-pane { display: contents; }
+.wz-pane[hidden] { display: none; }

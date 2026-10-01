@@ -508,11 +508,17 @@
               <div class="chat-group">Вчера</div>
               <div class="chat-row"><button type="button">Что-то похожее на «Убик», 1969<small>10:22 · 2 вопроса · инкогнито</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
             </div>
-            <div class="chat-side-foot"><button type="button">Память: 2 факта</button></div>
+            <div class="chat-side-foot"><button type="button" title="Что консультант помнит о вашем вкусе — правится на экране «Найти»">Память: 2 факта</button> · <button type="button" title="Выгрузить память, профиль, книги и разговоры в vault Obsidian. Двойной щелчок — забрать оттуда ваши новые факты">Obsidian<svg><use href="../src/icons/sprite.svg#i-external"/></svg></button></div>
           </aside>
           <div class="chat-main">
             <header class="chat-head">
               <h2>Хочу что-то мрачное, но короткое</h2><p class="sub">помнит ваш вкус</p><span class="spacer"></span>
+              <!-- провайдер ИИ — для всего приложения; CLI, которого нет на компьютере, — disabled с подсказкой (см. chat.html) -->
+              <div class="pills small" role="radiogroup" aria-label="Провайдер ИИ — для всего приложения">
+                <button type="button" role="radio" aria-checked="true" title="Claude Code: Opus / Sonnet / Haiku — для всех функций ИИ">Claude</button>
+                <button type="button" role="radio" aria-checked="false" title="Antigravity: Gemini 3.1 Pro / 3.8 Flash — для всех функций ИИ">Antigravity</button>
+                <span class="pill-ink" aria-hidden="true"></span>
+              </div>
               <label class="switch"><input type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">инкогнито</span></label>
             </header>
             <div class="chat-scroll" aria-live="polite">
@@ -606,7 +612,8 @@
         </div>
       </div>
       <div class="demo-row"><p class="demo-note">Всё живое: «+ Новый чат» — пустое состояние с полем по центру; «инкогнито» — поле пунктиром; карандаш у заголовка — переименовать; «Изменить» — пузырь становится полем, ответы ниже уходят;
-      «Другой ответ» пишется заново; реакции снимаются повторным нажатием; «Уже читал» открывает быструю оценку; «в Telegram» у нескачанной записи сам скачивает и отправляет; флажок — жалоба, не красная кнопка. Лента едет вниз сама, только если вы её не отмотали; иначе — кнопка «вниз».</p></div>
+      «Другой ответ» пишется заново; реакции снимаются повторным нажатием; «Уже читал» открывает быструю оценку; «в Telegram» у нескачанной записи сам скачивает и отправляет; флажок — жалоба, не красная кнопка. Лента едет вниз сама, только если вы её не отмотали; иначе — кнопка «вниз».
+      В шапке — переключатель провайдера ИИ: один на всё приложение, не на разговор; CLI, которого нет на компьютере, показан, но недоступен — с подсказкой «CLI не найден» (<a href="chat.html">chat.html</a>). Подвал списка — «Память: N фактов · Obsidian»: зеркало данных во внешний инструмент — щелчок выгружает, двойной забирает оттуда новое.</p></div>
     </section>
 
     <!-- анкета по шагам: строка шагов, открытые группы, все варианты сразу, действия последним рядом -->
@@ -614,7 +621,8 @@
       <div class="section-head">
         <p class="kicker">анкета по шагам</p>
         <h2>Семь шагов, всё видно сразу</h2>
-        <p>Строка шагов от края до края, вопросы открытыми группами, варианты чипами без «ещё», действия и статус сохранения — последним рядом карточки. Ничего не плавает поверх полей.</p>
+        <p>Строка шагов от края до края, вопросы открытыми группами, варианты чипами без «ещё», действия и статус сохранения — последним рядом карточки. Ничего не плавает поверх полей.
+        Ввод — на уровне того, как думает человек: подсказки из библиотеки, «любая книга» и «автор целиком» (Alt+Enter) в одном поле; у выбора вариант по умолчанию назван в подсказке.</p>
       </div>
       <div class="ways">
         <div class="pills glass" role="radiogroup" aria-label="Как заполнить" id="demo-ways">
@@ -634,14 +642,88 @@
       </form>
       <form class="panel demo-wizard" id="demo-wizard">
         <nav class="steps" aria-label="Шаги анкеты" id="demo-steps">
-          <button class="step done" type="button"><span class="n">1</span><span class="l">Любимые книги</span></button><span class="step-sep"></span>
+          <button class="step on" type="button" aria-current="step"><span class="n">1</span><span class="l">Любимые книги</span></button><span class="step-sep"></span>
           <button class="step done" type="button"><span class="n">2</span><span class="l">Не зашли</span></button><span class="step-sep"></span>
           <button class="step done" type="button"><span class="n">3</span><span class="l">Как слушаете</span></button><span class="step-sep"></span>
           <button class="step" type="button"><span class="n">4</span><span class="l">Кино и игры</span></button><span class="step-sep"></span>
           <button class="step done" type="button"><span class="n">5</span><span class="l">О вас</span></button><span class="step-sep"></span>
-          <button class="step on" type="button" aria-current="step"><span class="n">6</span><span class="l">Что ещё</span></button><span class="step-sep"></span>
+          <button class="step" type="button"><span class="n">6</span><span class="l">Что ещё</span></button><span class="step-sep"></span>
           <button class="step" type="button"><span class="n">7</span><span class="l">Итог</span></button>
         </nav>
+        <div class="wz-pane" data-pane="books">
+        <div class="view-head"><div><h3>Любимые книги</h3><p>Начните вводить название или автора — подскажу из библиотеки. Любую другую книгу — как «Автор — Название»; любимого автора целиком — «Добавить автора» (<kbd>Alt</kbd>+<kbd>Enter</kbd>) и опишите, чем он цепляет.</p></div></div>
+        <div class="suggest" id="wz-suggest">
+          <svg><use href="../src/icons/sprite.svg#i-search"/></svg>
+          <input class="in" placeholder="Название или автор — попробуйте «Абэ», «Лем» или «Пикник»" aria-label="Книга или автор" autocomplete="off" spellcheck="false">
+          <div class="hints" role="listbox" aria-label="Подсказки" hidden></div>
+        </div>
+        <p class="entries-note" id="wz-note"></p>
+        <div class="entries" id="wz-entries">
+          <div class="entry" data-key="Кобо Абэ">
+            <div class="entry-head">
+              <div class="entry-fields one"><input class="in" aria-label="Автор" value="Кобо Абэ"></div>
+              <span class="tag accent">автор целиком</span>
+              <button class="x" type="button" aria-label="Убрать"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button>
+            </div>
+            <p class="entry-lbl">Чем нравится автор</p>
+            <div class="choices" role="group" aria-label="Чем нравится автор">
+              <button class="choice" type="button" aria-pressed="true">атмосфера</button><button class="choice" type="button" aria-pressed="false">герои</button><button class="choice" type="button" aria-pressed="false">язык</button>
+              <button class="choice" type="button" aria-pressed="true">идеи</button><button class="choice" type="button" aria-pressed="false">сюжет</button><button class="choice" type="button" aria-pressed="false">юмор</button><button class="choice" type="button" aria-pressed="true">мрачность</button>
+            </div>
+            <div class="entry-row">
+              <div class="scale small" role="group" aria-label="Оценка"><button type="button" aria-pressed="false">1</button><button type="button" aria-pressed="false">2</button><button type="button" aria-pressed="false">3</button><button type="button" aria-pressed="false">4</button><button type="button" aria-pressed="false">5</button><button type="button" aria-pressed="false">6</button><button type="button" aria-pressed="false">7</button><button type="button" aria-pressed="false">8</button><button type="button" aria-pressed="true">9</button><button type="button" aria-pressed="false">10</button></div>
+              <input class="in" aria-label="Комментарий" value="Замкнутые пространства и песок, который не кончается">
+            </div>
+          </div>
+          <div class="entry" data-key="Стругацкие — Пикник на обочине">
+            <div class="entry-head">
+              <div class="entry-title">Стругацкие — «Пикник на обочине»<small>7,2 ч · прослушано · 9 · в вашей библиотеке</small></div>
+              <span class="tag">в библиотеке</span>
+              <button class="x" type="button" aria-label="Убрать"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button>
+            </div>
+            <p class="entry-lbl">Чем понравилась</p>
+            <div class="choices" role="group" aria-label="Чем понравилась">
+              <button class="choice" type="button" aria-pressed="true">сюжет</button><button class="choice" type="button" aria-pressed="false">герои</button><button class="choice" type="button" aria-pressed="true">атмосфера</button>
+              <button class="choice" type="button" aria-pressed="false">язык</button><button class="choice" type="button" aria-pressed="true">идеи</button><button class="choice" type="button" aria-pressed="false">чтец</button><button class="choice" type="button" aria-pressed="false">финал</button>
+            </div>
+            <div class="entry-row">
+              <div class="scale small" role="group" aria-label="Оценка"><button type="button" aria-pressed="false">1</button><button type="button" aria-pressed="false">2</button><button type="button" aria-pressed="false">3</button><button type="button" aria-pressed="false">4</button><button type="button" aria-pressed="false">5</button><button type="button" aria-pressed="false">6</button><button type="button" aria-pressed="false">7</button><button type="button" aria-pressed="false">8</button><button type="button" aria-pressed="true">9</button><button type="button" aria-pressed="false">10</button></div>
+              <input class="in" aria-label="Комментарий" placeholder="Одной строкой: что запомнилось (необязательно)">
+            </div>
+          </div>
+        </div>
+        </div>
+        <div class="wz-pane" data-pane="listen" hidden>
+        <div class="view-head"><div><h3>Как слушаете</h3><p>Язык, темп, чтецы. Вариант по умолчанию назван в подсказке у вопроса: не трогаете — будет он.</p></div></div>
+        <div class="form-grid">
+          <div class="lbl">Главный язык <small>по умолчанию — оба на равных</small>
+            <div class="choices" role="radiogroup" aria-label="Главный язык">
+              <button class="choice" type="button" role="radio" aria-checked="true" data-value="both">русский и украинский</button>
+              <button class="choice" type="button" role="radio" aria-checked="false" data-value="ru">русский</button>
+              <button class="choice" type="button" role="radio" aria-checked="false" data-value="uk">украинский</button>
+            </div>
+          </div>
+          <div class="lbl">Английский <small>по умолчанию — немного</small>
+            <div class="choices" role="radiogroup" aria-label="Английский">
+              <button class="choice" type="button" role="radio" aria-checked="false" data-value="no">нет</button>
+              <button class="choice" type="button" role="radio" aria-checked="true" data-value="some">немного</button>
+              <button class="choice" type="button" role="radio" aria-checked="false" data-value="yes">охотно</button>
+            </div>
+          </div>
+          <div class="lbl wide">Когда слушаете
+            <div class="choices" role="group" aria-label="Когда слушаете">
+              <button class="choice" type="button" aria-pressed="true">в дороге</button>
+              <button class="choice" type="button" aria-pressed="false">за рулём</button>
+              <button class="choice" type="button" aria-pressed="false">спорт</button>
+              <button class="choice" type="button" aria-pressed="true">дома</button>
+              <button class="choice" type="button" aria-pressed="false">перед сном</button>
+              <button class="choice" type="button" aria-pressed="false">на работе</button>
+            </div>
+          </div>
+          <label class="wide">Любимые чтецы <small>необязательно</small><input class="in" placeholder="Например: Князев, Клюквин, Терновский"></label>
+        </div>
+        </div>
+        <div class="wz-pane" data-pane="more" hidden>
         <div class="view-head"><div><h3>Что ещё нужно знать</h3><p>Запреты, настроение, где слушаете — и вопросы, которые консультант хочет уточнить. Всё необязательно.</p></div></div>
         <div class="form-grid">
           <label>Не предлагать авторов <small>никогда</small><input class="in" placeholder="Автор, Enter"></label>
@@ -652,16 +734,6 @@
               <button class="choice" type="button" role="radio" aria-checked="true">баланс</button>
               <button class="choice" type="button" role="radio" aria-checked="false">мрачное — да</button>
               <button class="choice" type="button" role="radio" aria-checked="false">чем мрачнее, тем лучше</button>
-            </div>
-          </div>
-          <div class="lbl">Где слушаете
-            <div class="choices" role="group" aria-label="Где слушаете">
-              <button class="choice" type="button" aria-pressed="true">в дороге</button>
-              <button class="choice" type="button" aria-pressed="false">за рулём</button>
-              <button class="choice" type="button" aria-pressed="false">спорт</button>
-              <button class="choice" type="button" aria-pressed="true">дома</button>
-              <button class="choice" type="button" aria-pressed="false">перед сном</button>
-              <button class="choice" type="button" aria-pressed="false">на работе</button>
             </div>
           </div>
           <label class="wide">Что ещё важно<input class="in" placeholder="Свободно: «люблю, когда финал переворачивает всё», «не выношу медленное начало»…"></label>
@@ -677,9 +749,100 @@
           </div>
           <div class="btn-row" style="margin-top:12px"><button class="btn" type="button">Ещё вопросы</button></div>
         </div>
-        <div class="form-actions"><button class="btn" type="button">← Назад</button><span class="spacer"></span><span class="item-meta">✓ черновик сохранён · 14:31</span><button class="btn primary" type="submit">К итогу →</button></div>
+        </div>
+        <div class="form-actions"><button class="btn" type="button">← Назад</button><span class="spacer"></span><span class="item-meta">✓ черновик сохранён · 14:31</span><button class="btn primary" type="submit">Далее →</button></div>
       </form>
-      <div class="demo-row"><p class="demo-note">Быстрая оценка (<code>.scale</code>, 1–10 одним кликом, цифра с клавиатуры) и жалоба открываются из чата выше: «Уже читал» и флажок. Клик по шагу переносит текущий.</p></div>
+      <div class="demo-row"><p class="demo-note">Клик по шагу показывает его панель: 1–2 — книги (поле с подсказками, карточки <code>.entry</code>: «в библиотеке», «вне библиотеки», «автор целиком»), 3–5 — как слушаете (выбор с подписью «по умолчанию — …»), 6–7 — что ещё. Подсказки: ↑↓, Enter — выбранное или любая книга, Alt+Enter — автор целиком (когда запрос похож на имя автора, эта строка первая). Быстрая оценка (<code>.scale</code>) и жалоба открываются из чата выше.</p></div>
+    </section>
+
+    <!-- мастер первого запуска: шаги карточками сверху вниз, одно действие в ряд, всё откладываемое (блок setup, UX.md §16) -->
+    <section class="section" id="setup">
+      <div class="section-head">
+        <p class="kicker">первый запуск</p>
+        <h2>Шесть шагов, каждый можно отложить</h2>
+        <p>Мастер первого запуска — не экраны один за другим, а список карточек: номер или ✓, заголовок, «готово / не сделано», пояснение и одно действие в ряд; у необязательных шагов — ещё «Позже».
+        Открывается сам при первом запуске, пока не проверен ИИ и не заполнена анкета; «Закрыть, настрою потом» возвращает обычный экран, а счётчик несделанных остаётся на пункте рейки.</p>
+        <div class="demo-row"><button class="btn small" type="button" id="setup-reset">Как при первом запуске</button></div>
+      </div>
+      <div class="demo-app tall" id="setup-app">
+        <div class="app">
+          <aside class="rail">
+            <a class="brand" href="#setup"><svg><use href="../src/icons/sprite.svg#i-mark"/></svg>книги</a>
+            <p class="rail-kicker">экраны</p>
+            <nav class="rail-nav" id="setup-rail" aria-label="Экраны примера первого запуска">
+              <button type="button" data-view="vs-home"><svg><use href="../src/icons/sprite.svg#i-home"/></svg><span class="l">Обзор</span></button>
+              <button type="button" data-view="vs-setup" aria-current="page"><svg><use href="../src/icons/sprite.svg#i-sliders"/></svg><span class="l">Настройка</span><small>4</small></button>
+            </nav>
+          </aside>
+          <main class="app-main">
+            <section class="view" id="vs-home" hidden>
+              <header class="view-head"><div><h2>Обзор</h2><p>Обычный экран: мастер закрыт, но не потерян — пункт «Настройка» с числом несделанных шагов остаётся в рейке.</p></div></header>
+              <div class="notice">Настройка не закончена: <b>4 шага</b> ждут. <button class="text-btn small" type="button" data-view="vs-setup">Открыть настройку</button></div>
+              <div class="kpis">
+                <div class="kpi"><b>0</b><span>книг в библиотеке</span></div>
+                <div class="kpi"><b>—</b><span>каталог не скачан</span></div>
+                <div class="kpi"><b>0</b><span>отзывов</span></div>
+              </div>
+            </section>
+            <section class="view" id="vs-setup">
+              <header class="view-head"><div><h2>Шесть шагов — и аудиотека готова</h2><p>Любой шаг можно пройти позже: приложение работает и без Telegram, а каталог дособирается сам.</p></div></header>
+              <div class="setup" id="setup-list">
+                <div class="setup-step done">
+                  <div class="n">✓</div>
+                  <h3>ИИ-помощник</h3>
+                  <p class="st">готово</p>
+                  <p class="tx">Чат, подбор и поиск работают через установленный CLI — выберите, что есть на этом компьютере. Сменить можно в любой момент в шапке чата.</p>
+                  <div class="act">
+                    <div class="pills small" role="radiogroup" aria-label="Провайдер ИИ">
+                      <button type="button" role="radio" aria-checked="true" title="Claude Code: Opus / Sonnet / Haiku — для всех функций ИИ">Claude</button>
+                      <button type="button" role="radio" aria-checked="false" disabled title="CLI не найден на этом компьютере">Antigravity</button>
+                      <span class="pill-ink" aria-hidden="true"></span>
+                    </div>
+                    <button class="btn" type="button">Проверить связь</button>
+                  </div>
+                </div>
+                <div class="setup-step">
+                  <div class="n">2</div>
+                  <h3>Папка библиотеки</h3>
+                  <p class="st">не сделано</p>
+                  <p class="tx">Куда класть скачанные аудиокниги. На Windows лучше диск с местом: временные файлы склейки тоже пойдут рядом, а не на диск C:.</p>
+                  <div class="act"><input class="in" aria-label="Папка библиотеки" value="D:\Аудиокниги"><button class="btn primary" type="button">Сохранить</button></div>
+                </div>
+                <div class="setup-step">
+                  <div class="n">3</div>
+                  <h3>Каталог книг из интернета</h3>
+                  <p class="st">не сделано</p>
+                  <p class="tx">Около 50 тыс. книг с открытых источников — для поиска и советов. Быстрее всего скачать готовый снимок; можно и обойти источники заново, это около 2,5 часов в фоне.</p>
+                  <div class="act"><span class="item-meta">0 записей · 0 книг</span><button class="btn" type="button">Скачать готовый каталог</button><button class="text-btn" type="button">Обойти источники заново</button></div>
+                </div>
+                <div class="setup-step">
+                  <div class="n">4</div>
+                  <h3>Ваш вкус</h3>
+                  <p class="st">не сделано</p>
+                  <p class="tx">Анкета — по шагам или одним рассказом своими словами. По ней консультант советует книги.</p>
+                  <div class="act"><button class="btn" type="button">Заполнить анкету</button></div>
+                </div>
+                <div class="setup-step">
+                  <div class="n">5</div>
+                  <h3>Другие компьютеры (необязательно)</h3>
+                  <p class="st">не сделано</p>
+                  <p class="tx">Профили, отзывы и память о вкусе — в вашем приватном репозитории: на другом компьютере советы будут такими же. Нужен вход в GitHub CLI. Каталог и аудио не синхронизируются — у каждого компьютера свои.</p>
+                  <div class="act"><button class="btn" type="button">Включить синхронизацию</button><button class="text-btn" type="button">Позже</button></div>
+                </div>
+                <div class="setup-step">
+                  <div class="n">6</div>
+                  <h3>Telegram (необязательно)</h3>
+                  <p class="st">не сделано</p>
+                  <p class="tx">Отправка книг в ваш канал одной кнопкой. Настраивается командой в терминале — понадобятся api_id, api_hash и название канала.</p>
+                  <div class="act"><span class="item-meta">команда в терминале</span><button class="text-btn" type="button">Позже</button></div>
+                </div>
+              </div>
+              <div class="setup-foot"><button class="btn" type="button" id="setup-close">Закрыть, настрою потом</button></div>
+            </section>
+          </main>
+        </div>
+      </div>
+      <div class="demo-row"><p class="demo-note">Всё живое: действие шага делает его сделанным, раскалённой становится кнопка следующего несделанного; «Позже» откладывает; «Закрыть, настрою потом» показывает обычный экран с уведомлением. Правила: не больше 7 шагов, каждый откладываемый, обязательных — минимум, приложение работает без необязательных. Блок <code>setup</code>, UX.md §16.</p></div>
     </section>
 
     <!-- сцена: композиции, состояния и все движения — кнопки ниже делают то же, что панель «Фон», и прокручивают к первому экрану -->
@@ -933,7 +1096,7 @@
           <h3 id="m-flip" data-toc="Перестановка списка">Перестановка списка — FLIP</h3>
           <button class="btn small replay" type="button" data-replay="flip">ещё раз</button>
           <div class="sample-stage">
-            <div class="flip-list" id="m-flip">
+            <div class="flip-list" id="m-flip-list">
               <div class="item"><div class="item-body"><div class="item-title">Пикник на обочине</div><div class="item-meta">9 · прочитано</div></div></div>
               <div class="item"><div class="item-body"><div class="item-title">Солярис</div><div class="item-meta">в очереди</div></div></div>
               <div class="item"><div class="item-body"><div class="item-title">Превращение</div><div class="item-meta">8 · прочитано</div></div></div>
@@ -1302,7 +1465,7 @@
   <div class="toasts" id="toasts" aria-live="polite"></div>
 
   <script type="module">
-    import { boot, shell, buildToc, wireSegmented, wireTree, wireTheme, wireChatDemo, wireRateDialog, pressDemo, breathDemo, hoverDemo } from './demo.js';
+    import { boot, shell, buildToc, wireSegmented, wireTree, wireTheme, wireChatDemo, wireRateDialog, wireWizardDemo, wireSetupDemo, pressDemo, breathDemo, hoverDemo } from './demo.js';
     import { buttonState, countTo, odometer, enter, exit, flip, moveInk, closeDialog } from '../src/js/motion.js';
     import { pulse, hudRing, hudType } from '../src/js/kosmos.js';
     shell('index');
@@ -1327,9 +1490,13 @@
     }));
 
     // мини-приложение: рейка показывает свой экран (экран входит снизу), чипы переключаются, форма отвечает тостом
-    import('../src/js/site.js').then(({ wireRail }) => wireRail($('demo-rail'), (el) =>
-      document.querySelectorAll('.demo-app .view').forEach((v) => { const show = v.id === el.dataset.view;
-        if (show && v.hidden) { v.hidden = false; enter(v, { dy: 10, scale: 1, blur: 0, response: 0.5, damping: 0.85 }); } else if (!show) v.hidden = true; })));
+    import('../src/js/site.js').then(({ wireRail }) => { wireRail($('demo-rail'), (el) =>
+      document.querySelectorAll('#app .demo-app .view').forEach((v) => { const show = v.id === el.dataset.view;
+        if (show && v.hidden) { v.hidden = false; enter(v, { dy: 10, scale: 1, blur: 0, response: 0.5, damping: 0.85 }); } else if (!show) v.hidden = true; }));
+      wireRail($('setup-rail'), (el) => setup.show(el.dataset.view)); });
+    // мастер первого запуска: шаги, «Позже», закрытие и «как при первом запуске»
+    const setup = wireSetupDemo($('setup-app'), toast);
+    $('setup-reset').addEventListener('click', () => { setup.reset(); $('setup-app').scrollIntoView({ behavior: reducedQuery.matches ? 'auto' : 'smooth', block: 'start' }); });
     document.querySelectorAll('#demo-choices .choice, #demo-choices-cat .choice:not(.more)').forEach((b) => b.addEventListener('click', () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'))));
     document.querySelector('#demo-choices-cat .more').addEventListener('click', () => toast('', 'Пример: раскрылись бы остальные 9 — только для списков длиннее 24'));
     $('demo-app-form').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Сохранено'); });
@@ -1341,11 +1508,7 @@
     const reasons = $('report-reasons'), reportSend = $('report-send');
     reasons.querySelectorAll('.choice').forEach((c) => c.addEventListener('click', () => { reasons.querySelectorAll('.choice').forEach((o) => o.setAttribute('aria-checked', String(o === c))); reportSend.disabled = false; }));
     reportSend.addEventListener('click', () => { closeDialog($('report')); toast('ok', 'Запись отмечена — ищу другую'); });
-    document.querySelectorAll('#demo-wizard .choices').forEach((g) => g.querySelectorAll('.choice').forEach((b) => b.addEventListener('click', () => {
-      if (g.getAttribute('role') === 'radiogroup') g.querySelectorAll('.choice').forEach((o) => o.setAttribute('aria-checked', String(o === b)));
-      else b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'));
-    })));
-    document.querySelectorAll('#demo-steps .step').forEach((s) => s.addEventListener('click', () => { document.querySelectorAll('#demo-steps .step').forEach((o) => { o.classList.toggle('on', o === s); if (o === s) o.setAttribute('aria-current', 'step'); else o.removeAttribute('aria-current'); }); }));
+    wireWizardDemo($('demo-wizard'), toast);   // панели шагов, чипы, подсказки «любая книга» / «автор целиком», карточки
     $('demo-wizard').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Переход к итогу (пример)'); });
     wireSegmented($('demo-ways'), 'aria-checked', (it) => { const text = it.dataset.way === 'text'; $('demo-wizard-text').hidden = !text; $('demo-wizard').hidden = text; });
     $('demo-wizard-text').addEventListener('submit', (e) => { e.preventDefault(); toast('ok', 'Заполнено 5 разделов — проверьте в «Итоге» (пример)'); $('demo-ways').querySelector('[data-way="steps"]').click(); });
@@ -1434,18 +1597,20 @@
     wireSegmented($('halo-pills'), 'aria-checked', (it) => { cosmosApi.setHalo(it.dataset.halo); toTop(); });
     $('rays-switch').addEventListener('change', (e) => { cosmosApi.setRays(e.target.checked); toTop(); });
     // кнопки раздела «Сцена» — через те же органы панели «Фон», чтобы состояние было одно
+    // повторное нажатие на уже выбранное (та же композиция, ореол, дым) не бывает немым: вдох кольца подтверждает нажатие
+    const same = (btn, on) => { if (btn.getAttribute(on) === 'true') cosmosApi.pulse('done'); btn.click(); };
     document.querySelectorAll('[data-scene]').forEach((b) => b.addEventListener('click', () => {
       const [k, v] = b.dataset.scene.split(':');
-      if (k === 'comp') $('comp-pills').querySelector(`[data-comp="${v}"]`).click();
-      else if (k === 'halo') $('halo-pills').querySelector(`[data-halo="${v}"]`).click();
+      if (k === 'comp') same($('comp-pills').querySelector(`[data-comp="${v}"]`), 'aria-checked');
+      else if (k === 'halo') same($('halo-pills').querySelector(`[data-halo="${v}"]`), 'aria-checked');
       else if (k === 'rays') $('rays-switch').click();
-      else if (k === 'smoke') $('smoke-row').querySelector(`[data-smoke="${v}"]`).click();
+      else if (k === 'smoke') same($('smoke-row').querySelector(`[data-smoke="${v}"]`), 'aria-pressed');
       else if (k === 'spin') $('spin-btn').click();
       else if (k === 'kick') { $('spin-kick').click(); toTop(); }
       else if (k === 'pulse') { $('pulse-go').click(); toTop(); }
-      else if (k === 'energy') { (v === '1' ? $('energy-up') : $('energy-down')).click(); toTop(); }
+      else if (k === 'energy') { if (cosmosApi.energyT === +v) cosmosApi.pulse('done'); (v === '1' ? $('energy-up') : $('energy-down')).click(); toTop(); }
       else if (k === 'asleep') $('toggle-asleep').click();
-      else if (k === 'live') toTop();
+      else if (k === 'live') { cosmosApi.pulse('go'); toTop(); }
     }));
 
     // ---- секция «Движение» ----
@@ -1453,10 +1618,12 @@
     const mTabs = wireSegmented($('m-tabs'), 'aria-selected');
     const mTree = wireTree($('m-tree-nav'));
     // состояние кнопки: busy 1.4 s → done 1.2 s → idle
-    const runState = async (b) => {
-      if (b.dataset.state && b.dataset.state !== 'idle') return;
-      await buttonState(b, 'busy'); await new Promise((r) => setTimeout(r, 1400));
-      await buttonState(b, 'done'); await new Promise((r) => setTimeout(r, 1200));
+    // клик по занятой кнопке ничего не делает (как в жизни); «ещё раз» (force) перезапускает цикл с начала
+    const runState = async (b, force) => {
+      if (!force && b.dataset.state && b.dataset.state !== 'idle') return;
+      const my = (b._run = (b._run || 0) + 1);
+      await buttonState(b, 'busy'); await new Promise((r) => setTimeout(r, 1400)); if (b._run !== my) return;
+      await buttonState(b, 'done'); await new Promise((r) => setTimeout(r, 1200)); if (b._run !== my) return;
       buttonState(b, 'idle');
     };
     for (const id of ['state-btn', 'state-btn-2']) $(id).addEventListener('click', () => runState($(id)));
@@ -1470,8 +1637,11 @@
     // вход экрана, FLIP, поток
     const enterPanel = $('m-enter-panel');
     const replayEnter = () => exit(enterPanel, { dy: 8 }).then(() => enter(enterPanel, { dy: 14, scale: 0.96, blur: 8, response: 0.6, damping: 0.9 }));
-    const flipList = $('m-flip');
-    const shuffle = () => flip(flipList, () => { const kids = [...flipList.children]; for (let i = kids.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [kids[i], kids[j]] = [kids[j], kids[i]]; } kids.forEach((k) => flipList.append(k)); });
+    const flipList = $('m-flip-list');
+    // порядок всегда меняется: перестановка, совпавшая с текущей, тасуется заново — «ещё раз» не бывает холостым
+    const shuffle = () => flip(flipList, () => { const kids = [...flipList.children]; let order;
+      do { order = [...kids]; for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; } } while (order.every((k, i) => k === kids[i]));
+      order.forEach((k) => flipList.append(k)); });
     const streamMd = $('m-stream-md'), streamHtml = streamMd.innerHTML.replace('<span class="caret" aria-hidden="true"></span>', '');
     let sTimer = 0;
     const replayStream = () => { clearInterval(sTimer); const words = streamHtml.split(' '); let i = 0;
@@ -1499,7 +1669,7 @@
     // «ещё раз» — у каждого образца своя кнопка
     const REPLAY = {
       press: () => [...$('m-press-row').children].forEach((b, i) => setTimeout(() => pressDemo(b), i * 120)),
-      state: () => { runState($('state-btn')); setTimeout(() => runState($('state-btn-2')), 300); },
+      state: () => { runState($('state-btn'), true); setTimeout(() => runState($('state-btn-2'), true), 300); },
       focus: () => { const bs = [...$('m-focus-row').children]; bs.forEach((b, i) => setTimeout(() => { b.focus({ preventScroll: true }); breathDemo(b); }, i * 450)); setTimeout(() => bs[2].blur(), 1600); },
       switch: () => $('m-switch-row').querySelectorAll('input').forEach((i, n) => setTimeout(() => i.click(), n * 250)),
       ink: () => { mPills.next(); setTimeout(mTabs.next, 200); },

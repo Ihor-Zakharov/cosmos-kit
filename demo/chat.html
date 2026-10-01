@@ -52,13 +52,19 @@
               <div class="chat-group">Раньше</div>
               <div class="chat-row"><button type="button">Лекции по истории Рима<small>12 сен · 6 вопросов</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="../src/icons/sprite.svg#i-x"/></svg></button></div>
             </div>
-            <div class="chat-side-foot"><button type="button">Память: 2 факта</button></div>
+            <div class="chat-side-foot"><button type="button" title="Что консультант помнит о вашем вкусе — правится на экране «Найти»">Память: 2 факта</button> · <button type="button" title="Выгрузить память, профиль, книги и разговоры в vault Obsidian. Двойной щелчок — забрать оттуда ваши новые факты">Obsidian<svg><use href="../src/icons/sprite.svg#i-external"/></svg></button></div>
           </aside>
           <div class="chat-main">
             <header class="chat-head">
               <h1>Хочу что-то мрачное, но короткое</h1>
               <button class="icon-btn small" type="button" data-act="rename" aria-label="Переименовать разговор"><svg><use href="../src/icons/sprite.svg#i-pencil"/></svg></button>
               <p class="sub">помнит ваш вкус</p><span class="spacer"></span>
+              <!-- провайдер ИИ — для всего приложения; CLI, которого нет на этом компьютере, — disabled с подсказкой -->
+              <div class="pills small" role="radiogroup" aria-label="Провайдер ИИ — для всего приложения">
+                <button type="button" role="radio" aria-checked="true" title="Claude Code: Opus / Sonnet / Haiku — для всех функций ИИ">Claude</button>
+                <button type="button" role="radio" aria-checked="false" disabled title="CLI не найден">Antigravity</button>
+                <span class="pill-ink" aria-hidden="true"></span>
+              </div>
               <label class="switch" title="Не видит анкету, отзывы и память и ничего не запоминает"><input type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">инкогнито</span></label>
             </header>
             <div class="chat-scroll" aria-live="polite">

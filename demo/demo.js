@@ -2,7 +2,7 @@
 // Это же — пример того, что сайт делает у себя один раз (см. SKILL.md «Как подключить»).
 import { createCosmos, attachSceneScroll } from '../src/js/cosmos.js';
 import { attachButtons, attachPointerGlow, attachSwitches, attachChecks, attachDisclosures, attachCards, attachSwipeToClose,
-  moveInk, motionOf, openDialog, closeDialog, pushToast, dismissToast } from '../src/js/motion.js';
+  moveInk, motionOf, openDialog, closeDialog, pushToast, dismissToast, enter, exit } from '../src/js/motion.js';
 
 const ICON = new URL('../src/icons/sprite.svg', import.meta.url).href;
 
@@ -117,7 +117,7 @@ export function wireTree(tree) {
 
 /** шапка + меню витрины: одна страница, все разделы — якоря */
 export function shell() {
-  const nav = [['#accents', 'Темы'], ['#components', 'Компоненты'], ['#app', 'Приложение'], ['#chat', 'Чат'], ['#wizard', 'Анкета'], ['#scene', 'Сцена'],
+  const nav = [['#accents', 'Темы'], ['#components', 'Компоненты'], ['#app', 'Приложение'], ['#chat', 'Чат'], ['#wizard', 'Анкета'], ['#setup', 'Первый запуск'], ['#scene', 'Сцена'],
     ['#motion', 'Движение'], ['#kosmos', 'KOCMOC'], ['#future', 'Будет'], ['blocks.html', 'Блоки']];
   const links = nav.map(([h, t], i) => `<a href="${h}"${i === 0 ? ' aria-current="page"' : ''}>${t}</a>`).join('');
   document.getElementById('topbar').innerHTML = `
@@ -197,7 +197,8 @@ export function hoverDemo(el, lift = 1.02) { const m = motionOf(el); m.to({ s: l
     Enter / Shift+Enter, ↑ в пустом поле — правка последнего вопроса (пузырь становится полем, ответы ниже уходят),
     «Другой ответ», копирование, новый чат (пустое состояние с подсказками), инкогнито, выбор и удаление разговора,
     переименование (карандаш у заголовка), поиск по разговорам (появляется, когда их больше шести), кнопка «вниз»,
-    реакции и «Уже читал» → быстрая оценка, группа нескачанного: Скачать → в Telegram одним нажатием, флажок → жалоба.
+    реакции и «Уже читал» → быстрая оценка, группа нескачанного: Скачать → в Telegram одним нажатием, флажок → жалоба,
+    переключатель провайдера ИИ в шапке, подвал «Память · Obsidian» (щелчок — выгрузка, двойной — импорт).
     Лента сама едет вниз, только если человек не отмотал её вверх. root — элемент .chat. */
 export function wireChatDemo(root, toast) {
   const $ = (s) => root.querySelector(s);
@@ -359,6 +360,18 @@ export function wireChatDemo(root, toast) {
     toast?.('', 'Пример: ' + t);
   };
 
+  // подвал списка — зеркало данных во внешний инструмент: щелчок по «Obsidian» выгружает, двойной — забирает оттуда новое;
+  // выгрузка ждёт 260 мс, чтобы двойной щелчок не дал и выгрузку, и импорт
+  let footTimer = 0;
+  const footAct = (btn) => {
+    if (!/Obsidian/.test(btn.textContent)) { toast?.('', 'Память: «любит мрачное и короткое», «не выносит медленное начало» — пример'); return; }
+    clearTimeout(footTimer);
+    footTimer = setTimeout(() => { btn.disabled = true; setTimeout(() => { btn.disabled = false; toast?.('ok', 'Obsidian: 14 заметок (3 обновлено) · путь скопирован'); }, reduced ? 0 : 500); }, 260);
+  };
+  side.querySelector('.chat-side-foot')?.addEventListener('dblclick', (e) => { const btn = e.target.closest('button'); if (!btn || !/Obsidian/.test(btn.textContent)) return; clearTimeout(footTimer); toast?.('ok', 'Из Obsidian: +2 факта'); });
+  // провайдер ИИ в шапке — действует на всё приложение; недоступный (CLI не найден) — disabled, нажать нельзя
+  head.querySelectorAll('.pills').forEach((g) => wireSegmented(g, 'aria-checked', (it) => toast?.('', `ИИ: ${it.textContent.trim()} — для всех функций приложения`)));
+
   // новый чат → пустое состояние с полем по центру; инкогнито — пунктир и свой текст; выбор разговора
   const blank = () => {
     stop(); main.classList.add('blank'); title.textContent = 'Новый чат'; rows().forEach((r) => r.classList.remove('on'));
@@ -397,7 +410,7 @@ export function wireChatDemo(root, toast) {
     else if (btn.matches('.advice-side .btn-row .btn')) fetchAct(btn);
     else if (btn.matches('.chat-row > button:first-child')) select(btn.closest('.chat-row'));
     else if (btn.matches('.chat-row .x')) { const row = btn.closest('.chat-row'), was = row.classList.contains('on'); row.remove(); syncSearch(); toast?.('', 'Разговор удалён'); if (was) blank(); }
-    else if (btn.closest('.chat-side-foot')) toast?.('', 'Память: «любит мрачное и короткое», «не выносит медленное начало» — пример');
+    else if (btn.closest('.chat-side-foot')) footAct(btn);
     else if (btn.matches('.chat-side > .btn')) blank();
   });
   root.querySelectorAll('.composer .pills').forEach((g) => wireSegmented(g, 'aria-checked'));
@@ -420,4 +433,134 @@ export function wireRateDialog(dlg, toast) {
   const [mark, full] = [...dlg.querySelectorAll('.modal-actions .btn')].slice(-2);
   mark?.addEventListener('click', () => toast?.('', 'Отмечено как прочитанное'));
   full?.addEventListener('click', () => toast?.('', 'Пример: открылась бы карточка отзыва'));
+}
+
+/** анкета витрины: клик по шагу показывает его панель (.wz-pane: 1–2 — книги, 3–5 — как слушаете, 6–7 — что ещё) и меняет подпись
+    главной кнопки («Далее →» / «К итогу →»); чипы — делегированием (radiogroup → aria-checked одному, group → aria-pressed,
+    .scale.small — оценка одним кликом, повтор снимает); поле .suggest подсказывает из «библиотеки» (≤ 8, задержка 90 мс):
+    ↑↓ — выбор, Enter — выбранное или «любая книга», Alt+Enter — «автор целиком» (строка поднимается первой, когда запрос похож
+    на имя автора), Esc — спрятать; добавленное — карточкой .entry первым, крестик убирает. Это ввод на уровне того, как думает
+    человек: «нравится автор», а не только «книга из базы». */
+export function wireWizardDemo(form, toast) {
+  const $ = (s) => form.querySelector(s);
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const steps = [...form.querySelectorAll('.steps .step')], next = $('.form-actions .btn.primary');
+  const paneOf = (i) => (i < 2 ? 'books' : i < 5 ? 'listen' : 'more');
+  const showStep = (s) => {
+    const i = steps.indexOf(s);
+    steps.forEach((o) => { o.classList.toggle('on', o === s); if (o === s) o.setAttribute('aria-current', 'step'); else o.removeAttribute('aria-current'); });
+    form.querySelectorAll('.wz-pane').forEach((p) => { p.hidden = p.dataset.pane !== paneOf(i); });
+    if (next) next.textContent = i >= 5 ? 'К итогу →' : 'Далее →';
+  };
+  steps.forEach((s) => s.addEventListener('click', () => showStep(s)));
+  showStep(steps.find((s) => s.classList.contains('on')) || steps[0]);
+  const entries = $('.entries'), note = $('.entries-note');
+  const count = () => { if (!note) return; const n = entries.children.length;
+    note.innerHTML = n ? `Добавлено: <b>${n}</b>` + (n < 3 ? ' · хорошо бы ещё пару' : '') : 'Пока пусто. Название и Enter — книга; имя и Alt+Enter — автор целиком.'; };
+  form.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.matches('.choice')) { const g = b.closest('.choices');
+      if (g?.getAttribute('role') === 'radiogroup') g.querySelectorAll('.choice').forEach((o) => o.setAttribute('aria-checked', String(o === b)));
+      else b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); }
+    else if (b.closest('.scale')) { const was = b.getAttribute('aria-pressed') === 'true'; b.closest('.scale').querySelectorAll('button').forEach((o) => o.setAttribute('aria-pressed', String(o === b && !was))); }
+    else if (b.matches('.entry .x')) { const en = b.closest('.entry'); const title = en.dataset.key || ''; (reduced ? Promise.resolve() : Promise.race([exit(en, { dy: 0, scale: 0.97 }), new Promise((r) => setTimeout(r, 320))])).then(() => { en.remove(); count(); toast?.('', `Убрано: ${title}`); }); }   // уход не дольше 320 мс
+  });
+  // подсказки из «библиотеки» — для витрины список короткий; в приложении — запрос к серверу с той же механикой
+  const LIB = [['Кобо Абэ', 'Женщина в песках', '5 ч · прослушано · 9'], ['Кобо Абэ', 'Чужое лицо', '6,2 ч · в очереди'], ['Кобо Абэ', 'Сожжённая карта', '7 ч'],
+    ['Станислав Лем', 'Солярис', '8,9 ч · в очереди'], ['Станислав Лем', 'Непобедимый', '6,5 ч'], ['Стругацкие', 'Пикник на обочине', '7,2 ч · прослушано · 9'],
+    ['Франц Кафка', 'Превращение', '2 ч 10 мин'], ['Франц Кафка', 'Процесс', '9 ч'], ['Умберто Эко', 'Имя розы', '21 ч'], ['Филип Дик', 'Убик', '7,5 ч · прослушано · 8'],
+    ['Джордж Оруэлл', '1984', '11,3 ч · брошено · 6'], ['Эли Визель', 'Ночь', '3 ч 40 мин']].map(([a, t, m]) => ({ a, t, m }));
+  const WHY_BOOK = ['сюжет', 'герои', 'атмосфера', 'язык', 'идеи', 'чтец', 'финал'], WHY_AUTHOR = ['атмосфера', 'герои', 'язык', 'идеи', 'сюжет', 'юмор', 'мрачность'];
+  const sg = $('.suggest'); if (!sg || !entries) { count(); return { showStep }; }
+  const inp = sg.querySelector('input'), hints = sg.querySelector('.hints');
+  const norm = (s) => s.toLowerCase().replace(/ё/g, 'е').trim();
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const hl = (text, q) => { const i = norm(text).indexOf(norm(q)); return i < 0 ? esc(text) : esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + q.length)) + '</mark>' + esc(text.slice(i + q.length)); };
+  const scale = (v) => `<div class="scale small" role="group" aria-label="Оценка">${[...Array(10)].map((_, i) => `<button type="button" aria-pressed="${i + 1 === v}">${i + 1}</button>`).join('')}</div>`;
+  const chips = (list, on, label) => `<div class="choices" role="group" aria-label="${label}">${list.map((c) => `<button class="choice" type="button" aria-pressed="${on.includes(c)}">${c}</button>`).join('')}</div>`;
+  const card = ({ author, title, meta, kind }) => {
+    const x = `<button class="x" type="button" aria-label="Убрать"><svg><use href="${ICON}#i-x"/></svg></button>`;
+    const head = kind === 'author' ? `<div class="entry-fields one"><input class="in" aria-label="Автор" value="${esc(title)}"></div><span class="tag accent">автор целиком</span>${x}`
+      : kind === 'lib' ? `<div class="entry-title">${esc(author ? author + ' — «' + title + '»' : title)}<small>${esc(meta || 'в вашей библиотеке')}</small></div><span class="tag">в библиотеке</span>${x}`
+      : `<div class="entry-fields"><input class="in" aria-label="Автор" placeholder="Автор" value="${esc(author)}"><input class="in" aria-label="Название" placeholder="Название" value="${esc(title)}"></div><span class="tag out">вне библиотеки</span>${x}`;
+    return `<div class="entry" data-key="${esc(kind === 'author' ? title : (author ? author + ' — ' : '') + title)}"><div class="entry-head">${head}</div>
+      <p class="entry-lbl">${kind === 'author' ? 'Чем нравится автор' : 'Чем понравилась'}</p>${chips(kind === 'author' ? WHY_AUTHOR : WHY_BOOK, [], kind === 'author' ? 'Чем нравится автор' : 'Чем понравилась')}
+      <div class="entry-row">${scale(0)}<input class="in" aria-label="Комментарий" placeholder="Одной строкой: что запомнилось (необязательно)"></div></div>`;
+  };
+  let H = [], rows = [], act = 0, q = '', timer = 0;
+  const has = (key) => [...entries.querySelectorAll('.entry')].some((e) => norm(e.dataset.key || '') === norm(key));
+  const add = (it) => {
+    const key = it.kind === 'author' ? it.title : (it.author ? it.author + ' — ' : '') + it.title;
+    if (has(key)) { toast?.('warn', 'Уже в списке'); return; }
+    entries.insertAdjacentHTML('afterbegin', card(it)); if (!reduced) enter(entries.firstElementChild, { dy: 8 });
+    inp.value = ''; q = ''; H = []; hints.hidden = true; count(); inp.focus();
+  };
+  const free = () => { const m = q.split(/\s+[—–-]\s+/); add(m.length > 1 ? { author: m[0].trim(), title: m.slice(1).join(' — ').trim() } : { author: '', title: q }); };
+  const addAuthor = () => add({ author: '', title: q, kind: 'author' });
+  const paint = () => {
+    if (!q) { hints.hidden = true; return; }
+    const hits = H.map((it) => ({ html: `<span>${hl((it.a ? it.a + ' — ' : '') + it.t, q)}</span><span class="tag">в библиотеке</span><small>${esc(it.m)}</small>`, pick: () => add({ author: it.a, title: it.t, meta: it.m, kind: 'lib' }) }));
+    const book = { html: `<span>+ Добавить «${esc(q)}» — любая книга</span><span class="tag out">Enter</span><small>формат «Автор — Название»; можно и без автора</small>`, pick: free, add: true };
+    const author = { html: `<span>+ Добавить автора «${esc(q)}» целиком</span><span class="tag out">Alt+Enter</span><small>если нравится автор в целом — опишите чем</small>`, pick: addAuthor, add: true };
+    // запрос похож на имя автора (две и больше его книги в подсказках) — «автор целиком» первым
+    const authorLike = H.filter((it) => norm(it.a).includes(norm(q))).length >= 2;
+    rows = authorLike ? [author, ...hits, book] : [...hits, book, author];
+    act = Math.min(act, rows.length - 1);
+    hints.innerHTML = rows.map((r, i) => `<div class="hint${r.add ? ' add' : ''}" role="option" aria-selected="${i === act}" data-i="${i}">${r.html}</div>`).join('');
+    hints.hidden = false; hints.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest' });
+  };
+  inp.addEventListener('input', () => { clearTimeout(timer); q = inp.value.trim(); if (!q) { H = []; hints.hidden = true; return; }
+    timer = setTimeout(() => { H = LIB.filter((x) => norm(x.a + ' ' + x.t).includes(norm(q))).slice(0, 8); act = 0; paint(); }, 90); });
+  inp.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' && rows.length) { e.preventDefault(); act = (act + 1) % rows.length; paint(); }
+    else if (e.key === 'ArrowUp' && rows.length) { e.preventDefault(); act = (act - 1 + rows.length) % rows.length; paint(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (!q) return; if (e.altKey) addAuthor(); else (rows[act] || { pick: free }).pick(); }
+    else if (e.key === 'Escape' && !hints.hidden) { e.stopPropagation(); hints.hidden = true; }
+  });
+  inp.addEventListener('blur', () => setTimeout(() => { hints.hidden = true; }, 150));
+  inp.addEventListener('focus', () => { if (q) paint(); });
+  hints.addEventListener('mousedown', (e) => { const h = e.target.closest('.hint'); if (!h) return; e.preventDefault(); rows[+h.dataset.i]?.pick(); });
+  count();
+  return { showStep, add };
+}
+
+/** мастер первого запуска витрины: действие шага → шаг сделан («✓», «готово»), раскалённым становится следующий несделанный;
+    «Позже» → отложен («позже»); счётчик несделанных — <small> у пункта рейки; «Закрыть, настрою потом» → обычный экран с
+    уведомлением и кнопкой «открыть»; reset() — как при первом запуске. root — рамка .demo-app с рейкой и экранами;
+    rail — её .rail-nav (переключение экранов — wireRail из site.js, show(id) — его обработчик). */
+export function wireSetupDemo(root, toast) {
+  const $ = (s) => root.querySelector(s);
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const list = $('.setup'), seed = list.innerHTML, rail = $('.rail-nav'), views = [...root.querySelectorAll('.view')];
+  const railBtn = (id) => rail.querySelector(`[data-view="${id}"]`);
+  const DONE = { 'Проверить связь': ['Проверить связь', 'ИИ отвечает · 1,4 с', 'Проверяю…'], 'Сохранить': ['Изменить', 'Папка сохранена', ''],
+    'Скачать готовый каталог': ['Обновить каталог', 'Каталог: 50 112 записей · 48 350 книг', '↓ качается…'], 'Заполнить анкету': ['Открыть анкету', 'Пример: открылась бы анкета', ''],
+    'Включить синхронизацию': ['Синхронизировать сейчас', 'Синхронизация включена: приватный репозиторий создан', 'Создаю репозиторий…'] };
+  const plural = (n, a, b, c) => `${n} ${n % 10 === 1 && n % 100 !== 11 ? a : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? b : c}`;
+  const sync = () => {
+    const steps = [...list.querySelectorAll('.setup-step')], left = steps.filter((s) => !s.classList.contains('done') && !s.classList.contains('later'));
+    const badge = railBtn('vs-setup')?.querySelector('small'); if (badge) badge.textContent = left.length ? String(left.length) : '';
+    steps.forEach((s) => s.querySelector('.act .btn')?.classList.toggle('primary', s === left[0]));
+    const n = $('.notice'); if (n) { n.hidden = !left.length; const b = n.querySelector('b'); if (b) b.textContent = plural(left.length, 'шаг', 'шага', 'шагов'); }
+  };
+  const wirePills = () => list.querySelectorAll('.pills').forEach((g) => wireSegmented(g, 'aria-checked', (it) => toast?.('', `ИИ: ${it.textContent.trim()} — для всех функций приложения`)));
+  list.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b || b.closest('.pills') || b.disabled) return;
+    const step = b.closest('.setup-step'), st = step.querySelector('.st'), n = step.querySelector('.n'), label = b.textContent.trim();
+    if (b.matches('.text-btn') && /^Позже/.test(label)) { step.classList.add('later'); st.textContent = 'позже'; b.remove(); toast?.('', 'Отложено — шаг остаётся в «Настройке»'); sync(); return; }
+    if (b.matches('.text-btn')) { toast?.('', 'Пример: ' + label); return; }
+    const [after, msg, busy] = DONE[label] || [label, 'Готово', ''];
+    b.disabled = true; if (busy) b.textContent = busy;
+    setTimeout(() => {
+      b.disabled = false; b.textContent = after; step.classList.add('done'); step.classList.remove('later'); n.textContent = '✓'; st.textContent = 'готово';
+      if (/Скачать/.test(label)) { const m = step.querySelector('.item-meta'); if (m) m.textContent = '50 112 записей · 48 350 книг'; }
+      toast?.('ok', msg); sync();
+    }, reduced || !busy ? 0 : 900);
+  });
+  const show = (id) => views.forEach((v) => { const on = v.id === id; if (on && v.hidden) { v.hidden = false; if (!reduced) enter(v, { dy: 10, scale: 1, blur: 0, response: 0.5, damping: 0.85 }); } else if (!on) v.hidden = true; });
+  $('.setup-foot .btn')?.addEventListener('click', () => { railBtn('vs-home')?.click(); toast?.('', 'Мастер закрыт — откроется из рейки «Настройка»'); });
+  root.querySelectorAll('.notice [data-view]').forEach((b) => b.addEventListener('click', () => railBtn(b.dataset.view)?.click()));
+  const reset = () => { list.innerHTML = seed; wirePills(); sync(); railBtn('vs-setup')?.click(); toast?.('', 'Первый запуск: ИИ не проверен, анкета пуста — мастер открылся сам'); };
+  wirePills(); sync();
+  return { show, reset, sync };
 }

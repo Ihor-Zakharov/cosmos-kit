@@ -84,7 +84,7 @@
     // порядок и группы — как в src/blocks/INDEX.md
     const GROUPS = [
       ['site', 'Сайт', ['topbar', 'hero', 'features', 'steps', 'text', 'stats', 'pricing', 'faq', 'cta', 'contact', 'footer']],
-      ['app', 'Приложение', ['app-shell', 'list', 'table', 'form', 'wizard', 'wizard-text', 'tabs', 'empty', 'dialog-confirm', 'dialog-rate', 'dialog-report', 'chat', 'advice']],
+      ['app', 'Приложение', ['app-shell', 'list', 'table', 'form', 'wizard', 'wizard-text', 'setup', 'tabs', 'empty', 'dialog-confirm', 'dialog-rate', 'dialog-report', 'chat', 'advice']],
     ];
     const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const box = document.getElementById('blocks'), toc = document.getElementById('toc');
@@ -101,7 +101,7 @@
           .replace(/data-open="#confirm-delete"/g, `data-open="#confirm-delete-${name}"`)
           .replace(/id="report"/g, `id="report-${name}"`).replace(/data-open="#report"/g, `data-open="#report-${name}"`)
           .replace(/id="rate"/g, `id="rate-${name}"`).replace(/data-open="#rate"/g, `data-open="#rate-${name}"`);
-        const kind = name === 'app-shell' ? 'app-like' : name === 'chat' ? 'chat-like' : /^(list|table|form|wizard|wizard-text|tabs|empty|dialog-confirm|dialog-rate|dialog-report|advice)$/.test(name) ? 'plain' : '';
+        const kind = name === 'app-shell' ? 'app-like' : name === 'chat' ? 'chat-like' : /^(list|table|form|wizard|wizard-text|setup|tabs|empty|dialog-confirm|dialog-rate|dialog-report|advice)$/.test(name) ? 'plain' : '';
         const s = document.createElement('section'); s.className = 'blk'; s.id = 'b-' + name;
         s.innerHTML = `<div class="blk-head"><p class="kicker">${gname.toLowerCase()} · ${name}.html</p><h2>${esc(name)}</h2><p>${esc(rest.join('·').trim() || title.trim())}</p></div>
           <div class="blk-stage ${kind}">${live}</div>

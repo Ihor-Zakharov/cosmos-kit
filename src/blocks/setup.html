@@ -1,0 +1,48 @@
+<!-- БЛОК setup · мастер первого запуска: шаги карточками сверху вниз, не экран за экраном.
+     Правила: шагов ≤ 7; у каждого номер («✓» — сделан), заголовок, состояние «готово / не сделано / позже», пояснение в 1–3 строки
+     и ОДНО действие в ряду .act (первое несделанное — .btn.primary, остальные — .btn; у необязательного шага — ещё «Позже» как .text-btn;
+     второстепенная альтернатива — тоже .text-btn). Необязательное помечено словом в заголовке; приложение работает и без него.
+     Под заголовком экрана — подсказка «любой шаг можно пройти позже». Открывается сам при первом запуске, пока не сделаны обязательные
+     шаги и мастер не закрыт; «Закрыть, настрою потом» — подвал .setup-foot; число несделанных — <small> у пункта рейки.
+     Экран приложения: внутри .view после .view-head. -->
+<header class="view-head"><div><h1>ЗАМЕНИТЬ Пять шагов — и всё готово</h1><p>Любой шаг можно пройти позже: ЗАМЕНИТЬ что работает и без них.</p></div></header>
+<div class="setup">
+  <div class="setup-step done">
+    <div class="n">✓</div>
+    <h2>ЗАМЕНИТЬ шаг с выбором</h2>
+    <p class="st">готово</p>
+    <p class="tx">ЗАМЕНИТЬ пояснение: что это даёт и где это можно поменять потом.</p>
+    <div class="act">
+      <div class="pills small" role="radiogroup" aria-label="ЗАМЕНИТЬ выбор" data-segmented>
+        <button type="button" role="radio" aria-checked="true">ЗАМЕНИТЬ</button>
+        <button type="button" role="radio" aria-checked="false" disabled title="ЗАМЕНИТЬ почему недоступно">ЗАМЕНИТЬ</button>
+        <span class="pill-ink" aria-hidden="true"></span>
+      </div>
+      <button class="btn" type="button">ЗАМЕНИТЬ Проверить</button>
+    </div>
+  </div>
+  <div class="setup-step">
+    <div class="n">2</div>
+    <h2>ЗАМЕНИТЬ шаг с полем</h2>
+    <p class="st">не сделано</p>
+    <p class="tx">ЗАМЕНИТЬ пояснение.</p>
+    <div class="act"><input class="in" aria-label="ЗАМЕНИТЬ что вводить" value="ЗАМЕНИТЬ"><button class="btn primary" type="button">Сохранить</button></div>
+  </div>
+  <div class="setup-step">
+    <div class="n">3</div>
+    <h2>ЗАМЕНИТЬ шаг с процессом</h2>
+    <p class="st">не сделано</p>
+    <p class="tx">ЗАМЕНИТЬ пояснение: сколько займёт и что быстрее.</p>
+    <div class="act"><span class="item-meta">ЗАМЕНИТЬ 0 записей</span><button class="btn" type="button">ЗАМЕНИТЬ Скачать готовое</button><button class="text-btn" type="button">ЗАМЕНИТЬ медленный путь · 2,5 ч в фоне</button></div>
+  </div>
+  <div class="setup-step">
+    <div class="n">4</div>
+    <h2>ЗАМЕНИТЬ необязательный шаг (необязательно)</h2>
+    <p class="st">не сделано</p>
+    <p class="tx">ЗАМЕНИТЬ пояснение: что даёт и что нужно.</p>
+    <div class="act"><button class="btn" type="button">ЗАМЕНИТЬ Включить</button><button class="text-btn" type="button">Позже</button></div>
+  </div>
+</div>
+<div class="setup-foot"><button class="btn" type="button">Закрыть, настрою потом</button></div>
+<!-- JS: действие шага → .setup-step.done, .n «✓», .st «готово», .primary переходит к следующему несделанному; «Позже» → .later, .st «позже»;
+     счётчик несделанных — в <small> пункта рейки; «Закрыть, настрою потом» — показать обычный экран, мастер остаётся в рейке -->

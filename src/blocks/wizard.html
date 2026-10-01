@@ -1,7 +1,11 @@
 <!-- БЛОК wizard · мастер/анкета по шагам.
      Правила: ≤ 7 шагов, у каждого номер и короткая подпись; одна тема на шаг; вопросы — открытыми группами .group (не раскрытиями);
      варианты — все сразу (.choices: до 24 на широком экране, до 16 на узком); внизу — только «Далее» (.btn.primary) и «Назад» (.btn);
-     автосохранение с видимым статусом. Над мастером — .ways «две дороги»: по шагам или своими словами (вторая — блок wizard-text). -->
+     автосохранение с видимым статусом. Над мастером — .ways «две дороги»: по шагам или своими словами (вторая — блок wizard-text).
+     Ввод — на уровне того, как думает человек, не только сущностей базы: поле .suggest подсказывает из базы (≤ 8), а строки .hint.add
+     принимают своё — «любая книга» по Enter и «автор целиком» по Alt+Enter (строка поднимается первой, когда запрос похож на имя автора);
+     добавленное — карточками .entry (метка .tag: «в библиотеке», «вне библиотеки», «автор целиком»; у автора подпись «Чем нравится автор»).
+     Выбор одного из вариантов — .choices[role=radiogroup] с data-value; вариант по умолчанию назван в подсказке <small> у подписи. -->
 <div class="ways">
   <div class="pills" role="radiogroup" aria-label="Как заполнить" data-segmented>
     <button type="button" role="radio" aria-checked="true">По шагам</button>
@@ -16,6 +20,59 @@
     <button class="step" type="button"><span class="n">3</span><span class="l">ЗАМЕНИТЬ</span></button>
   </nav>
   <div class="group">
+    <h3>ЗАМЕНИТЬ Любимые книги</h3>
+    <div class="suggest">
+      <svg><use href="kit/icons/sprite.svg#i-search"/></svg>
+      <input class="in" aria-label="ЗАМЕНИТЬ книга или автор" placeholder="ЗАМЕНИТЬ название или автор" autocomplete="off">
+      <div class="hints" role="listbox" aria-label="Подсказки" hidden>
+        <div class="hint" role="option" aria-selected="true"><span>ЗАМЕНИТЬ Автор — <mark>Назв</mark>ание</span><span class="tag">в библиотеке</span><small>ЗАМЕНИТЬ мета</small></div>
+        <div class="hint add" role="option" aria-selected="false"><span>+ Добавить «ЗАМЕНИТЬ запрос» — любая книга</span><span class="tag out">Enter</span><small>формат «Автор — Название»; можно и без автора</small></div>
+        <div class="hint add" role="option" aria-selected="false"><span>+ Добавить автора «ЗАМЕНИТЬ запрос» целиком</span><span class="tag out">Alt+Enter</span><small>если нравится автор в целом — опишите чем</small></div>
+      </div>
+    </div>
+    <p class="entries-note">Добавлено: <b>2</b> · ЗАМЕНИТЬ подсказка, когда мало</p>
+    <div class="entries">
+      <div class="entry">
+        <div class="entry-head">
+          <div class="entry-fields one"><input class="in" aria-label="Автор" value="ЗАМЕНИТЬ автор"></div>
+          <span class="tag accent">автор целиком</span>
+          <button class="x" type="button" aria-label="Убрать"><svg><use href="kit/icons/sprite.svg#i-x"/></svg></button>
+        </div>
+        <p class="entry-lbl">Чем нравится автор</p>
+        <div class="choices" role="group" aria-label="Чем нравится автор">
+          <button class="choice" type="button" aria-pressed="true">ЗАМЕНИТЬ</button>
+          <button class="choice" type="button" aria-pressed="false">ЗАМЕНИТЬ</button>
+        </div>
+        <div class="entry-row">
+          <div class="scale small" role="group" aria-label="Оценка"><button type="button" aria-pressed="false">1</button><button type="button" aria-pressed="false">2</button><button type="button" aria-pressed="false">3</button><button type="button" aria-pressed="false">4</button><button type="button" aria-pressed="false">5</button><button type="button" aria-pressed="false">6</button><button type="button" aria-pressed="false">7</button><button type="button" aria-pressed="true">8</button><button type="button" aria-pressed="false">9</button><button type="button" aria-pressed="false">10</button></div>
+          <input class="in" aria-label="Комментарий" placeholder="Одной строкой: что запомнилось (необязательно)">
+        </div>
+      </div>
+      <div class="entry">
+        <div class="entry-head">
+          <div class="entry-title">ЗАМЕНИТЬ Автор — «Название»<small>ЗАМЕНИТЬ мета · в вашей библиотеке</small></div>
+          <span class="tag">в библиотеке</span>
+          <button class="x" type="button" aria-label="Убрать"><svg><use href="kit/icons/sprite.svg#i-x"/></svg></button>
+        </div>
+        <p class="entry-lbl">Чем понравилась</p>
+        <div class="choices" role="group" aria-label="Чем понравилась">
+          <button class="choice" type="button" aria-pressed="false">ЗАМЕНИТЬ</button>
+          <button class="choice" type="button" aria-pressed="true">ЗАМЕНИТЬ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="group">
+    <h3>ЗАМЕНИТЬ вопрос с умолчанием</h3>
+    <div class="lbl">ЗАМЕНИТЬ Главный язык <small>по умолчанию — ЗАМЕНИТЬ оба на равных</small>
+      <div class="choices" role="radiogroup" aria-label="ЗАМЕНИТЬ Главный язык">
+        <button class="choice" type="button" role="radio" aria-checked="true" data-value="both">ЗАМЕНИТЬ подпись значения</button>
+        <button class="choice" type="button" role="radio" aria-checked="false" data-value="ru">ЗАМЕНИТЬ</button>
+        <button class="choice" type="button" role="radio" aria-checked="false" data-value="uk">ЗАМЕНИТЬ</button>
+      </div>
+    </div>
+  </div>
+  <div class="group">
     <h3>ЗАМЕНИТЬ вопрос группы</h3>
     <div class="choices" role="group" aria-label="ЗАМЕНИТЬ">
       <button class="choice" type="button" aria-pressed="false">ЗАМЕНИТЬ</button>
@@ -25,3 +82,6 @@
   </div>
   <div class="form-actions"><button class="btn primary" type="button">Далее</button><button class="btn" type="button">Назад</button><span class="item-meta">✓ сохранено</span></div>
 </div>
+<!-- JS: .choice в role=group — переключать aria-pressed; в role=radiogroup — aria-checked одному, значение — data-value;
+     .suggest: подсказки по вводу (задержка 60–120 мс), ↑↓ — .sel, Enter — выбранная или «любая книга», Alt+Enter — «автор целиком»,
+     Esc — спрятать; выбранное — карточкой .entry первым в .entries; .x — убрать -->

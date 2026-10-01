@@ -747,7 +747,7 @@ select.in option { background: var(--s-raised); color: var(--ink); }
 textarea.in { height: auto; min-height: 130px; padding: 10px 12px; resize: vertical; line-height: 1.55; font-size: 14.5px; }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 16px 14px; }
 .form-grid label, .lbl { display: flex; flex-direction: column; gap: 7px; font: 500 14px/1.35 var(--font-text); color: var(--ink); }
-.form-grid label.wide { grid-column: 1 / -1; }
+.form-grid label.wide, .form-grid .lbl.wide { grid-column: 1 / -1; }
 .form-grid label small, .lbl small { font: 400 13px/1.4 var(--font-text); color: var(--ink-3); }
 .form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-top: 18px; border-top: 1px solid var(--line-1); }
 
@@ -976,3 +976,80 @@ table.data .strong { color: var(--ink); }
 .ways { display: flex; justify-content: center; margin-bottom: 18px; }
 .field.area .field-body { align-items: stretch; padding: 12px 14px; }
 .field.area textarea { min-height: 220px; padding: 2px 0; font-size: 16px; line-height: 1.55; resize: vertical; }
+
+/* ============================================================
+   Первый запуск и ввод «как думает человек» (01.10, вынесено из abook; DESIGN-TODO п. 23; UX.md §16)
+     · .setup — мастер первого запуска: вертикальный список карточек-шагов .setup-step: номер или «✓» (.n), заголовок (h2 под h1 экрана),
+       состояние .st («готово / не сделано / позже»), пояснение .tx и ряд .act с ОДНИМ действием (у необязательного шага —
+       ещё «Позже» как .text-btn); .done — сделан, .later — отложен. Подвал .setup-foot — «Закрыть, настрою потом».
+       Шагов ≤ 7, каждый откладываемый, приложение работает без необязательных; открывается сам при первом запуске,
+       пока не сделаны обязательные шаги и мастер не закрыт; число несделанных — <small> у пункта рейки.
+     · .suggest — поле .in с подсказками: список .hints (строки .hint: текст с <mark>, метка .tag, мета <small>;
+       .sel / aria-selected — выбранная с клавиатуры; .hint.add — «+ Добавить …» для своего ввода, в том числе
+       «автора целиком» по Alt+Enter — ввод на уровне того, как думает человек, а не только сущностей базы). Подсказок ≤ 8.
+     · .entries / .entry — карточки добавленного (книга из библиотеки, книга вне её, автор целиком): шапка .entry-head
+       (название .entry-title с <small> или поля .entry-fields, метка .tag, крестик .x), подпись .entry-lbl («Чем нравится
+       автор»), чипы .choices, ряд .entry-row (оценка .scale.small и комментарий). .entries-note — счётчик и подсказка.
+     · .tag.out — контурная тихая метка («вне библиотеки», клавиша подсказки «Enter»).
+     · подпись «по умолчанию — …» у выбора — <small> в .lbl: вариант по умолчанию назван словами, не угадывается.
+     · .chat-side-foot — подвал списка разговоров: «Память: N фактов · Obsidian ↗» — зеркало данных во внешний инструмент
+       (щелчок — выгрузка, двойной — забрать оттуда новое), иконка i-external из спрайта.
+   ============================================================ */
+
+.setup { display: flex; flex-direction: column; gap: 12px; width: min(880px, 100%); margin-inline: auto; }
+.setup-step { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 6px 16px; align-items: start; padding: 18px 20px; background: var(--plate); border: 1px solid var(--line-1); border-radius: var(--r-xl);
+  transition: border-color var(--t-base); }
+.setup-step.done { border-color: var(--line-2); }
+.setup-step .n { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font: 600 15px/1 var(--font-display); color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line-2); font-variant-numeric: tabular-nums; }
+.setup-step.done .n { color: var(--ink); background: var(--s3); box-shadow: none; }
+.setup-step.later .n { color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line-1); }
+.setup-step h2, .setup-step h3 { margin: 4px 0 2px; font: 600 17px/1.3 var(--font-text); letter-spacing: 0; color: var(--ink); }
+.setup-step .st { grid-column: 3; grid-row: 1; margin: 0; font: 500 12px/36px var(--font-mono); color: var(--ink-3); white-space: nowrap; }
+.setup-step.done .st { color: var(--ink); }
+.setup-step .tx { grid-column: 2; margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+.setup-step .act { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 6px; }
+.setup-step .act .in { width: auto; flex: 1 1 340px; max-width: 520px; }
+.setup-step .act .item-meta { margin-top: 0; }
+.setup-foot { display: flex; justify-content: center; gap: 10px; margin-top: 4px; }
+@media (max-width: 760px) { .setup-step { grid-template-columns: 28px minmax(0, 1fr); padding: 14px 14px; } .setup-step .n { width: 28px; height: 28px; font-size: 13px; }
+  .setup-step .st { grid-column: 2; grid-row: auto; line-height: 1.4; } .setup-step .act .in { max-width: none; } }
+
+.suggest { position: relative; }
+.suggest > svg { position: absolute; left: 12px; top: 20px; translate: 0 -50%; width: 16px; height: 16px; color: var(--ink-3); pointer-events: none; }
+.suggest > svg ~ .in { padding-left: 36px; }
+.hints { position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 20; max-height: 360px; overflow: auto; scrollbar-width: thin; background: var(--s-raised); border: 1px solid var(--line-2); border-radius: var(--r-l); box-shadow: var(--shadow); font-size: 14px; }
+.hints[hidden] { display: none; }
+.hint { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--line-1); color: var(--ink); transition: background-color var(--t-fast); }
+.hint:last-child { border-bottom: 0; }
+@media (hover: hover) { .hint:hover { background: var(--surface); } }
+.hint.sel, .hint[aria-selected="true"] { background: var(--s3); }
+.hint small { grid-column: 1 / -1; font: 500 11.5px/1.4 var(--font-mono); color: var(--ink-3); }
+.hint mark { background: none; color: var(--ink); font-weight: 600; box-shadow: inset 0 -1px 0 var(--line-3); }
+.hint.add { color: var(--ink-2); }
+.hint .tag { grid-row: 1; grid-column: 2; }
+
+.entries { display: flex; flex-direction: column; gap: 10px; }
+.entries-note { margin: 0; min-height: 20px; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
+.entries-note b { color: var(--ink); font: 500 13px/1 var(--font-mono); }
+.entry { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; background: var(--s1); border: 1px solid var(--line-1); border-radius: var(--r-l); }
+.entry-head { display: flex; align-items: flex-start; gap: 10px; }
+.entry-title { flex: 1; min-width: 0; font-weight: 500; font-size: 15px; line-height: 1.35; color: var(--ink); }
+.entry-title small { display: block; margin-top: 3px; font: 500 11.5px/1.4 var(--font-mono); color: var(--ink-3); }
+.entry-fields { flex: 1; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 6px; }
+.entry-fields.one { grid-template-columns: minmax(0, 1fr); }
+.entry-fields .in { height: 36px; font-size: 14px; }
+.entry-head .tag { align-self: center; }
+.entry .x { flex: none; width: 32px; height: 32px; margin: -6px -8px -6px 0; border-radius: var(--r-s); display: grid; place-items: center; color: var(--ink-3); transition: color var(--t-fast), background-color var(--t-fast); }
+.entry .x:hover { color: var(--ink); background: var(--s3); }
+.entry .x svg { width: 14px; height: 14px; }
+.entry-lbl { font-size: 13.5px; color: var(--ink-2); }
+.entry-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.entry-row .in { flex: 1; min-width: 200px; height: 34px; font-size: 13.5px; }
+.scale.small { display: inline-grid; grid-template-columns: repeat(10, 30px); gap: 3px; }
+.scale.small button { height: 30px; border-radius: var(--r-s); font-size: 13px; }
+.tag.out { background: transparent; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--ink-3); }
+
+.chat-head .pills { flex: none; }
+.chat-side-foot button, .chat-side-foot a { display: inline-flex; align-items: center; gap: 4px; }
+.chat-side-foot svg { width: 12px; height: 12px; }
+.chat-side-foot button:disabled { opacity: .5; cursor: progress; }

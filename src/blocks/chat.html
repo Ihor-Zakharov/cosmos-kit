@@ -5,7 +5,10 @@
      одно .btn.primary — «Отправить» (во время ответа та же кнопка становится «Остановить», обычной);
      поиск по разговорам .chat-search — показать (убрать hidden), когда разговоров больше шести; карандаш у заголовка — переименовать;
      .chat-down — кнопка «вниз», класс .show — когда лента отмотана от конца. Внутри .app-main.chat-screen — .view без полей;
-     рейка приложения на экране чата сворачивается до иконок: .app.chatmode. -->
+     рейка приложения на экране чата сворачивается до иконок: .app.chatmode.
+     В шапке — переключатель провайдера ИИ (.pills.small): действует на всё приложение, недоступный вариант — disabled с подсказкой
+     title «CLI не найден». Подвал списка .chat-side-foot — «Память: N фактов · Obsidian ↗»: зеркало данных во внешний инструмент
+     (щелчок — выгрузка, двойной щелчок — забрать оттуда новое; подсказка в title). -->
 <div class="chat">
   <aside class="chat-side">
     <button class="btn small" type="button">+ Новый чат</button>
@@ -20,13 +23,18 @@
       <div class="chat-group">Вчера</div>
       <div class="chat-row"><button type="button">ЗАМЕНИТЬ тема разговора<small>10:22 · 2 вопроса · инкогнито</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="kit/icons/sprite.svg#i-x"/></svg></button></div>
     </div>
-    <div class="chat-side-foot"><button type="button">Память: 2 факта</button></div>
+    <div class="chat-side-foot"><button type="button" title="ЗАМЕНИТЬ что консультант помнит и где это правится">Память: 2 факта</button> · <button type="button" title="ЗАМЕНИТЬ что выгружается и куда; двойной щелчок — забрать оттуда новое">Obsidian<svg><use href="kit/icons/sprite.svg#i-external"/></svg></button></div>
   </aside>
   <div class="chat-main">
     <header class="chat-head">
       <h2>ЗАМЕНИТЬ тема разговора</h2>
       <button class="icon-btn small" type="button" aria-label="Переименовать разговор"><svg><use href="kit/icons/sprite.svg#i-pencil"/></svg></button>
       <p class="sub">помнит ваш вкус</p><span class="spacer"></span>
+      <div class="pills small" role="radiogroup" aria-label="Провайдер ИИ — для всего приложения" data-segmented>
+        <button type="button" role="radio" aria-checked="true" title="ЗАМЕНИТЬ какие модели · для всех функций ИИ">ЗАМЕНИТЬ провайдер</button>
+        <button type="button" role="radio" aria-checked="false" disabled title="CLI не найден">ЗАМЕНИТЬ провайдер</button>
+        <span class="pill-ink" aria-hidden="true"></span>
+      </div>
       <label class="switch"><input type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">инкогнито</span></label>
     </header>
     <div class="chat-scroll" aria-live="polite">
