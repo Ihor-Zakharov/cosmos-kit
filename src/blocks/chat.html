@@ -1,11 +1,18 @@
-<!-- БЛОК chat · чат с консультантом, как в браузерном Claude: отдельный экран во всю высоту.
+<!-- БЛОК chat · чат с консультантом: отдельный экран во всю высоту.
      Правила: слева разговоры группами по датам, справа колонка сообщений ≤ 880px и поле ввода последним рядом (ничего не плавает);
      вопрос — пузырь справа, ответ — без пузыря, Markdown в .md; действия сообщения видны при наведении; поток — .caret;
      пустой чат — .chat-main.blank с полем по центру и подсказками; инкогнито — .chat-main.incognito (поле пунктиром);
-     одно .btn.primary — «Отправить» (во время ответа та же кнопка становится «Остановить», обычной). Внутри .app-main — .view без полей. -->
+     одно .btn.primary — «Отправить» (во время ответа та же кнопка становится «Остановить», обычной);
+     поиск по разговорам .chat-search — показать (убрать hidden), когда разговоров больше шести; карандаш у заголовка — переименовать;
+     .chat-down — кнопка «вниз», класс .show — когда лента отмотана от конца. Внутри .app-main.chat-screen — .view без полей;
+     рейка приложения на экране чата сворачивается до иконок: .app.chatmode. -->
 <div class="chat">
   <aside class="chat-side">
     <button class="btn small" type="button">+ Новый чат</button>
+    <div class="chat-search" hidden>
+      <svg><use href="kit/icons/sprite.svg#i-search"/></svg>
+      <input class="in sm" type="search" placeholder="Поиск по разговорам" aria-label="Поиск по разговорам">
+    </div>
     <div class="chat-list">
       <div class="chat-group">Сегодня</div>
       <div class="chat-row on"><button type="button">ЗАМЕНИТЬ тема разговора<small>19:42 · 1 вопрос</small></button><button class="x" type="button" aria-label="Удалить разговор"><svg><use href="kit/icons/sprite.svg#i-x"/></svg></button></div>
@@ -17,7 +24,9 @@
   </aside>
   <div class="chat-main">
     <header class="chat-head">
-      <h2>ЗАМЕНИТЬ тема разговора</h2><p class="sub">помнит ваш вкус</p><span class="spacer"></span>
+      <h2>ЗАМЕНИТЬ тема разговора</h2>
+      <button class="icon-btn small" type="button" aria-label="Переименовать разговор"><svg><use href="kit/icons/sprite.svg#i-pencil"/></svg></button>
+      <p class="sub">помнит ваш вкус</p><span class="spacer"></span>
       <label class="switch"><input type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span class="switch-text">инкогнито</span></label>
     </header>
     <div class="chat-scroll" aria-live="polite">
@@ -38,6 +47,7 @@
         </div>
       </div>
     </div>
+    <button class="chat-down" type="button" aria-label="К последнему сообщению"><svg><use href="kit/icons/sprite.svg#i-arrow-down"/></svg></button>
     <div class="composer">
       <div class="composer-box">
         <textarea rows="1" maxlength="2000" aria-label="Сообщение" placeholder="ЗАМЕНИТЬ пример вопроса"></textarea>

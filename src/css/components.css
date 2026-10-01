@@ -739,6 +739,8 @@ dialog .icon-btn[data-close]:hover { background: var(--s3); border-color: var(--
 @media (hover: hover) { .in:hover { border-color: var(--line-3); } }
 .in:focus, .in:focus-visible { border-color: color-mix(in oklab, var(--el-a) 60%, transparent); box-shadow: var(--focus-ring); outline: none; }
 .in.sm { height: 34px; font-size: 13.5px; }
+/* селект в ряду фильтров — по ширине содержимого: .in растянут на 100 % колонки, и три слова в 400px выглядят пусто (UX.md §4) */
+.in.auto { width: auto; }
 select.in { padding-right: 32px; appearance: none; cursor: pointer;
   background: var(--s1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b4b5bd' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 9px center / 16px; }
 select.in option { background: var(--s-raised); color: var(--ink); }
@@ -791,7 +793,7 @@ table.data .strong { color: var(--ink); }
 
 /* ============================================================
    Чат и советы (01.10, вынесено из abook — экран «Чат» проверен пользователем; DESIGN-TODO п. 19)
-   Чат — как в браузерном Claude, отдельным экраном во всю высоту (внутри .app-main — .view без полей):
+   Чат — отдельным экраном во всю высоту (внутри .app-main — .view без полей):
      · .chat — сетка: слева .chat-side (кнопка «новый», .chat-list — разговоры группами по датам .chat-group, строка
        .chat-row с подписью <small> и крестиком .x, подвал .chat-side-foot), справа .chat-main;
      · .chat-main — колонка: .chat-head (заголовок, .sub, распорка, переключатель), .chat-scroll (прокручивается только он)
@@ -814,8 +816,30 @@ table.data .strong { color: var(--ink); }
    ============================================================ */
 
 .chat { display: grid; grid-template-columns: 268px minmax(0, 1fr); height: 100dvh; min-height: 520px; }
+/* чат как экран приложения: .app-main без полей, .view на всю ширину; .app.chatmode — рейка свёрнута до иконок (64px),
+   чтобы колонке разговоров и сообщениям досталась ширина (abook, 01.10) */
+.app-main.chat-screen { padding: 0; }
+.app-main.chat-screen > .view { max-width: none; gap: 0; }
+.app.chatmode { grid-template-columns: 64px minmax(0, 1fr); }
+.app.chatmode .rail { padding-left: 10px; padding-right: 10px; }
+.app.chatmode .rail .brand span, .app.chatmode .rail-nav .l, .app.chatmode .rail-nav small, .app.chatmode .rail-kicker, .app.chatmode .rail-foot { display: none; }
+.app.chatmode .rail-nav > a, .app.chatmode .rail-nav > button { justify-content: center; padding: 0; }
 .chat-side { display: flex; flex-direction: column; gap: 8px; min-height: 0; padding: 18px 12px 14px; border-right: 1px solid var(--line-1); }
 .chat-side > .btn { justify-content: center; }
+/* поиск по разговорам — показывать, когда разговоров больше шести (UX.md §13) */
+.chat-search { position: relative; }
+.chat-search .in { padding-left: 32px; }
+.chat-search > svg { position: absolute; left: 10px; top: 50%; translate: 0 -50%; width: 15px; height: 15px; color: var(--ink-3); pointer-events: none; }
+.chat-row.hide, .chat-group.hide { display: none; }
+/* кнопка «вниз»: появляется, когда лента отмотана вверх от конца; стоит над полем, не перекрывает фокус */
+.chat-main { position: relative; }
+.chat-down { position: absolute; left: 50%; bottom: 112px; translate: -50% 0; z-index: 2; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--s-raised); border: 1px solid var(--line-2); box-shadow: var(--shadow-sm); color: var(--ink-2); opacity: 0; pointer-events: none; transition: opacity var(--t-fast), color var(--t-fast); }
+.chat-down.show { opacity: 1; pointer-events: auto; }
+.chat-down:hover { color: var(--ink); }
+.chat-down svg { width: 16px; height: 16px; }
+/* переименование разговора: заголовок становится полем .in.sm на той же строке, Enter — сохранить, Esc — отмена */
+.chat-head .in.sm { flex: 1; min-width: 0; max-width: 520px; }
 .chat-list { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 2px; margin: 4px -4px 0; padding: 0 4px; scrollbar-width: thin; }
 .chat-group { padding: 12px 10px 4px; font: 500 11.5px/1.4 var(--font-mono); color: var(--ink-3); }
 .chat-row { display: flex; align-items: center; gap: 4px; border-radius: var(--r-m); color: var(--ink-2); transition: background-color var(--t-fast), color var(--t-fast); }
@@ -854,9 +878,13 @@ table.data .strong { color: var(--ink); }
 .msg.user { align-self: flex-end; max-width: 85%; }
 .bubble { padding: 10px 16px; border-radius: var(--r-l); background: var(--s3); border: 1px solid var(--line-1); color: var(--ink); font-size: 15.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
 .bubble small { display: block; margin-top: 4px; font: 500 11.5px/1.4 var(--font-mono); color: var(--ink-3); text-align: right; white-space: normal; }
+/* правка сообщения: пузырь становится полем (своё кольцо снято — фокус показывает рамка пузыря :focus-within),
+   под ним ряд «Отмена · Отправить снова»; ответы ниже уходят, новый ответ пишется заново */
 .bubble.edit { padding: 6px; width: min(640px, 100%); }
+.bubble.edit:focus-within { border-color: var(--line-3); }
 .bubble.edit textarea { width: 100%; min-height: 64px; padding: 6px 8px; background: transparent; border: 0; outline: none; resize: vertical; color: var(--ink); font: inherit; }
-.bubble.edit .btn-row { justify-content: flex-end; }
+.bubble.edit textarea:focus-visible { outline: none; box-shadow: none; }
+.bubble.edit .btn-row { justify-content: flex-end; padding: 4px 2px 2px; }
 .md { font-size: 16px; line-height: 1.75; color: var(--ink-2); }
 .md p { margin: 0 0 12px; }
 .md > :last-child { margin-bottom: 0; }

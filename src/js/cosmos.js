@@ -785,12 +785,12 @@ export function createCosmos(canvas, opts = {}) {
     },
     pause() { api._paused = true; },
     resume() { if (!api._paused) return; api._paused = false; api._last = 0; api.wake(); },
-    wake() { if (!api._raf && api.ok && !api._paused) api._raf = requestAnimationFrame(api._frame); },
+    wake() { if (!api._raf && api.ok && !api._paused && !document.hidden) api._raf = requestAnimationFrame(api._frame); },   // свёрнутая вкладка — rAF стоит (батарея, нагрев)
     // один кадр и на паузе: холст сменил размер (буфер очищен), пришла текстура, сменились токены
     _redraw() { if (!api._raf && api.ok) api._raf = requestAnimationFrame(api._frame); },
     resize() {},
     readTokens() { return false; },
-    destroy() { cancelAnimationFrame(api._raf); api._raf = 0; api.ok = false; },
+    destroy() { cancelAnimationFrame(api._raf); api._raf = 0; api.ok = false; document.removeEventListener('visibilitychange', onVisible); },
     _pt: [0, 0], _ptS: [0, 0], _scroll: 0, _paused: false, _raf: 0, _last: 0,
     _t: POSTER_T, _age: 0, _expo: reduced ? 1 : 0, _expoRing: reduced ? 1 : 0, _far: 0,
     _odd: false, _slow: 0, _lite: false,
@@ -1015,9 +1015,12 @@ export function createCosmos(canvas, opts = {}) {
     api._odd = !api._odd;
     if (busy || api._odd || reduced || api._paused) draw();
     if (reduced) { api._last = 0; return; }                          // перерисовка — только по событию
-    if (!api._paused) api._raf = requestAnimationFrame(api._frame);
+    if (!api._paused && !document.hidden) api._raf = requestAnimationFrame(api._frame);
     else api._last = 0;
   };
+  // вкладка свёрнута — цикл останавливается сам (см. выше); вернулась — продолжаем с нового отсчёта времени, без скачка
+  const onVisible = () => { if (!document.hidden) { api._last = 0; api.wake(); } };
+  document.addEventListener('visibilitychange', onVisible);
   measure();
   api.readTokens();
   api.wake();

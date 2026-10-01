@@ -49,6 +49,8 @@ RULES = {
     "H8": "голова секции слева (.section-head.left) — только рядом с сайдбаром; по умолчанию по центру",
     "H10": "страница — либо сайт (.topbar + .hero/.section), либо приложение (.app + .rail): не оба каркаса сразу",
     "H9": "ряд кнопок героя (.hero-actions) — только в .hero; в секции под центрированной головой — .btn-row.row-center",
+    "H11": "класс .empty занят китом (пустое состояние: .empty-mark, <p>, <small>, кнопка) — для «скрыть/пусто» нужен свой класс или [hidden]",
+    "H12": "select.in вне формы (ряд фильтров) — по ширине содержимого: select.in.auto, иначе растянется на всю колонку",
     # доступность
     "A1": "у <img> есть alt, у кнопки/ссылки без текста — aria-label, у поля — подпись или aria-label",
     # стили (свои *.css и <style>)
@@ -59,15 +61,20 @@ RULES = {
     "S5": "не переопределять компоненты кита (.btn { … }) — собрать из токенов свой класс",
     "S6": "без !important и без inline style (кроме CSS-переменных вида style=\"--p:.6\")",
     "S7": "текст не мельче 13px, основной — 14–16px (мелкий моно — только числа и коды, классами кита)",
+    "S9": "outline: none в своих стилях — только вместе с другим признаком фокуса (:focus-within у контейнера, как .composer-box)",
     "S8": "колонки грида — minmax(0, 1fr), а не голый 1fr (иначе поле растянет колонку и будет горизонтальная прокрутка)",
     # скрипты
     "J1": "без alert()/confirm()/prompt() — диалог кита (openDialog) и тосты (pushToast / site.toast)",
     "J2": "диалоги открывать openDialog()/closeDialog() или data-open/data-close, не showModal()/close() напрямую",
     "J3": "без сторонних библиотек с CDN (jQuery, React, анимационные) — механика есть в ките",
+    # тексты интерфейса (site-research G-landing-anatomy-copy)
+    "T1": "без клише генеративного копирайтинга в кнопках, заголовках, лиде (seamless, robust, unleash, «бесшовный», «революционный», «мощный»…) — число, факт, результат",
+    "T2": "заголовок h1/h2 — утверждение, не риторический вопрос («Какой результат?»); вопрос уместен только в диалоге и FAQ",
+    "T3": "без ложного контраста «Не X, а Y» в заголовках и лиде — сказать, что есть",
     # кит
     "K1": "файлы kit/ не правятся (обновление затрёт); всё своё — site.css/site.js",
 }
-WARN_ONLY = {"H7", "H8", "S5", "S7", "S8", "P6"}     # P6 — ошибка в полном прогоне, предупреждение по одному файлу
+WARN_ONLY = {"H7", "H8", "H11", "H12", "S5", "S7", "S8", "S9", "T1", "T2", "T3", "P6"}     # P6 — ошибка в полном прогоне, предупреждение по одному файлу
 
 CSS_COLOR = re.compile(r"#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|oklch|oklab|lab|lch|hwb)\(", re.I)
 NAMED_COLORS = re.compile(r"(?<![\w-])(?:white|black|red|green|blue|yellow|orange|purple|pink|gray|grey|silver|gold|"
@@ -77,6 +84,9 @@ COLOR_PROPS = re.compile(r"^(?:color|background(?:-color)?|border(?:-[a-z]+)*|ou
                          r"fill|stroke|caret-color|accent-color|text-decoration(?:-color)?|column-rule(?:-color)?|filter)$")
 PLACEHOLDERS = [("ЗАМЕНИТЬ", "пометка ЗАМЕНИТЬ"), ("Название сайта", "«Название сайта»"), ("lorem ipsum", "lorem ipsum"),
                 ("example.com", "example.com"), ("кикер · 2–4 слова", "кикер-заглушка"), ("Заголовок секции", "«Заголовок секции»")]
+CLICHE = re.compile(r"\b(?:unleash|unlock|elevate|supercharge|revolutioni[sz]e|seamless(?:ly)?|robust|game-?changer|empower|cutting-edge|next-gen(?:eration)?|"
+                    r"world-class|state-of-the-art)\b|бесшовн|революционн|инновационн|передов(?:ой|ая|ое|ые)|уникальн|мощн(?:ый|ая|ое|ые|ейш)|"
+                    r"нового поколения|лучш(?:ий|ая|ее|ие) в (?:своём|своей|мире)|раскро(?:й|йте) (?:потенциал|возможности)|прокача(?:й|йте)", re.I)
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
 
 
@@ -165,6 +175,7 @@ def check_css(text, path, out, kit_classes, known_tokens, base_line=0):
     for m in re.finditer(r"@import\s+url\(\s*['\"]?https?:|fonts\.googleapis", raw):
         out.add(path, base_line + raw[:m.start()].count("\n") + 1, "P5", "внешний импорт", "шрифты и стили — только из kit/")
     s5 = set()
+    has_focus_within = ":focus-within" in raw
     for ln, sel, prop, val in css_decls(text):
         L = base_line + ln
         v = re.sub(r"url\([^)]*\)", "", val)
@@ -180,6 +191,8 @@ def check_css(text, path, out, kit_classes, known_tokens, base_line=0):
         if prop in ("transition", "transition-duration", "animation", "animation-duration") and \
                 re.search(r"(?<![\w-])\d*\.?\d+m?s\b", re.sub(r"var\([^)]*\)", "", v)) and not re.fullmatch(r"(none|0s?)", v):
             out.add(path, L, "S3", f"{prop}: {val[:50]}", "var(--t-fast) цвет/рамка · var(--t-base) раскрытие · var(--t-slow) · var(--t-scene)")
+        if prop == "outline" and re.fullmatch(r"(none|0)", v) and not has_focus_within:
+            out.add(path, L, "S9", f"{sel.split(' ⟩ ')[-1][:40]} {{ outline: {v} }}", "фокус должен быть виден: контейнер { … } + контейнер:focus-within { border-color: var(--line-3) }")
         if "!important" in v and "prefers-reduced-motion" not in sel:
             out.add(path, L, "S6", f"!important в {prop}", "поднять специфичность своим классом")
         for t in re.findall(r"var\(\s*(--[\w-]+)", v):
@@ -395,6 +408,25 @@ def check_html(text, path, out, root, kit_classes, site_classes, known_tokens, i
             out.add(path, L, "A1", f"<{t}> без подписи", "<label>Подпись <input …></label> или aria-label")
         if t in ("input", "textarea") and a.get("type") in ("checkbox", "radio") and not within(e, lambda tt, cc: tt == "label") and not a.get("aria-label"):
             out.add(path, L, "A1", "флажок без подписи", "обернуть в <label class=\"switch\">…</label>")
+        # T1–T3: тексты интерфейса — клише, риторические вопросы, ложный контраст (warn)
+        tx = e["text"].strip()
+        if tx and (t in ("h1", "h2", "h3", "button") or {"lead", "kicker", "card-title", "btn", "display"} & c) and not within(e, lambda tt, cc: "prose" in cc):
+            m = CLICHE.search(tx)
+            if m:
+                out.add(path, L, "T1", f"клише «{m.group(0)}» в <{t}> «{tx[:32]}»", "конкретика: число, факт, что получит человек")
+        if tx and t in ("h1", "h2") and not within(e, lambda tt, cc: tt == "dialog" or "faq" in cc):
+            if tx.endswith("?"):
+                out.add(path, L, "T2", f"риторический вопрос «{tx[:40]}»", "заголовок — утверждение: «Сайт за вечер»")
+            if re.match(r"^Не\s.+?,\s*а\s", tx):
+                out.add(path, L, "T3", f"«Не X, а Y»: «{tx[:40]}»", "сказать, что есть, без ложного контраста")
+        # H11: .empty — пустое состояние кита, а не «скрыть»
+        if "empty" in c and t not in ("p", "small", "span"):
+            kids = [x for x in els if x["line"] >= L and any(("empty" in cc) for _, cc in x["anc"]) and x is not e]
+            if not any(x["tag"] in ("p", "small") or "empty-mark" in x["cls"] for x in kids[:8]):
+                out.add(path, L, "H11", "<%s class=\"empty\"> без текста пустого состояния" % t, "это блок empty (глиф, <p>, <small>, кнопка); чтобы спрятать — [hidden], свой класс — с префиксом js- или в site.css")
+        # H12: селект в ряду фильтров — по содержимому
+        if t == "select" and "in" in c and "auto" not in c and not within(e, lambda tt, cc: tt == "label" or {"form-grid", "lbl", "form-actions", "modal-box"} & cc):
+            out.add(path, L, "H12", "select.in вне формы растянется на всю колонку", "<select class=\"in auto\"> — по ширине содержимого (UX.md §4)")
         # S6: inline style
         st = a.get("style", "")
         if st:
